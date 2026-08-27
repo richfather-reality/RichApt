@@ -1700,12 +1700,21 @@ function isIOS(){
 function isMobile(){
   return /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
 }
+/* 카카오톡/네이버/인스타그램/페이스북/라인 등 인앱 브라우저는
+   "홈 화면에 추가" 기능 자체가 없어서 별도 안내가 필요함 */
+function isInAppBrowser(){
+  const ua = navigator.userAgent || '';
+  return /kakaotalk|naver|instagram|fban|fbav|line\//i.test(ua);
+}
 
 function renderInstallBanner(){
   const el = document.getElementById('installBanner');
   if(!el) return;
   if(isStandaloneMode()){ el.innerHTML = ''; return; }
-  if(deferredInstallPrompt){
+  if(isInAppBrowser()){
+    // 인앱 브라우저는 애초에 설치가 불가능 — 외부 브라우저로 열도록 안내
+    el.innerHTML = `<button class="install-banner" onclick="showInstallGuide('inapp')">📲 앱 설치하기 — 바탕화면에 바로 추가</button>`;
+  } else if(deferredInstallPrompt){
     // 크롬 등 네이티브 설치 프롬프트 지원 브라우저 — 탭하면 바로 설치창
     el.innerHTML = `<button class="install-banner" onclick="triggerInstall()">📲 앱 설치하기 — 바탕화면에 바로 추가</button>`;
   } else if(isIOS()){
@@ -1739,17 +1748,30 @@ async function triggerInstall(){
 function showInstallGuide(kind){
   const el = document.getElementById('iosInstallModal');
   el.style.display = 'block';
-  const steps = kind === 'ios' ? `
+  let title = '📲 홈 화면에 앱 추가하기';
+  let steps;
+  if(kind === 'inapp'){
+    title = '⚠️ 이 브라우저에서는 설치가 안 돼요';
+    steps = `
+        <li>카카오톡 등 앱 안에 열린 브라우저는 "홈 화면에 추가" 기능이 없습니다</li>
+        <li>우측 상단 <b>메뉴(⋮ 또는 ···)</b> 버튼을 탭하세요</li>
+        <li><b>"다른 브라우저로 열기"</b>를 선택해 크롬(또는 삼성인터넷)으로 여세요</li>
+        <li>그 브라우저에서 다시 <b>"앱 설치하기"</b> 버튼을 눌러주세요</li>`;
+  } else if(kind === 'ios'){
+    steps = `
         <li>하단(또는 상단)의 <b>공유</b> 버튼을 탭하세요</li>
         <li>메뉴에서 <b>"홈 화면에 추가"</b>를 선택하세요</li>
-        <li><b>"추가"</b>를 누르면 바탕화면에 앱처럼 설치됩니다</li>` : `
+        <li><b>"추가"</b>를 누르면 바탕화면에 앱처럼 설치됩니다</li>`;
+  } else {
+    steps = `
         <li>우측 상단 <b>메뉴(⋮)</b> 버튼을 탭하세요</li>
         <li><b>"홈 화면에 추가"</b> 또는 <b>"앱 설치"</b>를 선택하세요</li>
         <li>확인을 누르면 바탕화면에 앱처럼 설치됩니다</li>`;
+  }
   el.innerHTML = `
     <div class="install-modal-overlay" onclick="if(event.target===this) closeIOSInstallGuide()">
       <div class="install-modal">
-        <h3>📲 홈 화면에 앱 추가하기</h3>
+        <h3>${title}</h3>
         <ol>${steps}</ol>
         <button class="close-btn" onclick="closeIOSInstallGuide()">확인했습니다</button>
       </div>
