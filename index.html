@@ -1315,7 +1315,7 @@ function submitInquiry(){
       dealType: '매매',
       message: (s.message||'').trim(),
       propertyRef: propertyRef,
-      budgetEok: isSell ? null : parseFloat(s.price),
+      budgetEok: parseFloat(s.price),
       askingPriceEok: isSell ? parseFloat(s.price) : null,
       source: '리치아파트 대시보드',
       website: websiteEl ? websiteEl.value : ''
