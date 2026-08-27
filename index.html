@@ -333,17 +333,23 @@
     .ticker-wrap,.gu-nav,.dong-nav,#typeToggle,.feature-tabs,
     .contact-banner,#installBanner,#iosInstallModal,.print-fab,
     .footer,.share-btn,.dong-chip,.close-btn,
-    .inquiry-form,.summary-cta,.char-wrap{display:none !important;}
+    .inquiry-form,.summary-cta{display:none !important;}
     .print-only{display:block !important;}
-    header{padding:0 0 12px !important;border:none !important;}
+    header{padding:0 0 12px !important;border:none !important;display:flex !important;justify-content:space-between !important;align-items:center !important;}
     header .brand-mark{background:var(--teal) !important;color:#fff !important;}
     header h1{color:#111 !important;}
     header .sub{color:#555 !important;}
+    .char-wrap{display:flex !important;}
+    .char-caption{color:#555 !important;}
     #printHeader{
       padding:0 0 14px;margin-bottom:14px;border-bottom:2px solid #12615a;
       font-size:12px;color:#444;
     }
     #printHeader .title{font-size:19px;font-weight:800;color:#111;margin-bottom:4px;}
+    #printFooter{
+      display:block !important;margin-top:20px;padding-top:14px;border-top:2px solid #12615a;
+      text-align:center;font-size:13px;font-weight:700;color:#111;
+    }
     main{padding:0 !important;}
     .panel{
       background:#fff !important;border:1px solid #ccc !important;
@@ -404,6 +410,7 @@
 <div class="feature-tabs" id="featureTabs"></div>
 
 <main id="mainContent"></main>
+<div id="printFooter" class="print-only">📞 리치부동산 · 010-4897-8240</div>
 
 <div class="footer">
   <div><span class="brand-small">리치부동산연구소</span> · 리치아파트 통합 시세 플랫폼 (내부 검토용 · 미공개)</div>
@@ -412,7 +419,7 @@
 
 <script>
 /* ───────── 국토부 실거래 데이터 (2025-08-25~2026-08-24, 경기도 기흥구/영통구) ───────── */
-const REAL = {"기흥구": {"totalCount": 8260, "recent30Count": 163, "avgPrice": 6.18, "changePct": -9.24, "maxdate": "2026-08-24", "dong": {"신갈동": {"count": 1000, "avgPrice": 5.93, "recent": [{"name": "갈현마을현대홈타운", "area": 60.0, "floor": 12, "date": "2026-08-17", "dateShort": "08/17", "price": 6.48}, {"name": "용인기흥 우방아이유쉘", "area": 60.0, "floor": 18, "date": "2026-08-15", "dateShort": "08/15", "price": 4.65}, {"name": "갈현마을현대홈타운", "area": 60.0, "floor": 1, "date": "2026-08-15", "dateShort": "08/15", "price": 5.95}, {"name": "양현마을신안", "area": 60.0, "floor": 7, "date": "2026-08-14", "dateShort": "08/14", "price": 6.58}, {"name": "도현마을현대", "area": 134.7, "floor": 10, "date": "2026-08-13", "dateShort": "08/13", "price": 9.35}, {"name": "신흥덕롯데캐슬레이시티", "area": 60.0, "floor": 17, "date": "2026-08-12", "dateShort": "08/12", "price": 6.7}, {"name": "기흥파크뷰", "area": 84.9, "floor": 10, "date": "2026-08-10", "dateShort": "08/10", "price": 7.08}, {"name": "신흥덕롯데캐슬레이시티", "area": 60.0, "floor": 22, "date": "2026-08-08", "dateShort": "08/08", "price": 6.5}]}, "구갈동": {"count": 948, "avgPrice": 7.66, "recent": [{"name": "기흥역센트럴푸르지오", "area": 84.8, "floor": 10, "date": "2026-08-22", "dateShort": "08/22", "price": 10.35}, {"name": "강남마을자연앤(6단지)", "area": 118.2, "floor": 1, "date": "2026-08-20", "dateShort": "08/20", "price": 5.3}, {"name": "한성2", "area": 47.8, "floor": 1, "date": "2026-08-20", "dateShort": "08/20", "price": 5.7}, {"name": "기흥역센트럴푸르지오", "area": 85.0, "floor": 5, "date": "2026-08-14", "dateShort": "08/14", "price": 10.3}, {"name": "기흥역파크푸르지오", "area": 85.0, "floor": 32, "date": "2026-08-14", "dateShort": "08/14", "price": 9.5}, {"name": "기흥역지웰푸르지오", "area": 84.9, "floor": 18, "date": "2026-08-13", "dateShort": "08/13", "price": 9.9}, {"name": "한양수자인", "area": 88.8, "floor": 4, "date": "2026-08-12", "dateShort": "08/12", "price": 6.7}, {"name": "강남마을자연앤(4단지)", "area": 84.7, "floor": 10, "date": "2026-08-12", "dateShort": "08/12", "price": 5.33}]}, "중동": {"count": 809, "avgPrice": 5.53, "recent": [{"name": "신동백아이파크", "area": 102.0, "floor": 2, "date": "2026-08-18", "dateShort": "08/18", "price": 5.7}, {"name": "동백역월드메르디앙아파트", "area": 122.9, "floor": 15, "date": "2026-08-15", "dateShort": "08/15", "price": 5.5}, {"name": "신동백롯데캐슬에코2단지", "area": 99.5, "floor": 12, "date": "2026-08-15", "dateShort": "08/15", "price": 6.6}, {"name": "서희삼정", "area": 85.0, "floor": 1, "date": "2026-08-15", "dateShort": "08/15", "price": 3.55}, {"name": "어은목마을벽산블루밍아파트", "area": 84.5, "floor": 21, "date": "2026-08-12", "dateShort": "08/12", "price": 6.25}, {"name": "동백역월드메르디앙아파트", "area": 85.0, "floor": 17, "date": "2026-08-12", "dateShort": "08/12", "price": 4.7}, {"name": "신동백롯데캐슬에코1단지", "area": 106.2, "floor": 21, "date": "2026-08-12", "dateShort": "08/12", "price": 6.95}, {"name": "동백역한라비발디(어은목마을)", "area": 128.3, "floor": 14, "date": "2026-08-12", "dateShort": "08/12", "price": 6.05}]}, "마북동": {"count": 807, "avgPrice": 7.25, "recent": [{"name": "교동마을정광아파트", "area": 85.0, "floor": 10, "date": "2026-08-21", "dateShort": "08/21", "price": 4.5}, {"name": "용인마북신원아침도시", "area": 72.7, "floor": 14, "date": "2026-08-19", "dateShort": "08/19", "price": 5.1}, {"name": "블루밍구성더센트럴", "area": 84.8, "floor": 11, "date": "2026-08-14", "dateShort": "08/14", "price": 12.4}, {"name": "교동마을마북이편한세상", "area": 129.0, "floor": 3, "date": "2026-08-13", "dateShort": "08/13", "price": 6.35}, {"name": "구성우림필유", "area": 84.3, "floor": 13, "date": "2026-08-13", "dateShort": "08/13", "price": 7.4}, {"name": "교동마을동양파라곤", "area": 167.5, "floor": 1, "date": "2026-08-12", "dateShort": "08/12", "price": 6.95}, {"name": "교동마을현대필그린", "area": 134.5, "floor": 4, "date": "2026-08-11", "dateShort": "08/11", "price": 5.4}, {"name": "교동마을현대홈타운", "area": 85.0, "floor": 1, "date": "2026-08-11", "dateShort": "08/11", "price": 4.8}]}, "영덕동": {"count": 804, "avgPrice": 6.26, "recent": [{"name": "두진", "area": 59.7, "floor": 4, "date": "2026-08-22", "dateShort": "08/22", "price": 2.98}, {"name": "용인기흥효성해링턴플레이스", "area": 84.9, "floor": 21, "date": "2026-08-19", "dateShort": "08/19", "price": 6.77}, {"name": "청현마을기흥데시앙", "area": 85.0, "floor": 1, "date": "2026-08-18", "dateShort": "08/18", "price": 3.8}, {"name": "두진", "area": 85.0, "floor": 2, "date": "2026-08-15", "dateShort": "08/15", "price": 3.5}, {"name": "흥덕마을동원로얄듀크", "area": 84.7, "floor": 13, "date": "2026-08-13", "dateShort": "08/13", "price": 8.5}, {"name": "신동아파밀리에", "area": 115.1, "floor": 4, "date": "2026-08-11", "dateShort": "08/11", "price": 7.15}, {"name": "광교호수아델리움", "area": 84.8, "floor": 15, "date": "2026-08-11", "dateShort": "08/11", "price": 8.6}, {"name": "영덕신일1", "area": 126.9, "floor": 14, "date": "2026-08-08", "dateShort": "08/08", "price": 4.7}]}, "동백동": {"count": 687, "avgPrice": 5.25, "recent": [{"name": "호수마을동보노빌리티", "area": 84.9, "floor": 1, "date": "2026-08-24", "dateShort": "08/24", "price": 5.5}, {"name": "호수마을상록롯데캐슬", "area": 84.9, "floor": 17, "date": "2026-08-20", "dateShort": "08/20", "price": 5.9}, {"name": "호수마을상록롯데캐슬", "area": 84.9, "floor": 7, "date": "2026-08-20", "dateShort": "08/20", "price": 5.9}, {"name": "호수마을자연앤데시앙", "area": 85.0, "floor": 7, "date": "2026-08-18", "dateShort": "08/18", "price": 4.89}, {"name": "용인동백두산위브더제니스", "area": 84.9, "floor": 10, "date": "2026-08-18", "dateShort": "08/18", "price": 8.0}, {"name": "호수마을자연앤데시앙", "area": 85.0, "floor": 19, "date": "2026-08-15", "dateShort": "08/15", "price": 5.0}, {"name": "모아미래도2단지아파트", "area": 59.7, "floor": 5, "date": "2026-08-14", "dateShort": "08/14", "price": 4.39}, {"name": "호수마을어울림", "area": 84.8, "floor": 1, "date": "2026-08-13", "dateShort": "08/13", "price": 4.65}]}, "보정동": {"count": 653, "avgPrice": 9.55, "recent": [{"name": "연원마을삼성명가타운", "area": 124.9, "floor": 7, "date": "2026-08-18", "dateShort": "08/18", "price": 9.75}, {"name": "행원마을동아솔레시티", "area": 84.5, "floor": 3, "date": "2026-08-13", "dateShort": "08/13", "price": 9.15}, {"name": "죽전자이2차", "area": 84.9, "floor": 8, "date": "2026-08-13", "dateShort": "08/13", "price": 7.2}, {"name": "용인보정꿈에그린", "area": 101.7, "floor": 7, "date": "2026-08-10", "dateShort": "08/10", "price": 10.35}, {"name": "죽현마을아이파크", "area": 84.8, "floor": 22, "date": "2026-08-10", "dateShort": "08/10", "price": 11.75}, {"name": "상떼빌구성역플랫폼시티", "area": 84.9, "floor": 7, "date": "2026-08-10", "dateShort": "08/10", "price": 8.8}, {"name": "성호샤인힐즈아파트", "area": 85.0, "floor": 7, "date": "2026-08-08", "dateShort": "08/08", "price": 11.8}, {"name": "죽전누리에뜰", "area": 77.5, "floor": 15, "date": "2026-07-21", "dateShort": "07/21", "price": 5.9}]}, "언남동": {"count": 536, "avgPrice": 6.18, "recent": [{"name": "하마비마을동일하이빌1", "area": 144.0, "floor": 12, "date": "2026-08-20", "dateShort": "08/20", "price": 6.7}, {"name": "초원마을성원상떼빌2차", "area": 105.7, "floor": 10, "date": "2026-08-19", "dateShort": "08/19", "price": 6.95}, {"name": "초원마을성원상떼빌2차", "area": 129.7, "floor": 18, "date": "2026-08-19", "dateShort": "08/19", "price": 6.7}, {"name": "하마비마을동부센트레빌", "area": 125.7, "floor": 2, "date": "2026-08-14", "dateShort": "08/14", "price": 6.7}, {"name": "하마비마을동부", "area": 60.0, "floor": 13, "date": "2026-08-07", "dateShort": "08/07", "price": 5.5}, {"name": "하마비마을동일하이빌1", "area": 144.0, "floor": 14, "date": "2026-08-07", "dateShort": "08/07", "price": 6.82}, {"name": "장미마을삼성래미안2", "area": 85.0, "floor": 1, "date": "2026-07-27", "dateShort": "07/27", "price": 8.1}, {"name": "유원휴하임", "area": 57.9, "floor": 2, "date": "2026-07-19", "dateShort": "07/19", "price": 3.3}]}, "보라동": {"count": 405, "avgPrice": 4.49, "recent": [{"name": "용인보라효성해링턴플레이스", "area": 75.4, "floor": 10, "date": "2026-08-22", "dateShort": "08/22", "price": 6.0}, {"name": "삼성래미안", "area": 59.7, "floor": 10, "date": "2026-08-20", "dateShort": "08/20", "price": 3.3}, {"name": "한보라마을화성파크", "area": 123.5, "floor": 11, "date": "2026-08-19", "dateShort": "08/19", "price": 5.47}, {"name": "기흥삼정선비마을", "area": 84.9, "floor": 17, "date": "2026-08-19", "dateShort": "08/19", "price": 3.7}, {"name": "용인보라효성해링턴플레이스", "area": 75.4, "floor": 19, "date": "2026-08-17", "dateShort": "08/17", "price": 5.88}, {"name": "용인보라효성해링턴플레이스", "area": 74.9, "floor": 7, "date": "2026-08-16", "dateShort": "08/16", "price": 5.53}, {"name": "쌍용스윗닷홈1", "area": 139.9, "floor": 9, "date": "2026-08-13", "dateShort": "08/13", "price": 5.3}, {"name": "용인보라효성해링턴플레이스", "area": 84.8, "floor": 17, "date": "2026-08-12", "dateShort": "08/12", "price": 5.98}]}, "상하동": {"count": 404, "avgPrice": 3.98, "recent": [{"name": "갈천마을신일유토빌", "area": 122.6, "floor": 6, "date": "2026-08-22", "dateShort": "08/22", "price": 4.95}, {"name": "쌍용(3단지)", "area": 84.9, "floor": 9, "date": "2026-08-21", "dateShort": "08/21", "price": 3.55}, {"name": "강남마을한라비발디", "area": 85.0, "floor": 2, "date": "2026-08-19", "dateShort": "08/19", "price": 4.53}, {"name": "강남마을한라비발디", "area": 85.0, "floor": 11, "date": "2026-08-15", "dateShort": "08/15", "price": 4.8}, {"name": "갈천마을신일유토빌", "area": 122.6, "floor": 3, "date": "2026-08-11", "dateShort": "08/11", "price": 4.5}, {"name": "지석마을그대가크레던스", "area": 113.3, "floor": 5, "date": "2026-08-09", "dateShort": "08/09", "price": 5.9}, {"name": "쌍용(3단지)", "area": 84.9, "floor": 15, "date": "2026-08-04", "dateShort": "08/04", "price": 3.3}, {"name": "쌍용(3단지)", "area": 84.9, "floor": 4, "date": "2026-08-04", "dateShort": "08/04", "price": 3.85}]}, "서천동": {"count": 403, "avgPrice": 6.28, "recent": [{"name": "힐스테이트서천", "area": 85.0, "floor": 7, "date": "2026-08-21", "dateShort": "08/21", "price": 9.1}, {"name": "현대홈타운", "area": 116.0, "floor": 8, "date": "2026-08-12", "dateShort": "08/12", "price": 6.75}, {"name": "용인서천효성해링턴플레이스", "area": 75.0, "floor": 9, "date": "2026-08-10", "dateShort": "08/10", "price": 6.95}, {"name": "힐스테이트서천", "area": 84.9, "floor": 17, "date": "2026-08-10", "dateShort": "08/10", "price": 8.78}, {"name": "영통로효성해링턴플레이스1차", "area": 60.0, "floor": 6, "date": "2026-08-07", "dateShort": "08/07", "price": 7.05}, {"name": "용인서천효성해링턴플레이스", "area": 75.0, "floor": 10, "date": "2026-08-04", "dateShort": "08/04", "price": 6.85}, {"name": "현대홈타운", "area": 116.0, "floor": 18, "date": "2026-07-31", "dateShort": "07/31", "price": 6.2}, {"name": "영통로효성해링턴플레이스1차", "area": 60.0, "floor": 16, "date": "2026-07-31", "dateShort": "07/31", "price": 7.0}]}, "상갈동": {"count": 287, "avgPrice": 4.71, "recent": [{"name": "세대넥스빌", "area": 59.9, "floor": 3, "date": "2026-08-24", "dateShort": "08/24", "price": 2.4}, {"name": "금화마을5단지주공그린빌", "area": 59.6, "floor": 3, "date": "2026-08-21", "dateShort": "08/21", "price": 4.5}, {"name": "금화마을5단지주공그린빌", "area": 84.8, "floor": 13, "date": "2026-08-15", "dateShort": "08/15", "price": 5.3}, {"name": "금화마을주공3단지", "area": 60.0, "floor": 11, "date": "2026-08-13", "dateShort": "08/13", "price": 6.3}, {"name": "금화마을주공3단지", "area": 49.9, "floor": 11, "date": "2026-08-12", "dateShort": "08/12", "price": 4.7}, {"name": "금화마을4단지주공그린빌", "area": 84.4, "floor": 17, "date": "2026-08-07", "dateShort": "08/07", "price": 6.8}, {"name": "금화마을4단지주공그린빌", "area": 84.4, "floor": 3, "date": "2026-08-06", "dateShort": "08/06", "price": 6.45}, {"name": "금화마을4단지주공그린빌", "area": 84.4, "floor": 10, "date": "2026-07-04", "dateShort": "07/04", "price": 6.5}]}, "공세동": {"count": 209, "avgPrice": 4.31, "recent": [{"name": "호수청구", "area": 85.0, "floor": 5, "date": "2026-08-21", "dateShort": "08/21", "price": 3.15}, {"name": "한보라마을9단지경남아너스빌", "area": 60.0, "floor": 4, "date": "2026-08-14", "dateShort": "08/14", "price": 3.44}, {"name": "대주피오레2단지", "area": 122.8, "floor": 13, "date": "2026-08-14", "dateShort": "08/14", "price": 5.15}, {"name": "한보라마을9단지경남아너스빌", "area": 59.9, "floor": 6, "date": "2026-08-10", "dateShort": "08/10", "price": 3.45}, {"name": "한보라마을9단지경남아너스빌", "area": 59.8, "floor": 17, "date": "2026-08-09", "dateShort": "08/09", "price": 3.45}, {"name": "대주피오레2단지", "area": 180.9, "floor": 18, "date": "2026-08-08", "dateShort": "08/08", "price": 5.65}, {"name": "대주피오레1단지", "area": 97.3, "floor": 3, "date": "2026-08-08", "dateShort": "08/08", "price": 4.3}, {"name": "한보라마을9단지경남아너스빌", "area": 60.0, "floor": 17, "date": "2026-08-07", "dateShort": "08/07", "price": 3.7}]}, "청덕동": {"count": 153, "avgPrice": 4.34, "recent": [{"name": "휴먼시아물푸레마을3단지", "area": 84.8, "floor": 7, "date": "2026-08-13", "dateShort": "08/13", "price": 4.21}, {"name": "경남아너스빌", "area": 141.6, "floor": 5, "date": "2026-08-06", "dateShort": "08/06", "price": 5.4}, {"name": "휴먼시아물푸레마을3단지", "area": 84.8, "floor": 8, "date": "2026-08-01", "dateShort": "08/01", "price": 4.05}, {"name": "호반베르디움", "area": 111.5, "floor": 13, "date": "2026-07-30", "dateShort": "07/30", "price": 5.65}, {"name": "휴먼시아물푸레마을3단지", "area": 84.8, "floor": 2, "date": "2026-07-30", "dateShort": "07/30", "price": 4.22}, {"name": "물푸레마을휴먼시아7단지", "area": 84.7, "floor": 6, "date": "2026-07-04", "dateShort": "07/04", "price": 4.45}, {"name": "휴먼시아물푸레마을3단지", "area": 84.3, "floor": 2, "date": "2026-07-04", "dateShort": "07/04", "price": 2.5}, {"name": "호반베르디움", "area": 125.3, "floor": 9, "date": "2026-07-04", "dateShort": "07/04", "price": 5.5}]}, "하갈동": {"count": 57, "avgPrice": 3.94, "recent": [{"name": "청명호수신안인스빌2단지", "area": 85.0, "floor": 5, "date": "2026-08-22", "dateShort": "08/22", "price": 3.87}, {"name": "청명호수신안인스빌1단지", "area": 85.0, "floor": 10, "date": "2026-08-16", "dateShort": "08/16", "price": 4.27}, {"name": "청명호수신안인스빌1단지", "area": 122.8, "floor": 15, "date": "2026-07-04", "dateShort": "07/04", "price": 4.15}, {"name": "청명호수신안인스빌2단지", "area": 85.0, "floor": 12, "date": "2026-06-30", "dateShort": "06/30", "price": 3.9}, {"name": "청명호수신안인스빌1단지", "area": 85.0, "floor": 3, "date": "2026-06-30", "dateShort": "06/30", "price": 3.97}, {"name": "청명호수신안인스빌1단지", "area": 122.8, "floor": 1, "date": "2026-06-30", "dateShort": "06/30", "price": 4.05}, {"name": "청명호수신안인스빌1단지", "area": 85.0, "floor": 1, "date": "2026-06-28", "dateShort": "06/28", "price": 3.71}, {"name": "청명호수신안인스빌1단지", "area": 85.0, "floor": 9, "date": "2026-06-24", "dateShort": "06/24", "price": 3.75}]}, "지곡동": {"count": 50, "avgPrice": 3.32, "recent": [{"name": "써니밸리II", "area": 85.0, "floor": 4, "date": "2026-07-03", "dateShort": "07/03", "price": 3.0}, {"name": "써니밸리II", "area": 114.9, "floor": 2, "date": "2026-06-16", "dateShort": "06/16", "price": 3.48}, {"name": "써니밸리II", "area": 85.0, "floor": 1, "date": "2026-06-12", "dateShort": "06/12", "price": 3.28}, {"name": "써니밸리II", "area": 114.9, "floor": 9, "date": "2026-05-30", "dateShort": "05/30", "price": 3.75}, {"name": "써니밸리II", "area": 114.9, "floor": 11, "date": "2026-05-28", "dateShort": "05/28", "price": 3.6}, {"name": "써니밸리II", "area": 114.9, "floor": 9, "date": "2026-05-20", "dateShort": "05/20", "price": 3.3}, {"name": "써니밸리II", "area": 85.0, "floor": 19, "date": "2026-05-08", "dateShort": "05/08", "price": 3.9}, {"name": "써니밸리II", "area": 114.9, "floor": 9, "date": "2026-05-08", "dateShort": "05/08", "price": 3.5}]}, "고매동": {"count": 48, "avgPrice": 2.69, "recent": [{"name": "세원", "area": 84.2, "floor": 14, "date": "2026-08-08", "dateShort": "08/08", "price": 2.9}, {"name": "매화마을우남퍼스트빌", "area": 84.2, "floor": 7, "date": "2026-07-03", "dateShort": "07/03", "price": 2.85}, {"name": "시뉴어하우스", "area": 164.8, "floor": 3, "date": "2026-06-30", "dateShort": "06/30", "price": 4.8}, {"name": "동성", "area": 60.0, "floor": 6, "date": "2026-06-30", "dateShort": "06/30", "price": 2.1}, {"name": "기흥써니밸리", "area": 84.9, "floor": 6, "date": "2026-06-30", "dateShort": "06/30", "price": 2.51}, {"name": "매화마을우남퍼스트빌", "area": 84.2, "floor": 4, "date": "2026-06-23", "dateShort": "06/23", "price": 2.6}, {"name": "우림홀인원", "area": 84.8, "floor": 13, "date": "2026-06-13", "dateShort": "06/13", "price": 2.95}, {"name": "우림홀인원", "area": 84.8, "floor": 4, "date": "2026-06-10", "dateShort": "06/10", "price": 2.7}]}}}, "영통구": {"totalCount": 6698, "recent30Count": 309, "avgPrice": 7.55, "changePct": -3.47, "maxdate": "2026-08-24", "dong": {"영통동": {"count": 2454, "avgPrice": 5.38, "recent": [{"name": "벽적골주공휴먼시아8단지", "area": 60.0, "floor": 18, "date": "2026-08-24", "dateShort": "08/24", "price": 5.4}, {"name": "태영", "area": 84.9, "floor": 5, "date": "2026-08-24", "dateShort": "08/24", "price": 8.1}, {"name": "벽적골주공휴먼시아8단지", "area": 49.6, "floor": 18, "date": "2026-08-22", "dateShort": "08/22", "price": 3.9}, {"name": "신나무실미주", "area": 102.0, "floor": 19, "date": "2026-08-22", "dateShort": "08/22", "price": 8.6}, {"name": "풍림", "area": 84.8, "floor": 16, "date": "2026-08-21", "dateShort": "08/21", "price": 4.8}, {"name": "살구골마을진덕서광성지동아", "area": 164.8, "floor": 17, "date": "2026-08-21", "dateShort": "08/21", "price": 11.3}, {"name": "신나무실미주", "area": 102.0, "floor": 1, "date": "2026-08-20", "dateShort": "08/20", "price": 8.45}, {"name": "건영1차", "area": 85.0, "floor": 3, "date": "2026-08-19", "dateShort": "08/19", "price": 8.0}]}, "망포동": {"count": 1410, "avgPrice": 7.53, "recent": [{"name": "센트럴하이츠", "area": 137.0, "floor": 2, "date": "2026-08-24", "dateShort": "08/24", "price": 8.0}, {"name": "마젤란21(1101동)", "area": 84.6, "floor": 1, "date": "2026-08-20", "dateShort": "08/20", "price": 5.3}, {"name": "영통아이파크캐슬3단지", "area": 59.9, "floor": 11, "date": "2026-08-18", "dateShort": "08/18", "price": 9.05}, {"name": "망포벽산이빌리지", "area": 74.9, "floor": 2, "date": "2026-08-17", "dateShort": "08/17", "price": 4.1}, {"name": "늘푸른벽산", "area": 134.9, "floor": 10, "date": "2026-08-15", "dateShort": "08/15", "price": 5.8}, {"name": "영통자이", "area": 60.0, "floor": 10, "date": "2026-08-15", "dateShort": "08/15", "price": 6.95}, {"name": "힐스테이트영통", "area": 84.9, "floor": 16, "date": "2026-08-15", "dateShort": "08/15", "price": 14.4}, {"name": "영통아이파크캐슬1단지", "area": 84.7, "floor": 20, "date": "2026-08-14", "dateShort": "08/14", "price": 12.2}]}, "매탄동": {"count": 947, "avgPrice": 5.25, "recent": [{"name": "e-편한세상", "area": 101.7, "floor": 13, "date": "2026-08-21", "dateShort": "08/21", "price": 8.0}, {"name": "성일", "area": 49.7, "floor": 2, "date": "2026-08-21", "dateShort": "08/21", "price": 2.56}, {"name": "원천성일", "area": 49.9, "floor": 10, "date": "2026-08-19", "dateShort": "08/19", "price": 4.5}, {"name": "동남", "area": 49.7, "floor": 7, "date": "2026-08-18", "dateShort": "08/18", "price": 2.75}, {"name": "주공그린빌4", "area": 76.0, "floor": 7, "date": "2026-08-17", "dateShort": "08/17", "price": 5.25}, {"name": "매탄위브하늘채", "area": 60.0, "floor": 17, "date": "2026-08-17", "dateShort": "08/17", "price": 7.08}, {"name": "원천성일", "area": 49.9, "floor": 5, "date": "2026-08-16", "dateShort": "08/16", "price": 4.7}, {"name": "매탄위브하늘채", "area": 60.0, "floor": 24, "date": "2026-08-15", "dateShort": "08/15", "price": 6.8}]}, "이의동": {"count": 652, "avgPrice": 13.95, "recent": [{"name": "광교e편한세상", "area": 120.8, "floor": 18, "date": "2026-08-14", "dateShort": "08/14", "price": 21.5}, {"name": "광교에듀포레", "area": 84.9, "floor": 27, "date": "2026-08-12", "dateShort": "08/12", "price": 17.1}, {"name": "광교2차e편한세상", "area": 84.3, "floor": 1, "date": "2026-08-11", "dateShort": "08/11", "price": 10.0}, {"name": "자연앤힐스테이트", "area": 84.3, "floor": 9, "date": "2026-08-11", "dateShort": "08/11", "price": 20.5}, {"name": "광교2차e편한세상", "area": 84.7, "floor": 7, "date": "2026-08-08", "dateShort": "08/08", "price": 11.7}, {"name": "광교e편한세상", "area": 120.8, "floor": 37, "date": "2026-08-08", "dateShort": "08/08", "price": 23.7}, {"name": "광교호반베르디움", "area": 84.3, "floor": 11, "date": "2026-08-08", "dateShort": "08/08", "price": 10.5}, {"name": "SummitPlace광교", "area": 116.4, "floor": 12, "date": "2026-08-08", "dateShort": "08/08", "price": 20.0}]}, "원천동": {"count": 641, "avgPrice": 10.19, "recent": [{"name": "주공", "area": 61.5, "floor": 8, "date": "2026-08-24", "dateShort": "08/24", "price": 5.2}, {"name": "영흥숲푸르지오파크비엔", "area": 85.0, "floor": 18, "date": "2026-08-18", "dateShort": "08/18", "price": 9.2}, {"name": "영흥숲푸르지오파크비엔", "area": 117.4, "floor": 11, "date": "2026-08-18", "dateShort": "08/18", "price": 13.2}, {"name": "광교중흥에스클래스", "area": 109.2, "floor": 33, "date": "2026-08-14", "dateShort": "08/14", "price": 27.85}, {"name": "원천레이크파크", "area": 50.0, "floor": 14, "date": "2026-08-14", "dateShort": "08/14", "price": 4.2}, {"name": "광교중흥에스클래스", "area": 109.2, "floor": 24, "date": "2026-08-14", "dateShort": "08/14", "price": 27.3}, {"name": "영흥숲푸르지오파크비엔", "area": 85.0, "floor": 13, "date": "2026-08-14", "dateShort": "08/14", "price": 9.98}, {"name": "영흥숲푸르지오파크비엔", "area": 85.0, "floor": 18, "date": "2026-08-14", "dateShort": "08/14", "price": 9.9}]}, "하동": {"count": 474, "avgPrice": 10.85, "recent": [{"name": "광교더리브", "area": 84.9, "floor": 18, "date": "2026-08-19", "dateShort": "08/19", "price": 14.9}, {"name": "힐스테이트광교", "area": 97.1, "floor": 21, "date": "2026-08-15", "dateShort": "08/15", "price": 18.5}, {"name": "광교더리브", "area": 84.9, "floor": 13, "date": "2026-08-13", "dateShort": "08/13", "price": 14.95}, {"name": "광교더포레스트", "area": 84.8, "floor": 13, "date": "2026-08-13", "dateShort": "08/13", "price": 9.85}, {"name": "광교더리브", "area": 84.8, "floor": 17, "date": "2026-08-13", "dateShort": "08/13", "price": 15.2}, {"name": "힐스테이트광교", "area": 97.1, "floor": 47, "date": "2026-08-13", "dateShort": "08/13", "price": 16.4}, {"name": "광교더리브", "area": 84.9, "floor": 9, "date": "2026-08-07", "dateShort": "08/07", "price": 14.9}, {"name": "광교더리브", "area": 84.9, "floor": 7, "date": "2026-08-06", "dateShort": "08/06", "price": 13.95}]}, "신동": {"count": 120, "avgPrice": 8.21, "recent": [{"name": "래미안영통마크원2단지", "area": 84.9, "floor": 12, "date": "2026-08-05", "dateShort": "08/05", "price": 10.95}, {"name": "래미안영통마크원2단지", "area": 84.9, "floor": 5, "date": "2026-07-18", "dateShort": "07/18", "price": 9.1}, {"name": "래미안영통마크원2단지", "area": 84.9, "floor": 7, "date": "2026-07-18", "dateShort": "07/18", "price": 9.3}, {"name": "래미안영통마크원2단지", "area": 84.9, "floor": 24, "date": "2026-07-17", "dateShort": "07/17", "price": 9.2}, {"name": "래미안영통마크원1단지", "area": 84.9, "floor": 22, "date": "2026-07-16", "dateShort": "07/16", "price": 8.8}, {"name": "래미안영통마크원2단지", "area": 97.9, "floor": 4, "date": "2026-07-16", "dateShort": "07/16", "price": 9.1}, {"name": "래미안영통마크원2단지", "area": 84.9, "floor": 13, "date": "2026-07-14", "dateShort": "07/14", "price": 6.3}, {"name": "래미안영통마크원2단지", "area": 84.9, "floor": 16, "date": "2026-07-09", "dateShort": "07/09", "price": 9.2}]}}}}
+const REAL = {"기흥구": {"totalCount": 8260, "recent30Count": 163, "avgPrice": 6.18, "changePct": -9.24, "change84Pct": 7.7, "maxdate": "2026-08-24", "dong": {"신갈동": {"count": 1000, "avgPrice": 5.93, "recent": [{"name": "갈현마을현대홈타운", "area": 60.0, "floor": 12, "date": "2026-08-17", "dateShort": "08/17", "price": 6.48}, {"name": "용인기흥 우방아이유쉘", "area": 60.0, "floor": 18, "date": "2026-08-15", "dateShort": "08/15", "price": 4.65}, {"name": "갈현마을현대홈타운", "area": 60.0, "floor": 1, "date": "2026-08-15", "dateShort": "08/15", "price": 5.95}, {"name": "양현마을신안", "area": 60.0, "floor": 7, "date": "2026-08-14", "dateShort": "08/14", "price": 6.58}, {"name": "도현마을현대", "area": 134.7, "floor": 10, "date": "2026-08-13", "dateShort": "08/13", "price": 9.35}, {"name": "신흥덕롯데캐슬레이시티", "area": 60.0, "floor": 17, "date": "2026-08-12", "dateShort": "08/12", "price": 6.7}, {"name": "기흥파크뷰", "area": 84.9, "floor": 10, "date": "2026-08-10", "dateShort": "08/10", "price": 7.08}, {"name": "신흥덕롯데캐슬레이시티", "area": 60.0, "floor": 22, "date": "2026-08-08", "dateShort": "08/08", "price": 6.5}], "avg84Price": 6.62, "change84Pct": 5.68, "count84": 382}, "구갈동": {"count": 948, "avgPrice": 7.66, "recent": [{"name": "기흥역센트럴푸르지오", "area": 84.8, "floor": 10, "date": "2026-08-22", "dateShort": "08/22", "price": 10.35}, {"name": "강남마을자연앤(6단지)", "area": 118.2, "floor": 1, "date": "2026-08-20", "dateShort": "08/20", "price": 5.3}, {"name": "한성2", "area": 47.8, "floor": 1, "date": "2026-08-20", "dateShort": "08/20", "price": 5.7}, {"name": "기흥역센트럴푸르지오", "area": 85.0, "floor": 5, "date": "2026-08-14", "dateShort": "08/14", "price": 10.3}, {"name": "기흥역파크푸르지오", "area": 85.0, "floor": 32, "date": "2026-08-14", "dateShort": "08/14", "price": 9.5}, {"name": "기흥역지웰푸르지오", "area": 84.9, "floor": 18, "date": "2026-08-13", "dateShort": "08/13", "price": 9.9}, {"name": "한양수자인", "area": 88.8, "floor": 4, "date": "2026-08-12", "dateShort": "08/12", "price": 6.7}, {"name": "강남마을자연앤(4단지)", "area": 84.7, "floor": 10, "date": "2026-08-12", "dateShort": "08/12", "price": 5.33}], "avg84Price": 8.53, "change84Pct": 8.15, "count84": 536}, "중동": {"count": 809, "avgPrice": 5.53, "recent": [{"name": "신동백아이파크", "area": 102.0, "floor": 2, "date": "2026-08-18", "dateShort": "08/18", "price": 5.7}, {"name": "동백역월드메르디앙아파트", "area": 122.9, "floor": 15, "date": "2026-08-15", "dateShort": "08/15", "price": 5.5}, {"name": "신동백롯데캐슬에코2단지", "area": 99.5, "floor": 12, "date": "2026-08-15", "dateShort": "08/15", "price": 6.6}, {"name": "서희삼정", "area": 85.0, "floor": 1, "date": "2026-08-15", "dateShort": "08/15", "price": 3.55}, {"name": "어은목마을벽산블루밍아파트", "area": 84.5, "floor": 21, "date": "2026-08-12", "dateShort": "08/12", "price": 6.25}, {"name": "동백역월드메르디앙아파트", "area": 85.0, "floor": 17, "date": "2026-08-12", "dateShort": "08/12", "price": 4.7}, {"name": "신동백롯데캐슬에코1단지", "area": 106.2, "floor": 21, "date": "2026-08-12", "dateShort": "08/12", "price": 6.95}, {"name": "동백역한라비발디(어은목마을)", "area": 128.3, "floor": 14, "date": "2026-08-12", "dateShort": "08/12", "price": 6.05}], "avg84Price": 5.38, "change84Pct": 1.73, "count84": 383}, "마북동": {"count": 807, "avgPrice": 7.25, "recent": [{"name": "교동마을정광아파트", "area": 85.0, "floor": 10, "date": "2026-08-21", "dateShort": "08/21", "price": 4.5}, {"name": "용인마북신원아침도시", "area": 72.7, "floor": 14, "date": "2026-08-19", "dateShort": "08/19", "price": 5.1}, {"name": "블루밍구성더센트럴", "area": 84.8, "floor": 11, "date": "2026-08-14", "dateShort": "08/14", "price": 12.4}, {"name": "교동마을마북이편한세상", "area": 129.0, "floor": 3, "date": "2026-08-13", "dateShort": "08/13", "price": 6.35}, {"name": "구성우림필유", "area": 84.3, "floor": 13, "date": "2026-08-13", "dateShort": "08/13", "price": 7.4}, {"name": "교동마을동양파라곤", "area": 167.5, "floor": 1, "date": "2026-08-12", "dateShort": "08/12", "price": 6.95}, {"name": "교동마을현대필그린", "area": 134.5, "floor": 4, "date": "2026-08-11", "dateShort": "08/11", "price": 5.4}, {"name": "교동마을현대홈타운", "area": 85.0, "floor": 1, "date": "2026-08-11", "dateShort": "08/11", "price": 4.8}], "avg84Price": 7.45, "change84Pct": 11.75, "count84": 413}, "영덕동": {"count": 804, "avgPrice": 6.26, "recent": [{"name": "두진", "area": 59.7, "floor": 4, "date": "2026-08-22", "dateShort": "08/22", "price": 2.98}, {"name": "용인기흥효성해링턴플레이스", "area": 84.9, "floor": 21, "date": "2026-08-19", "dateShort": "08/19", "price": 6.77}, {"name": "청현마을기흥데시앙", "area": 85.0, "floor": 1, "date": "2026-08-18", "dateShort": "08/18", "price": 3.8}, {"name": "두진", "area": 85.0, "floor": 2, "date": "2026-08-15", "dateShort": "08/15", "price": 3.5}, {"name": "흥덕마을동원로얄듀크", "area": 84.7, "floor": 13, "date": "2026-08-13", "dateShort": "08/13", "price": 8.5}, {"name": "신동아파밀리에", "area": 115.1, "floor": 4, "date": "2026-08-11", "dateShort": "08/11", "price": 7.15}, {"name": "광교호수아델리움", "area": 84.8, "floor": 15, "date": "2026-08-11", "dateShort": "08/11", "price": 8.6}, {"name": "영덕신일1", "area": 126.9, "floor": 14, "date": "2026-08-08", "dateShort": "08/08", "price": 4.7}], "avg84Price": 6.9, "change84Pct": 7.77, "count84": 467}, "동백동": {"count": 687, "avgPrice": 5.25, "recent": [{"name": "호수마을동보노빌리티", "area": 84.9, "floor": 1, "date": "2026-08-24", "dateShort": "08/24", "price": 5.5}, {"name": "호수마을상록롯데캐슬", "area": 84.9, "floor": 17, "date": "2026-08-20", "dateShort": "08/20", "price": 5.9}, {"name": "호수마을상록롯데캐슬", "area": 84.9, "floor": 7, "date": "2026-08-20", "dateShort": "08/20", "price": 5.9}, {"name": "호수마을자연앤데시앙", "area": 85.0, "floor": 7, "date": "2026-08-18", "dateShort": "08/18", "price": 4.89}, {"name": "용인동백두산위브더제니스", "area": 84.9, "floor": 10, "date": "2026-08-18", "dateShort": "08/18", "price": 8.0}, {"name": "호수마을자연앤데시앙", "area": 85.0, "floor": 19, "date": "2026-08-15", "dateShort": "08/15", "price": 5.0}, {"name": "모아미래도2단지아파트", "area": 59.7, "floor": 5, "date": "2026-08-14", "dateShort": "08/14", "price": 4.39}, {"name": "호수마을어울림", "area": 84.8, "floor": 1, "date": "2026-08-13", "dateShort": "08/13", "price": 4.65}], "avg84Price": 5.13, "change84Pct": 3.79, "count84": 426}, "보정동": {"count": 653, "avgPrice": 9.55, "recent": [{"name": "연원마을삼성명가타운", "area": 124.9, "floor": 7, "date": "2026-08-18", "dateShort": "08/18", "price": 9.75}, {"name": "행원마을동아솔레시티", "area": 84.5, "floor": 3, "date": "2026-08-13", "dateShort": "08/13", "price": 9.15}, {"name": "죽전자이2차", "area": 84.9, "floor": 8, "date": "2026-08-13", "dateShort": "08/13", "price": 7.2}, {"name": "용인보정꿈에그린", "area": 101.7, "floor": 7, "date": "2026-08-10", "dateShort": "08/10", "price": 10.35}, {"name": "죽현마을아이파크", "area": 84.8, "floor": 22, "date": "2026-08-10", "dateShort": "08/10", "price": 11.75}, {"name": "상떼빌구성역플랫폼시티", "area": 84.9, "floor": 7, "date": "2026-08-10", "dateShort": "08/10", "price": 8.8}, {"name": "성호샤인힐즈아파트", "area": 85.0, "floor": 7, "date": "2026-08-08", "dateShort": "08/08", "price": 11.8}, {"name": "죽전누리에뜰", "area": 77.5, "floor": 15, "date": "2026-07-21", "dateShort": "07/21", "price": 5.9}], "avg84Price": 8.95, "change84Pct": 5.5, "count84": 318}, "언남동": {"count": 536, "avgPrice": 6.18, "recent": [{"name": "하마비마을동일하이빌1", "area": 144.0, "floor": 12, "date": "2026-08-20", "dateShort": "08/20", "price": 6.7}, {"name": "초원마을성원상떼빌2차", "area": 105.7, "floor": 10, "date": "2026-08-19", "dateShort": "08/19", "price": 6.95}, {"name": "초원마을성원상떼빌2차", "area": 129.7, "floor": 18, "date": "2026-08-19", "dateShort": "08/19", "price": 6.7}, {"name": "하마비마을동부센트레빌", "area": 125.7, "floor": 2, "date": "2026-08-14", "dateShort": "08/14", "price": 6.7}, {"name": "하마비마을동부", "area": 60.0, "floor": 13, "date": "2026-08-07", "dateShort": "08/07", "price": 5.5}, {"name": "하마비마을동일하이빌1", "area": 144.0, "floor": 14, "date": "2026-08-07", "dateShort": "08/07", "price": 6.82}, {"name": "장미마을삼성래미안2", "area": 85.0, "floor": 1, "date": "2026-07-27", "dateShort": "07/27", "price": 8.1}, {"name": "유원휴하임", "area": 57.9, "floor": 2, "date": "2026-07-19", "dateShort": "07/19", "price": 3.3}], "avg84Price": 6.32, "change84Pct": 7.25, "count84": 227}, "보라동": {"count": 405, "avgPrice": 4.49, "recent": [{"name": "용인보라효성해링턴플레이스", "area": 75.4, "floor": 10, "date": "2026-08-22", "dateShort": "08/22", "price": 6.0}, {"name": "삼성래미안", "area": 59.7, "floor": 10, "date": "2026-08-20", "dateShort": "08/20", "price": 3.3}, {"name": "한보라마을화성파크", "area": 123.5, "floor": 11, "date": "2026-08-19", "dateShort": "08/19", "price": 5.47}, {"name": "기흥삼정선비마을", "area": 84.9, "floor": 17, "date": "2026-08-19", "dateShort": "08/19", "price": 3.7}, {"name": "용인보라효성해링턴플레이스", "area": 75.4, "floor": 19, "date": "2026-08-17", "dateShort": "08/17", "price": 5.88}, {"name": "용인보라효성해링턴플레이스", "area": 74.9, "floor": 7, "date": "2026-08-16", "dateShort": "08/16", "price": 5.53}, {"name": "쌍용스윗닷홈1", "area": 139.9, "floor": 9, "date": "2026-08-13", "dateShort": "08/13", "price": 5.3}, {"name": "용인보라효성해링턴플레이스", "area": 84.8, "floor": 17, "date": "2026-08-12", "dateShort": "08/12", "price": 5.98}], "avg84Price": 4.2, "change84Pct": 0.35, "count84": 185}, "상하동": {"count": 404, "avgPrice": 3.98, "recent": [{"name": "갈천마을신일유토빌", "area": 122.6, "floor": 6, "date": "2026-08-22", "dateShort": "08/22", "price": 4.95}, {"name": "쌍용(3단지)", "area": 84.9, "floor": 9, "date": "2026-08-21", "dateShort": "08/21", "price": 3.55}, {"name": "강남마을한라비발디", "area": 85.0, "floor": 2, "date": "2026-08-19", "dateShort": "08/19", "price": 4.53}, {"name": "강남마을한라비발디", "area": 85.0, "floor": 11, "date": "2026-08-15", "dateShort": "08/15", "price": 4.8}, {"name": "갈천마을신일유토빌", "area": 122.6, "floor": 3, "date": "2026-08-11", "dateShort": "08/11", "price": 4.5}, {"name": "지석마을그대가크레던스", "area": 113.3, "floor": 5, "date": "2026-08-09", "dateShort": "08/09", "price": 5.9}, {"name": "쌍용(3단지)", "area": 84.9, "floor": 15, "date": "2026-08-04", "dateShort": "08/04", "price": 3.3}, {"name": "쌍용(3단지)", "area": 84.9, "floor": 4, "date": "2026-08-04", "dateShort": "08/04", "price": 3.85}], "avg84Price": 3.82, "change84Pct": 0.43, "count84": 161}, "서천동": {"count": 403, "avgPrice": 6.28, "recent": [{"name": "힐스테이트서천", "area": 85.0, "floor": 7, "date": "2026-08-21", "dateShort": "08/21", "price": 9.1}, {"name": "현대홈타운", "area": 116.0, "floor": 8, "date": "2026-08-12", "dateShort": "08/12", "price": 6.75}, {"name": "용인서천효성해링턴플레이스", "area": 75.0, "floor": 9, "date": "2026-08-10", "dateShort": "08/10", "price": 6.95}, {"name": "힐스테이트서천", "area": 84.9, "floor": 17, "date": "2026-08-10", "dateShort": "08/10", "price": 8.78}, {"name": "영통로효성해링턴플레이스1차", "area": 60.0, "floor": 6, "date": "2026-08-07", "dateShort": "08/07", "price": 7.05}, {"name": "용인서천효성해링턴플레이스", "area": 75.0, "floor": 10, "date": "2026-08-04", "dateShort": "08/04", "price": 6.85}, {"name": "현대홈타운", "area": 116.0, "floor": 18, "date": "2026-07-31", "dateShort": "07/31", "price": 6.2}, {"name": "영통로효성해링턴플레이스1차", "area": 60.0, "floor": 16, "date": "2026-07-31", "dateShort": "07/31", "price": 7.0}], "avg84Price": 6.15, "change84Pct": 6.06, "count84": 177}, "상갈동": {"count": 287, "avgPrice": 4.71, "recent": [{"name": "세대넥스빌", "area": 59.9, "floor": 3, "date": "2026-08-24", "dateShort": "08/24", "price": 2.4}, {"name": "금화마을5단지주공그린빌", "area": 59.6, "floor": 3, "date": "2026-08-21", "dateShort": "08/21", "price": 4.5}, {"name": "금화마을5단지주공그린빌", "area": 84.8, "floor": 13, "date": "2026-08-15", "dateShort": "08/15", "price": 5.3}, {"name": "금화마을주공3단지", "area": 60.0, "floor": 11, "date": "2026-08-13", "dateShort": "08/13", "price": 6.3}, {"name": "금화마을주공3단지", "area": 49.9, "floor": 11, "date": "2026-08-12", "dateShort": "08/12", "price": 4.7}, {"name": "금화마을4단지주공그린빌", "area": 84.4, "floor": 17, "date": "2026-08-07", "dateShort": "08/07", "price": 6.8}, {"name": "금화마을4단지주공그린빌", "area": 84.4, "floor": 3, "date": "2026-08-06", "dateShort": "08/06", "price": 6.45}, {"name": "금화마을4단지주공그린빌", "area": 84.4, "floor": 10, "date": "2026-07-04", "dateShort": "07/04", "price": 6.5}], "avg84Price": 5.35, "change84Pct": 6.76, "count84": 100}, "공세동": {"count": 209, "avgPrice": 4.31, "recent": [{"name": "호수청구", "area": 85.0, "floor": 5, "date": "2026-08-21", "dateShort": "08/21", "price": 3.15}, {"name": "한보라마을9단지경남아너스빌", "area": 60.0, "floor": 4, "date": "2026-08-14", "dateShort": "08/14", "price": 3.44}, {"name": "대주피오레2단지", "area": 122.8, "floor": 13, "date": "2026-08-14", "dateShort": "08/14", "price": 5.15}, {"name": "한보라마을9단지경남아너스빌", "area": 59.9, "floor": 6, "date": "2026-08-10", "dateShort": "08/10", "price": 3.45}, {"name": "한보라마을9단지경남아너스빌", "area": 59.8, "floor": 17, "date": "2026-08-09", "dateShort": "08/09", "price": 3.45}, {"name": "대주피오레2단지", "area": 180.9, "floor": 18, "date": "2026-08-08", "dateShort": "08/08", "price": 5.65}, {"name": "대주피오레1단지", "area": 97.3, "floor": 3, "date": "2026-08-08", "dateShort": "08/08", "price": 4.3}, {"name": "한보라마을9단지경남아너스빌", "area": 60.0, "floor": 17, "date": "2026-08-07", "dateShort": "08/07", "price": 3.7}], "avg84Price": 3.09, "change84Pct": 10.34, "count84": 20}, "청덕동": {"count": 153, "avgPrice": 4.34, "recent": [{"name": "휴먼시아물푸레마을3단지", "area": 84.8, "floor": 7, "date": "2026-08-13", "dateShort": "08/13", "price": 4.21}, {"name": "경남아너스빌", "area": 141.6, "floor": 5, "date": "2026-08-06", "dateShort": "08/06", "price": 5.4}, {"name": "휴먼시아물푸레마을3단지", "area": 84.8, "floor": 8, "date": "2026-08-01", "dateShort": "08/01", "price": 4.05}, {"name": "호반베르디움", "area": 111.5, "floor": 13, "date": "2026-07-30", "dateShort": "07/30", "price": 5.65}, {"name": "휴먼시아물푸레마을3단지", "area": 84.8, "floor": 2, "date": "2026-07-30", "dateShort": "07/30", "price": 4.22}, {"name": "물푸레마을휴먼시아7단지", "area": 84.7, "floor": 6, "date": "2026-07-04", "dateShort": "07/04", "price": 4.45}, {"name": "휴먼시아물푸레마을3단지", "area": 84.3, "floor": 2, "date": "2026-07-04", "dateShort": "07/04", "price": 2.5}, {"name": "호반베르디움", "area": 125.3, "floor": 9, "date": "2026-07-04", "dateShort": "07/04", "price": 5.5}], "avg84Price": 3.98, "change84Pct": 1.55, "count84": 91}, "하갈동": {"count": 57, "avgPrice": 3.94, "recent": [{"name": "청명호수신안인스빌2단지", "area": 85.0, "floor": 5, "date": "2026-08-22", "dateShort": "08/22", "price": 3.87}, {"name": "청명호수신안인스빌1단지", "area": 85.0, "floor": 10, "date": "2026-08-16", "dateShort": "08/16", "price": 4.27}, {"name": "청명호수신안인스빌1단지", "area": 122.8, "floor": 15, "date": "2026-07-04", "dateShort": "07/04", "price": 4.15}, {"name": "청명호수신안인스빌2단지", "area": 85.0, "floor": 12, "date": "2026-06-30", "dateShort": "06/30", "price": 3.9}, {"name": "청명호수신안인스빌1단지", "area": 85.0, "floor": 3, "date": "2026-06-30", "dateShort": "06/30", "price": 3.97}, {"name": "청명호수신안인스빌1단지", "area": 122.8, "floor": 1, "date": "2026-06-30", "dateShort": "06/30", "price": 4.05}, {"name": "청명호수신안인스빌1단지", "area": 85.0, "floor": 1, "date": "2026-06-28", "dateShort": "06/28", "price": 3.71}, {"name": "청명호수신안인스빌1단지", "area": 85.0, "floor": 9, "date": "2026-06-24", "dateShort": "06/24", "price": 3.75}], "avg84Price": 3.82, "change84Pct": 1.98, "count84": 38}, "지곡동": {"count": 50, "avgPrice": 3.32, "recent": [{"name": "써니밸리II", "area": 85.0, "floor": 4, "date": "2026-07-03", "dateShort": "07/03", "price": 3.0}, {"name": "써니밸리II", "area": 114.9, "floor": 2, "date": "2026-06-16", "dateShort": "06/16", "price": 3.48}, {"name": "써니밸리II", "area": 85.0, "floor": 1, "date": "2026-06-12", "dateShort": "06/12", "price": 3.28}, {"name": "써니밸리II", "area": 114.9, "floor": 9, "date": "2026-05-30", "dateShort": "05/30", "price": 3.75}, {"name": "써니밸리II", "area": 114.9, "floor": 11, "date": "2026-05-28", "dateShort": "05/28", "price": 3.6}, {"name": "써니밸리II", "area": 114.9, "floor": 9, "date": "2026-05-20", "dateShort": "05/20", "price": 3.3}, {"name": "써니밸리II", "area": 85.0, "floor": 19, "date": "2026-05-08", "dateShort": "05/08", "price": 3.9}, {"name": "써니밸리II", "area": 114.9, "floor": 9, "date": "2026-05-08", "dateShort": "05/08", "price": 3.5}], "avg84Price": 3.21, "change84Pct": null, "count84": 33}, "고매동": {"count": 48, "avgPrice": 2.69, "recent": [{"name": "세원", "area": 84.2, "floor": 14, "date": "2026-08-08", "dateShort": "08/08", "price": 2.9}, {"name": "매화마을우남퍼스트빌", "area": 84.2, "floor": 7, "date": "2026-07-03", "dateShort": "07/03", "price": 2.85}, {"name": "시뉴어하우스", "area": 164.8, "floor": 3, "date": "2026-06-30", "dateShort": "06/30", "price": 4.8}, {"name": "동성", "area": 60.0, "floor": 6, "date": "2026-06-30", "dateShort": "06/30", "price": 2.1}, {"name": "기흥써니밸리", "area": 84.9, "floor": 6, "date": "2026-06-30", "dateShort": "06/30", "price": 2.51}, {"name": "매화마을우남퍼스트빌", "area": 84.2, "floor": 4, "date": "2026-06-23", "dateShort": "06/23", "price": 2.6}, {"name": "우림홀인원", "area": 84.8, "floor": 13, "date": "2026-06-13", "dateShort": "06/13", "price": 2.95}, {"name": "우림홀인원", "area": 84.8, "floor": 4, "date": "2026-06-10", "dateShort": "06/10", "price": 2.7}], "avg84Price": 2.76, "change84Pct": -0.19, "count84": 33}}, "avg84Price": 6.44, "count84": 3990}, "영통구": {"totalCount": 6698, "recent30Count": 309, "avgPrice": 7.55, "changePct": -3.47, "change84Pct": 12.34, "maxdate": "2026-08-24", "dong": {"영통동": {"count": 2454, "avgPrice": 5.38, "recent": [{"name": "벽적골주공휴먼시아8단지", "area": 60.0, "floor": 18, "date": "2026-08-24", "dateShort": "08/24", "price": 5.4}, {"name": "태영", "area": 84.9, "floor": 5, "date": "2026-08-24", "dateShort": "08/24", "price": 8.1}, {"name": "벽적골주공휴먼시아8단지", "area": 49.6, "floor": 18, "date": "2026-08-22", "dateShort": "08/22", "price": 3.9}, {"name": "신나무실미주", "area": 102.0, "floor": 19, "date": "2026-08-22", "dateShort": "08/22", "price": 8.6}, {"name": "풍림", "area": 84.8, "floor": 16, "date": "2026-08-21", "dateShort": "08/21", "price": 4.8}, {"name": "살구골마을진덕서광성지동아", "area": 164.8, "floor": 17, "date": "2026-08-21", "dateShort": "08/21", "price": 11.3}, {"name": "신나무실미주", "area": 102.0, "floor": 1, "date": "2026-08-20", "dateShort": "08/20", "price": 8.45}, {"name": "건영1차", "area": 85.0, "floor": 3, "date": "2026-08-19", "dateShort": "08/19", "price": 8.0}], "avg84Price": 6.62, "change84Pct": 7.18, "count84": 352}, "망포동": {"count": 1410, "avgPrice": 7.53, "recent": [{"name": "센트럴하이츠", "area": 137.0, "floor": 2, "date": "2026-08-24", "dateShort": "08/24", "price": 8.0}, {"name": "마젤란21(1101동)", "area": 84.6, "floor": 1, "date": "2026-08-20", "dateShort": "08/20", "price": 5.3}, {"name": "영통아이파크캐슬3단지", "area": 59.9, "floor": 11, "date": "2026-08-18", "dateShort": "08/18", "price": 9.05}, {"name": "망포벽산이빌리지", "area": 74.9, "floor": 2, "date": "2026-08-17", "dateShort": "08/17", "price": 4.1}, {"name": "늘푸른벽산", "area": 134.9, "floor": 10, "date": "2026-08-15", "dateShort": "08/15", "price": 5.8}, {"name": "영통자이", "area": 60.0, "floor": 10, "date": "2026-08-15", "dateShort": "08/15", "price": 6.95}, {"name": "힐스테이트영통", "area": 84.9, "floor": 16, "date": "2026-08-15", "dateShort": "08/15", "price": 14.4}, {"name": "영통아이파크캐슬1단지", "area": 84.7, "floor": 20, "date": "2026-08-14", "dateShort": "08/14", "price": 12.2}], "avg84Price": 7.67, "change84Pct": 16.38, "count84": 596}, "매탄동": {"count": 947, "avgPrice": 5.25, "recent": [{"name": "e-편한세상", "area": 101.7, "floor": 13, "date": "2026-08-21", "dateShort": "08/21", "price": 8.0}, {"name": "성일", "area": 49.7, "floor": 2, "date": "2026-08-21", "dateShort": "08/21", "price": 2.56}, {"name": "원천성일", "area": 49.9, "floor": 10, "date": "2026-08-19", "dateShort": "08/19", "price": 4.5}, {"name": "동남", "area": 49.7, "floor": 7, "date": "2026-08-18", "dateShort": "08/18", "price": 2.75}, {"name": "주공그린빌4", "area": 76.0, "floor": 7, "date": "2026-08-17", "dateShort": "08/17", "price": 5.25}, {"name": "매탄위브하늘채", "area": 60.0, "floor": 17, "date": "2026-08-17", "dateShort": "08/17", "price": 7.08}, {"name": "원천성일", "area": 49.9, "floor": 5, "date": "2026-08-16", "dateShort": "08/16", "price": 4.7}, {"name": "매탄위브하늘채", "area": 60.0, "floor": 24, "date": "2026-08-15", "dateShort": "08/15", "price": 6.8}], "avg84Price": 6.08, "change84Pct": -2.57, "count84": 344}, "이의동": {"count": 652, "avgPrice": 13.95, "recent": [{"name": "광교e편한세상", "area": 120.8, "floor": 18, "date": "2026-08-14", "dateShort": "08/14", "price": 21.5}, {"name": "광교에듀포레", "area": 84.9, "floor": 27, "date": "2026-08-12", "dateShort": "08/12", "price": 17.1}, {"name": "광교2차e편한세상", "area": 84.3, "floor": 1, "date": "2026-08-11", "dateShort": "08/11", "price": 10.0}, {"name": "자연앤힐스테이트", "area": 84.3, "floor": 9, "date": "2026-08-11", "dateShort": "08/11", "price": 20.5}, {"name": "광교2차e편한세상", "area": 84.7, "floor": 7, "date": "2026-08-08", "dateShort": "08/08", "price": 11.7}, {"name": "광교e편한세상", "area": 120.8, "floor": 37, "date": "2026-08-08", "dateShort": "08/08", "price": 23.7}, {"name": "광교호반베르디움", "area": 84.3, "floor": 11, "date": "2026-08-08", "dateShort": "08/08", "price": 10.5}, {"name": "SummitPlace광교", "area": 116.4, "floor": 12, "date": "2026-08-08", "dateShort": "08/08", "price": 20.0}], "avg84Price": 13.12, "change84Pct": 14.7, "count84": 275}, "원천동": {"count": 641, "avgPrice": 10.19, "recent": [{"name": "주공", "area": 61.5, "floor": 8, "date": "2026-08-24", "dateShort": "08/24", "price": 5.2}, {"name": "영흥숲푸르지오파크비엔", "area": 85.0, "floor": 18, "date": "2026-08-18", "dateShort": "08/18", "price": 9.2}, {"name": "영흥숲푸르지오파크비엔", "area": 117.4, "floor": 11, "date": "2026-08-18", "dateShort": "08/18", "price": 13.2}, {"name": "광교중흥에스클래스", "area": 109.2, "floor": 33, "date": "2026-08-14", "dateShort": "08/14", "price": 27.85}, {"name": "원천레이크파크", "area": 50.0, "floor": 14, "date": "2026-08-14", "dateShort": "08/14", "price": 4.2}, {"name": "광교중흥에스클래스", "area": 109.2, "floor": 24, "date": "2026-08-14", "dateShort": "08/14", "price": 27.3}, {"name": "영흥숲푸르지오파크비엔", "area": 85.0, "floor": 13, "date": "2026-08-14", "dateShort": "08/14", "price": 9.98}, {"name": "영흥숲푸르지오파크비엔", "area": 85.0, "floor": 18, "date": "2026-08-14", "dateShort": "08/14", "price": 9.9}], "avg84Price": 12.37, "change84Pct": -6.87, "count84": 167}, "하동": {"count": 474, "avgPrice": 10.85, "recent": [{"name": "광교더리브", "area": 84.9, "floor": 18, "date": "2026-08-19", "dateShort": "08/19", "price": 14.9}, {"name": "힐스테이트광교", "area": 97.1, "floor": 21, "date": "2026-08-15", "dateShort": "08/15", "price": 18.5}, {"name": "광교더리브", "area": 84.9, "floor": 13, "date": "2026-08-13", "dateShort": "08/13", "price": 14.95}, {"name": "광교더포레스트", "area": 84.8, "floor": 13, "date": "2026-08-13", "dateShort": "08/13", "price": 9.85}, {"name": "광교더리브", "area": 84.8, "floor": 17, "date": "2026-08-13", "dateShort": "08/13", "price": 15.2}, {"name": "힐스테이트광교", "area": 97.1, "floor": 47, "date": "2026-08-13", "dateShort": "08/13", "price": 16.4}, {"name": "광교더리브", "area": 84.9, "floor": 9, "date": "2026-08-07", "dateShort": "08/07", "price": 14.9}, {"name": "광교더리브", "area": 84.9, "floor": 7, "date": "2026-08-06", "dateShort": "08/06", "price": 13.95}], "avg84Price": 10.62, "change84Pct": 18.37, "count84": 250}, "신동": {"count": 120, "avgPrice": 8.21, "recent": [{"name": "래미안영통마크원2단지", "area": 84.9, "floor": 12, "date": "2026-08-05", "dateShort": "08/05", "price": 10.95}, {"name": "래미안영통마크원2단지", "area": 84.9, "floor": 5, "date": "2026-07-18", "dateShort": "07/18", "price": 9.1}, {"name": "래미안영통마크원2단지", "area": 84.9, "floor": 7, "date": "2026-07-18", "dateShort": "07/18", "price": 9.3}, {"name": "래미안영통마크원2단지", "area": 84.9, "floor": 24, "date": "2026-07-17", "dateShort": "07/17", "price": 9.2}, {"name": "래미안영통마크원1단지", "area": 84.9, "floor": 22, "date": "2026-07-16", "dateShort": "07/16", "price": 8.8}, {"name": "래미안영통마크원2단지", "area": 97.9, "floor": 4, "date": "2026-07-16", "dateShort": "07/16", "price": 9.1}, {"name": "래미안영통마크원2단지", "area": 84.9, "floor": 13, "date": "2026-07-14", "dateShort": "07/14", "price": 6.3}, {"name": "래미안영통마크원2단지", "area": 84.9, "floor": 16, "date": "2026-07-09", "dateShort": "07/09", "price": 9.2}], "avg84Price": 7.97, "change84Pct": 8.37, "count84": 80}}, "avg84Price": 8.7, "count84": 2064}};
 ;
 
 /* ───────── 리치부동산연구소 매물 데이터 (기흥구 아파트 20개 단지, 2026-08-24 기준, 매매 대표매물) ───────── */
@@ -532,8 +539,10 @@ function resolveComplexStats(gu, type, complexName){
 }
 
 /* 예측 가능한 단지 목록 — 매물 데이터가 있는(추적 중인) 단지만 노출 (실거래만 있고 매물 없는 단지는 제외) */
-function predictComplexList(gu, type){
-  const trackedNames = [...new Set(LISTINGS_ALL.filter(l=>l.gu===gu && l.type===type).map(l=>l.complex))];
+function predictComplexList(gu, type, dong){
+  let rows = LISTINGS_ALL.filter(l=>l.gu===gu && l.type===type);
+  if(dong && dong!=='전체') rows = rows.filter(l=>l.dong===dong);
+  const trackedNames = [...new Set(rows.map(l=>l.complex))];
   return trackedNames.sort();
 }
 
@@ -594,11 +603,7 @@ function renderTicker(){
   const dongMap = complexDongMap();
   let items = [];
   Object.keys(REAL).forEach(gu=>{
-    const d = REAL[gu];
-    const pct = fmtPct(d.changePct);
-    items.push(`<span>${gu} 최근30일 평균단가 <span class="${pct.up?'up':'down'}">${pct.text}</span></span>`);
-
-    // 매물 추적 단지 기준, 84㎡ · 최근 1년 신고가 거래만 대상으로 동별 최고가
+    // 매물 추적 단지 기준, 84.0000~84.9999㎡ 범위 내 실거래 중 단지별 최고가를 동별로 뽑아 스크롤
     const bestByDong = {}; // dong -> {complex, amount, date}
     Object.keys(REAL_TX['아파트'] || {}).forEach(complex=>{
       const complexGu = LISTINGS_ALL.find(l=>l.complex===complex && l.type==='아파트')?.gu;
@@ -606,8 +611,7 @@ function renderTicker(){
       const dong = dongMap[complex];
       if(!dong) return;
       REAL_TX['아파트'][complex].forEach(t=>{
-        if(t.sizeFloor !== 84) return;
-        if(!t.isRecordHigh) return;
+        if(t.sizeFloor < 84 || t.sizeFloor >= 85) return; // 84.0000 ~ 84.9999㎡
         if(!bestByDong[dong] || t.amount > bestByDong[dong].amount){
           bestByDong[dong] = { complex, amount: t.amount, date: t.date };
         }
@@ -616,7 +620,7 @@ function renderTicker(){
     Object.entries(bestByDong)
       .sort((a,b)=> b[1].amount - a[1].amount)
       .forEach(([dong, best])=>{
-        items.push(`<span>${gu} ${dong} ${best.complex} 84㎡ ${best.amount}억</span>`);
+        items.push(`<span>${gu} ${dong} ${best.complex} 84㎡ 최고 ${best.amount}억</span>`);
       });
   });
   el.innerHTML = (items.concat(items)).join('');
@@ -685,19 +689,21 @@ function currentStats(){
   const d = REAL[state.gu];
   const typeNote = state.housingType==='오피스텔' ? '(아파트 기준)' : '';
   if(state.dong==='전체'){
-    const pct = fmtPct(d.changePct);
+    const pct84 = fmtPct(d.change84Pct);
     return [
-      {label:`평균 실거래가(전체) ${typeNote}`, value:d.avgPrice+'억', delta:`최근 1년 ${d.totalCount.toLocaleString()}건 기준`, up:true},
+      {label:`평균 실거래가(84㎡) ${typeNote}`, value:(d.avg84Price ?? d.avgPrice)+'억', delta:`최근 1년 ${(d.count84 ?? d.totalCount).toLocaleString()}건 기준`, up:true},
       {label:"최근 30일 거래건수", value:d.recent30Count+'건', delta:`기준일 ${d.maxdate}`, up:true},
-      {label:"최근30일 평균단가 변동률", value:pct.text, delta:"⚠️ 동별 거래량 구성에 따라 왜곡될 수 있음", up:pct.up},
+      {label:"최근90일 단가 변동률(84㎡)", value:pct84.text, delta:"직전 90일 대비", up:pct84.up},
       {label:"데이터 소스", value:"국토부", delta:"실거래가 공개시스템 · 아파트", up:true},
     ];
   } else {
     const dd = d.dong[state.dong];
+    const pct84 = fmtPct(dd.change84Pct);
+    const pctText = dd.change84Pct===null || dd.change84Pct===undefined ? '데이터 부족' : pct84.text;
     return [
-      {label:`${state.dong} 평균 실거래가 ${typeNote}`, value:dd.avgPrice+'억', delta:`최근 1년 ${dd.count.toLocaleString()}건`, up:true},
+      {label:`${state.dong} 평균 실거래가(84㎡) ${typeNote}`, value:(dd.avg84Price ?? dd.avgPrice)+'억', delta:`최근 1년 ${(dd.count84 ?? dd.count).toLocaleString()}건`, up:true},
       {label:`${state.dong} 거래건수(1년)`, value:dd.count+'건', delta:`${state.gu} 내 비중 ${(dd.count/d.totalCount*100).toFixed(1)}%`, up:true},
-      {label:"구 전체 변동률(30일)", value:fmtPct(d.changePct).text, delta:`⚠️ ${state.gu} 전체 평균 (동별 구성 왜곡 가능)`, up:fmtPct(d.changePct).up},
+      {label:`${state.dong} 최근90일 단가 변동률(84㎡)`, value:pctText, delta:"직전 90일 대비", up:pct84.up},
       {label:"데이터 소스", value:"국토부", delta:"실거래가 공개시스템 · 아파트", up:true},
     ];
   }
@@ -771,6 +777,125 @@ function realComplexBreakdown(){
   return Object.values(byComplex).sort((a,b)=> b.count-a.count);
 }
 
+function parseTxDate(s){ return new Date(String(s).replace(/\./g,'-')); }
+
+/* 분석①: 84㎡ 기준 최근90일 vs 직전90일 평균가로 단지 랭킹 (요즘 오르는/내리는 단지) */
+function complexRankingByChange(){
+  const dongMap = complexDongMap();
+  const txForType = REAL_TX[state.housingType] || {};
+  let maxDate = null;
+  Object.values(txForType).forEach(list=> list.forEach(t=>{
+    const d = parseTxDate(t.date);
+    if(!maxDate || d>maxDate) maxDate = d;
+  }));
+  if(!maxDate) return [];
+  const cutoff90 = new Date(maxDate.getTime() - 90*86400000);
+  const cutoff180 = new Date(maxDate.getTime() - 180*86400000);
+
+  const results = [];
+  Object.keys(txForType).forEach(complex=>{
+    const complexGu = LISTINGS_ALL.find(l=>l.complex===complex && l.type===state.housingType)?.gu;
+    if(complexGu !== state.gu) return;
+    const dong = dongMap[complex];
+    if(state.dong!=='전체' && dong!==state.dong) return;
+    const items84 = txForType[complex].filter(t=> t.sizeFloor>=84 && t.sizeFloor<85);
+    const recent = items84.filter(t=> parseTxDate(t.date) > cutoff90);
+    const prev = items84.filter(t=>{ const d=parseTxDate(t.date); return d<=cutoff90 && d>cutoff180; });
+    if(recent.length<2 || prev.length<2) return; // 표본 부족하면 순위에서 제외
+    const avgRecent = recent.reduce((s,t)=>s+t.amount,0)/recent.length;
+    const avgPrev = prev.reduce((s,t)=>s+t.amount,0)/prev.length;
+    const changePct = Math.round((avgRecent/avgPrev-1)*1000)/10;
+    results.push({complex, dong, changePct, avgRecent: Math.round(avgRecent*100)/100, recentCount: recent.length});
+  });
+  return results.sort((a,b)=> b.changePct-a.changePct);
+}
+
+function complexRankingTable(rows){
+  if(!rows.length) return emptyState('순위를 매길 데이터가 부족합니다','최근90일·직전90일 각각 2건 이상 거래된 단지가 없습니다 (84㎡ 기준)');
+  return `<table>
+    <thead><tr><th>순위</th><th>단지</th><th>동</th><th>최근90일 평균</th><th>변동률</th></tr></thead>
+    <tbody>
+      ${rows.map((r,i)=>{
+        const dotColor = COLORS[r.complex] || DEFAULT_COLOR;
+        const color = r.changePct>0 ? 'var(--danger)' : r.changePct<0 ? 'var(--price-down)' : 'var(--text-muted)';
+        const arrow = r.changePct>0 ? '▲' : r.changePct<0 ? '▼' : '-';
+        return `<tr onclick="selectFeature('realprice');setRealpriceComplex('${r.complex.replace(/'/g,"\\'")}')" style="cursor:pointer;">
+        <td>${i+1}</td>
+        <td style="font-family:'Pretendard'"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${dotColor};margin-right:6px;"></span>${r.complex}</td>
+        <td style="font-family:'Pretendard'">${r.dong}</td>
+        <td>${r.avgRecent}억</td>
+        <td style="color:${color};font-weight:700;">${arrow}${Math.abs(r.changePct)}%</td>
+      </tr>`;}).join('')}
+    </tbody>
+  </table>
+  <div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">84.0000~84.9999㎡ 거래 기준 · 최근90일 vs 직전90일 평균가 비교 · 표본 부족(각 2건 미만) 단지는 제외</div>`;
+}
+
+/* 분석②: 선택한 단지+평형의 저/중/고층 가격 비교
+   국토부 실거래 데이터엔 총층수가 없어 매물기준 floorTierOf를 못 쓰므로,
+   이 단지·평형의 실거래에 나타난 층수 범위를 3등분해서 자체적으로 저/중/고를 나눈다. */
+function floorTierComparison(complex, area){
+  const list = (REAL_TX[state.housingType]?.[complex]||[]).filter(t=>String(t.sizeFloor)===String(area));
+  const withFloor = list.map(t=>({...t, floorNum: parseInt(t.floor,10)})).filter(t=> !isNaN(t.floorNum));
+  if(withFloor.length < 3) return emptyState('층 정보가 부족합니다','이 평형의 거래 중 층 비교가 가능한 데이터가 부족합니다');
+  const floors = withFloor.map(t=>t.floorNum);
+  const minF = Math.min(...floors), maxF = Math.max(...floors);
+  const range = maxF - minF;
+  const tierOf = (f) => {
+    if(range===0) return '중';
+    const ratio = (f-minF)/range;
+    if(ratio <= 1/3) return '저';
+    if(ratio <= 2/3) return '중';
+    return '고';
+  };
+  const tiers = {'저':[], '중':[], '고':[]};
+  withFloor.forEach(t=> tiers[tierOf(t.floorNum)].push(t.amount));
+  const rows = ['저','중','고'].map(tier=>({
+    tier, count: tiers[tier].length,
+    avg: tiers[tier].length ? Math.round(tiers[tier].reduce((a,b)=>a+b,0)/tiers[tier].length*100)/100 : null
+  }));
+  const maxAvg = Math.max(...rows.filter(r=>r.avg!==null).map(r=>r.avg));
+  return `<table>
+    <thead><tr><th>층</th><th>거래건수</th><th>평균가</th><th>고층 대비</th></tr></thead>
+    <tbody>
+      ${rows.map(r=>{
+        if(!r.count) return `<tr><td>${r.tier}층</td><td colspan="3" style="color:var(--text-muted);">데이터 없음</td></tr>`;
+        const diff = Math.round((r.avg - maxAvg)*100)/100;
+        const diffText = diff===0 ? '기준(최고)' : `${diff}억`;
+        return `<tr><td>${r.tier}층</td><td>${r.count}건</td><td>${r.avg}억</td><td style="color:${diff<0?'var(--price-down)':'var(--text-muted)'};">${diffText}</td></tr>`;
+      }).join('')}
+    </tbody>
+  </table>
+  <div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">이 평형 실거래에 나타난 층수 범위(${minF}~${maxF}층)를 3등분해 분류했습니다.</div>`;
+}
+
+/* 분석③: 선택한 단지+평형의 최근 6개월 월별 시세 추이 */
+function monthlyTrendTable(complex, area){
+  const list = (REAL_TX[state.housingType]?.[complex]||[]).filter(t=>String(t.sizeFloor)===String(area));
+  const byMonth = {};
+  list.forEach(t=>{
+    const month = String(t.date).slice(0,7).replace('.','-');
+    (byMonth[month] = byMonth[month] || []).push(t.amount);
+  });
+  const months = Object.keys(byMonth).sort().slice(-6);
+  if(!months.length) return emptyState('월별 추이 데이터가 없습니다','이 평형의 거래 이력이 없습니다');
+  const rows = months.map(m=>({
+    month: m, count: byMonth[m].length,
+    avg: Math.round(byMonth[m].reduce((a,b)=>a+b,0)/byMonth[m].length*100)/100
+  }));
+  return `<table>
+    <thead><tr><th>월</th><th>거래건수</th><th>평균가</th></tr></thead>
+    <tbody>
+      ${rows.map((r,i)=>{
+        const prevAvg = i>0 ? rows[i-1].avg : null;
+        const diff = prevAvg!==null ? Math.round((r.avg-prevAvg)*100)/100 : null;
+        const diffHtml = diff===null ? '' : diff>0 ? ` <span style="color:var(--danger);font-size:11px;">(+${diff}억)</span>` : diff<0 ? ` <span style="color:var(--price-down);font-size:11px;">(${diff}억)</span>` : '';
+        return `<tr><td>${r.month}</td><td>${r.count}건</td><td>${r.avg}억${diffHtml}</td></tr>`;
+      }).join('')}
+    </tbody>
+  </table>`;
+}
+
 /* 시세현황용: 단지별 최고가만 간단히 보여주는 표 (거래건수/가격범위 없이 최고가 위주) */
 function complexMaxTable(rows){
   if(!rows.length) return emptyState('실거래 데이터가 없습니다','해당 범위에 추적 중인 단지의 실거래가 없습니다');
@@ -842,7 +967,8 @@ function realTxTable(rows){
               : delta>0 ? ` <span style="color:var(--teal-light);font-size:11px;">(+${delta}억)</span>`
               : delta<0 ? ` <span style="color:var(--danger);font-size:11px;">(${delta}억)</span>`
               : ` <span style="color:var(--text-muted);font-size:11px;">(±0)</span>`;
-            const dongType = (r.dong && r.dong!=='-') ? `${r.dong}동 · ${Math.floor(r.size)}㎡` : `${Math.floor(r.size)}㎡`;
+            const dongLabel = String(r.dong||'').replace(/동$/,''); // 원본에 이미 "동"이 붙어있는 경우 중복 방지
+            const dongType = (r.dong && r.dong!=='-') ? `${dongLabel}동 · ${Math.floor(r.size)}㎡` : `${Math.floor(r.size)}㎡`;
             return `<tr>
             <td style="font-family:'Pretendard'">${dongType}</td>
             <td>${r.floor}층</td>
@@ -952,7 +1078,7 @@ function renderMain(){
       el.innerHTML = summaryHtml + officetelNotice + `
       ${newRows.length ? `<div class="panel" style="border:1px solid rgba(203,163,92,0.35);">
         <h2>🆕 오늘 새로 올라온 실거래 (${newRows.length}건)</h2>
-        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">최신 데이터 업데이트에서 새로 등록된 거래만 표시합니다. 신고가 배지·(±억)는 기존 최고가 대비 변동폭입니다.</p>
+        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">⚠️ 계약일이 오늘이라는 뜻이 아니라, 국토부 시스템에 오늘 새로 공개된 거래입니다 (신고 기한이 최대 30일이라 계약은 몇 달 전일 수 있어요). 신고가 배지·(±억)는 기존 최고가 대비 변동폭입니다.</p>
         ${realTxTable(newRows)}
       </div>` : ''}
       <div class="panel">
@@ -973,7 +1099,7 @@ function renderMain(){
       el.innerHTML = summaryHtml + `
       ${newRows.length ? `<div class="panel" style="border:1px solid rgba(203,163,92,0.35);">
         <h2>🆕 오늘 새로 올라온 실거래 (${newRows.length}건)</h2>
-        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">최신 데이터 업데이트에서 새로 등록된 거래만 표시합니다. 신고가 배지·(±억)는 기존 최고가 대비 변동폭입니다.</p>
+        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">⚠️ 계약일이 오늘이라는 뜻이 아니라, 국토부 시스템에 오늘 새로 공개된 거래입니다 (신고 기한이 최대 30일이라 계약은 몇 달 전일 수 있어요). 신고가 배지·(±억)는 기존 최고가 대비 변동폭입니다.</p>
         ${realTxTable(newRows)}
       </div>` : ''}
       <div class="panel">
@@ -1000,20 +1126,32 @@ function renderMain(){
       const label = a==='전체' ? '전체' : `${Math.round(a*100)/100}㎡`;
       return `<button class="dong-chip ${active?'active':''}" onclick="setRealpriceArea('${a}')">${label}</button>`;
     }).join('');
-    const aggregateSection = isOfficetel ? '' : `
-      <div class="panel">
-        <h2>${scopeLabel} 실거래 상세</h2>
-        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">국토부 실거래가 공개시스템 · 계약일 기준 · 2025-08-25 ~ 2026-08-24 · 아파트 매매</p>
-        ${collapsiblePanel('구·동 단위 실거래', `최근 ${currentRecentList().length}건 — 탭해서 보기`, realTable(currentRecentList()))}
-      </div>`;
     const hasSelection = state.realprice.complex!=='전체' && state.realprice.area!=='전체';
+    const rankingRows = complexRankingByChange();
+    const rankingSection = state.realprice.complex==='전체' ? `
+      <div class="panel">
+        <h2>${scopeLabel} 단지 랭킹 · 최근 상승세 (84㎡ 기준)</h2>
+        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">최근90일 평균가가 직전90일 대비 얼마나 올랐는지 단지별로 비교한 순위입니다.</p>
+        ${complexRankingTable(rankingRows)}
+      </div>` : '';
+    const analysisSection = hasSelection ? `
+      <div class="panel">
+        <h2>${state.realprice.complex} · ${Math.round(Number(state.realprice.area)*100)/100}㎡ 층별 가격 비교</h2>
+        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">같은 평형이라도 층에 따라 가격이 얼마나 차이 나는지 보여줍니다.</p>
+        ${floorTierComparison(state.realprice.complex, state.realprice.area)}
+      </div>
+      <div class="panel">
+        <h2>${state.realprice.complex} · ${Math.round(Number(state.realprice.area)*100)/100}㎡ 월별 시세 추이 (최근 6개월)</h2>
+        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">월별 평균 거래가 흐름입니다. 괄호 안은 전월 대비 변동폭입니다.</p>
+        ${monthlyTrendTable(state.realprice.complex, state.realprice.area)}
+      </div>` : '';
     const sizeDetailSection = hasSelection ? `
       <div class="panel">
         <h2>${state.realprice.complex} · ${Math.round(Number(state.realprice.area)*100)/100}㎡ 개별 거래 내역</h2>
         <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">이 정확한 평형의 전체 실거래 이력입니다. 계약일 기준 최신순, 신고가 배지·(±억)는 직전 기록 대비 변동폭입니다.</p>
         ${sizeTxHistoryTable(state.realprice.complex, state.realprice.area)}
       </div>` : '';
-    el.innerHTML = summaryHtml + officetelNotice + aggregateSection + `
+    el.innerHTML = summaryHtml + officetelNotice + rankingSection + `
       <div class="panel">
         <h2>${scopeLabel} 단지별 실거래 현황 (매물 추적 단지, ${state.housingType})</h2>
         <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">단지를 탭하면 그 단지로, 평형까지 좁혀서 더 자세히 볼 수 있습니다.</p>
@@ -1024,6 +1162,7 @@ function renderMain(){
         <h2>${state.realprice.complex} 평형 선택</h2>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">${areaChips}</div>
       </div>` : ''}
+      ${analysisSection}
       ${sizeDetailSection}
       <div class="panel">
         <h2>${scopeLabel}${state.realprice.complex!=='전체' ? ` · ${state.realprice.complex}` : ''}${state.realprice.area!=='전체' ? ` · ${Math.round(Number(state.realprice.area)*100)/100}㎡` : ''} 기존 실거래 최고가</h2>
@@ -1262,6 +1401,9 @@ function renderFinderPanel(scopeLabel){
   const hasFilter = state.finder.budget!=='전체' || state.finder.areaBucket!=='전체' || state.finder.exactArea!=='전체' || state.finder.complex!=='전체' || state.finder.gapOnly;
   const showResults = hasFilter && state.finder.searched;
   const totalInScope = LISTINGS_ALL.filter(l=>l.gu===state.gu&&l.type===state.housingType&&(state.dong==='전체'||l.dong===state.dong)).length;
+  // 평균 호가는 84.0000~84.9999㎡ 매물만 따로 집계 (실거래분석과 기준 통일)
+  const rows84 = rows.filter(r=> r.area>=84 && r.area<85);
+  const avgPrice84 = rows84.length ? Math.round(rows84.reduce((s,r)=>s+r.price,0)/rows84.length*100)/100 : null;
 
   const budgetChips = BUDGET_RANGES.map(b=>{
     const active = state.finder.budget===b.label ? 'active' : '';
@@ -1284,7 +1426,7 @@ function renderFinderPanel(scopeLabel){
 
   return `<div class="summary-grid">
       <div class="stat-card"><div class="label">${scopeLabel} 매물 수${hasFilter?' (필터 적용)':''}</div><div class="value">${count}건</div><div class="delta up">${hasFilter ? `전체 ${totalInScope}건 중` : `필터 없음 · 전체 기준`}</div></div>
-      <div class="stat-card"><div class="label">평균 호가</div><div class="value">${count?avgPrice+'억':'-'}</div><div class="delta up">${hasFilter?'필터 적용 기준':'전체 매물 기준'}</div></div>
+      <div class="stat-card"><div class="label">평균 호가(84㎡)</div><div class="value">${avgPrice84!==null?avgPrice84+'억':'-'}</div><div class="delta up">${avgPrice84!==null?`${rows84.length}건 기준`:'84㎡ 매물 없음'}</div></div>
       <div class="stat-card"><div class="label">갭투자 매물 비중</div><div class="value">${count?gapPct+'%':'-'}</div><div class="delta down">특징 키워드 기준</div></div>
       <div class="stat-card"><div class="label">데이터 소스</div><div class="value">리치부동산연구소</div><div class="delta up">대표매물 · 매매</div></div>
     </div>
@@ -1457,7 +1599,7 @@ function submitInquiry(){
 }
 
 function renderPredictPanel(scopeLabel){
-  const complexList = predictComplexList(state.gu, state.housingType);
+  const complexList = predictComplexList(state.gu, state.housingType, state.dong);
   if(!complexList.length){
     return `<div class="panel"><h2>내집시세예측</h2><p style="color:var(--text-muted);font-size:13px;">${state.gu} · ${state.housingType}는 아직 매물 데이터가 있는 단지가 없어 예측할 수 없습니다.</p></div>`;
   }
@@ -1613,12 +1755,12 @@ function renderPredictPanel(scopeLabel){
   const directionSelectOptions = ["전체", ...directionOptions].map(d=>`<option value="${d}" ${d===direction?'selected':''}>${d==='전체'?'전체(향 무관)':d}</option>`).join('');
 
   const nearbyTx = (REAL_TX[state.housingType]?.[complex] || []).filter(t=> Math.abs(t.size - area) <= 5)
-    .sort((a,b)=> b.date.localeCompare(a.date)).slice(0,3);
+    .sort((a,b)=> b.date.localeCompare(a.date)).slice(0,5);
   const nearbyTxHtml = nearbyTx.length ? `
     <div style="margin-top:10px;border-top:1px solid var(--line);padding-top:10px;">
       <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px;">최근 실거래 (${areaKey}㎡ 근처 · 사이즈별 정확 비교)</div>
       ${nearbyTx.map(t=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0;">
-        <span style="color:var(--text-muted);">${t.date} · ${t.dong!=='-'?t.dong+'동 ':''}${t.floor}층 · ${Math.floor(t.size)}㎡</span>
+        <span style="color:var(--text-muted);">${t.date} · ${t.dong!=='-'?String(t.dong).replace(/동$/,'')+'동 ':''}${t.floor}층 · ${Math.floor(t.size)}㎡</span>
         <span style="font-weight:700;">${t.amount}억 ${t.isRecordHigh?'<span class="tag-gap" style="background:rgba(203,163,92,0.2);color:var(--gold);">신고가</span>':''}</span>
       </div>`).join('')}
       <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px;">※ 신고가는 같은 정확한 전용면적끼리만 비교한 기록입니다. 사이즈가 다르면 서로 다른 타입의 신고가라 동시에 여러 건 뜰 수 있어요.</div>
