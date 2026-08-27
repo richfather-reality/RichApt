@@ -314,6 +314,7 @@
     .summary-grid{grid-template-columns:repeat(2,1fr);}
     .gu-nav{flex-direction:column;}
     header,.gu-nav,.dong-nav,.feature-tabs,main,.footer{padding-left:16px;padding-right:16px;}
+    .footer{flex-direction:column;align-items:flex-start;gap:10px;}
   }
 </style>
 </head>
@@ -1696,15 +1697,22 @@ function isStandaloneMode(){
 function isIOS(){
   return /iphone|ipad|ipod/i.test(navigator.userAgent);
 }
+function isMobile(){
+  return /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
+}
 
 function renderInstallBanner(){
   const el = document.getElementById('installBanner');
   if(!el) return;
   if(isStandaloneMode()){ el.innerHTML = ''; return; }
   if(deferredInstallPrompt){
+    // 크롬 등 네이티브 설치 프롬프트 지원 브라우저 — 탭하면 바로 설치창
     el.innerHTML = `<button class="install-banner" onclick="triggerInstall()">📲 앱 설치하기 — 바탕화면에 바로 추가</button>`;
   } else if(isIOS()){
-    el.innerHTML = `<button class="install-banner" onclick="showIOSInstallGuide()">📲 앱 설치하기 — 바탕화면에 바로 추가</button>`;
+    el.innerHTML = `<button class="install-banner" onclick="showInstallGuide('ios')">📲 앱 설치하기 — 바탕화면에 바로 추가</button>`;
+  } else if(isMobile()){
+    // 삼성인터넷 등 beforeinstallprompt 미지원/미발생 브라우저 — 수동 안내로 대체
+    el.innerHTML = `<button class="install-banner" onclick="showInstallGuide('android')">📲 앱 설치하기 — 바탕화면에 바로 추가</button>`;
   } else {
     el.innerHTML = '';
   }
@@ -1728,18 +1736,21 @@ async function triggerInstall(){
   renderInstallBanner();
 }
 
-function showIOSInstallGuide(){
+function showInstallGuide(kind){
   const el = document.getElementById('iosInstallModal');
   el.style.display = 'block';
+  const steps = kind === 'ios' ? `
+        <li>하단(또는 상단)의 <b>공유</b> 버튼을 탭하세요</li>
+        <li>메뉴에서 <b>"홈 화면에 추가"</b>를 선택하세요</li>
+        <li><b>"추가"</b>를 누르면 바탕화면에 앱처럼 설치됩니다</li>` : `
+        <li>우측 상단 <b>메뉴(⋮)</b> 버튼을 탭하세요</li>
+        <li><b>"홈 화면에 추가"</b> 또는 <b>"앱 설치"</b>를 선택하세요</li>
+        <li>확인을 누르면 바탕화면에 앱처럼 설치됩니다</li>`;
   el.innerHTML = `
     <div class="install-modal-overlay" onclick="if(event.target===this) closeIOSInstallGuide()">
       <div class="install-modal">
         <h3>📲 홈 화면에 앱 추가하기</h3>
-        <ol>
-          <li>하단(또는 상단)의 <b>공유</b> 버튼을 탭하세요</li>
-          <li>메뉴에서 <b>"홈 화면에 추가"</b>를 선택하세요</li>
-          <li><b>"추가"</b>를 누르면 바탕화면에 앱처럼 설치됩니다</li>
-        </ol>
+        <ol>${steps}</ol>
         <button class="close-btn" onclick="closeIOSInstallGuide()">확인했습니다</button>
       </div>
     </div>`;
