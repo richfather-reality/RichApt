@@ -373,6 +373,77 @@
     a{color:#12615a !important;text-decoration:none !important;}
     .tag-gap{background:#eee !important;color:#333 !important;}
   }
+  /* ── 양도세 계산기 탭 (스타일이 다른 탭으로 새지 않도록 .taxcalc 안에서만 적용) ── */
+  .taxcalc{
+    --tc-ink:#1a2332;--tc-ink-soft:#4a5568;--tc-paper:#eef1f6;--tc-surface:#ffffff;
+    --tc-line:#c7cfdb;--tc-line-soft:#e1e6ee;--tc-seal:#b5423a;--tc-seal-soft:#f3e3e1;
+    --tc-teal:#2f6f5e;--tc-teal-soft:#e4efec;
+    background:var(--tc-paper);color:var(--tc-ink);border-radius:16px;padding:20px 16px 28px;margin-top:12px;
+  }
+  .taxcalc *{box-sizing:border-box;}
+  .taxcalc .tc-header{margin-bottom:18px;position:relative;padding-bottom:16px;border-bottom:2px solid var(--tc-ink);}
+  .taxcalc .tc-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--tc-seal);text-transform:uppercase;margin-bottom:6px;}
+  .taxcalc .tc-header h2{font-size:20px;margin:0 0 8px;letter-spacing:-0.01em;color:var(--tc-ink);}
+  .taxcalc .tc-header p{margin:0;font-size:13px;color:var(--tc-ink-soft);line-height:1.6;}
+  .taxcalc .tc-grid{display:flex;flex-direction:column;gap:14px;}
+  .taxcalc .tc-card{background:var(--tc-surface);border:1px solid var(--tc-line);border-radius:10px;padding:18px 16px 20px;}
+  .taxcalc .tc-card h3{font-size:14.5px;margin:0 0 14px;padding-bottom:10px;border-bottom:1px dashed var(--tc-line);display:flex;align-items:center;gap:8px;color:var(--tc-ink);font-weight:700;}
+  .taxcalc .tc-card h3 .no{width:20px;height:20px;border-radius:50%;border:1.4px solid var(--tc-ink);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-family:'IBM Plex Mono',monospace;flex-shrink:0;}
+  .taxcalc fieldset{border:none;padding:0;margin:0 0 18px;}
+  .taxcalc .tc-field{margin-bottom:14px;}
+  .taxcalc .tc-field label{display:block;font-size:12.5px;color:var(--tc-ink-soft);margin-bottom:5px;}
+  .taxcalc .tc-field .hint{font-size:11px;color:#8a93a3;margin-top:4px;line-height:1.5;}
+  .taxcalc .tc-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .taxcalc input[type="text"],.taxcalc input[type="number"],.taxcalc input[type="date"],.taxcalc select{
+    width:100%;padding:9px 10px;border:1px solid var(--tc-line);border-radius:6px;
+    font-size:14px;font-family:'IBM Plex Mono',monospace;color:var(--tc-ink);background:#fff;
+  }
+  .taxcalc select{font-family:'Pretendard',sans-serif;}
+  .taxcalc input:focus,.taxcalc select:focus{outline:none;border-color:var(--tc-ink);box-shadow:0 0 0 3px var(--tc-line-soft);}
+  .taxcalc .tc-toggle-row{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;background:var(--tc-paper);border-radius:6px;margin-bottom:12px;}
+  .taxcalc .tc-toggle-row input{margin-top:3px;width:15px;height:15px;flex-shrink:0;}
+  .taxcalc .tc-toggle-row .txt{font-size:12.5px;line-height:1.5;color:var(--tc-ink);}
+  .taxcalc .tc-toggle-row .txt b{font-weight:700;}
+  .taxcalc .tc-sub-panel{border-left:2px solid var(--tc-seal);padding:2px 0 2px 14px;margin:8px 0 16px;display:none;}
+  .taxcalc .tc-sub-panel.show{display:block;}
+  .taxcalc .tc-result-card{position:static;}
+  .taxcalc .tc-total-box{background:var(--tc-ink);color:#fff;border-radius:10px;padding:18px 18px 16px;margin-bottom:18px;position:relative;overflow:hidden;}
+  .taxcalc .tc-total-box .label{font-size:11px;letter-spacing:.06em;color:#aeb8cc;font-family:'IBM Plex Mono',monospace;margin-bottom:6px;}
+  .taxcalc .tc-total-box .amount{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;line-height:1.2;}
+  .taxcalc .tc-total-box .amount span{font-size:13px;font-weight:500;color:#aeb8cc;margin-left:4px;}
+  .taxcalc .tc-seal{
+    position:absolute;right:14px;top:14px;width:48px;height:48px;border-radius:50%;
+    border:2px solid var(--tc-seal);color:var(--tc-seal);background:rgba(181,66,58,0.12);
+    display:flex;align-items:center;justify-content:center;
+    font-size:10.5px;font-weight:700;letter-spacing:-1px;transform:rotate(-8deg);opacity:.9;text-align:center;line-height:1.2;
+  }
+  .taxcalc .ledger{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12px;}
+  .taxcalc .ledger tr{border-bottom:1px dashed var(--tc-line-soft);}
+  .taxcalc .ledger tr:last-child{border-bottom:none;}
+  .taxcalc .ledger td{padding:7px 0;vertical-align:top;}
+  .taxcalc .ledger td.k{color:var(--tc-ink-soft);font-family:'Pretendard',sans-serif;font-size:12px;width:56%;}
+  .taxcalc .ledger td.v{text-align:right;font-weight:700;white-space:nowrap;}
+  .taxcalc .ledger tr.neg td.v{color:var(--tc-seal);}
+  .taxcalc .ledger tr.sub td.k, .taxcalc .ledger tr.sub td.v{color:#8a93a3;font-size:11px;font-weight:500;padding-left:10px;}
+  .taxcalc .ledger tr.sum td{border-top:1.4px solid var(--tc-ink);padding-top:9px;font-weight:700;}
+  .taxcalc .ledger tr.highlight td{background:var(--tc-teal-soft);}
+  .taxcalc .ledger tr.highlight td.k, .taxcalc .ledger tr.highlight td.v{color:var(--tc-teal);}
+  .taxcalc .tc-owner-row{display:grid;grid-template-columns:1fr 80px 24px;gap:8px;align-items:center;margin-bottom:8px;}
+  .taxcalc .tc-owner-row input{margin:0;}
+  .taxcalc .tc-owner-row .pct{font-size:12px;color:var(--tc-ink-soft);font-family:'IBM Plex Mono',monospace;}
+  .taxcalc .tc-owner-remove{border:1px solid var(--tc-line);background:#fff;color:var(--tc-seal);border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:12px;line-height:1;}
+  .taxcalc .tc-btn-add{border:1px dashed var(--tc-ink);background:transparent;color:var(--tc-ink);border-radius:6px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:'Pretendard',sans-serif;}
+  .taxcalc .tc-share-total{font-size:11px;color:var(--tc-ink-soft);margin-top:2px;font-family:'IBM Plex Mono',monospace;}
+  .taxcalc .owner-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:11.5px;margin-bottom:16px;}
+  .taxcalc .owner-table th{text-align:left;font-family:'Pretendard',sans-serif;font-weight:700;font-size:11px;color:var(--tc-ink-soft);padding:6px;border-bottom:1.4px solid var(--tc-ink);}
+  .taxcalc .owner-table th:not(:first-child), .taxcalc .owner-table td:not(:first-child){text-align:right;}
+  .taxcalc .owner-table td{padding:8px 6px;border-bottom:1px dashed var(--tc-line-soft);}
+  .taxcalc .owner-table tr:last-child td{border-bottom:none;}
+  .taxcalc .owner-table .oname{font-family:'Pretendard',sans-serif;font-weight:700;}
+  .taxcalc .tc-note{margin-top:14px;font-size:11px;color:var(--tc-ink-soft);line-height:1.6;background:var(--tc-paper);border-radius:6px;padding:10px 12px;}
+  .taxcalc .tc-exempt-msg{background:var(--tc-teal-soft);color:var(--tc-teal);border-radius:6px;padding:14px;font-size:13px;line-height:1.6;text-align:center;font-weight:700;}
+  .taxcalc .tc-footer{margin-top:20px;font-size:11px;color:#8a93a3;line-height:1.7;border-top:1px solid var(--tc-line);padding-top:14px;}
+  .taxcalc .tc-footer b{color:var(--tc-ink-soft);}
 </style>
 </head>
 <body>
@@ -501,6 +572,7 @@ const FEATURES = [
   {key:"predict", label:"내집시세예측", needsListing:true},
   {key:"realprice", label:"실거래분석"},
   {key:"trend", label:"매물변동", needsListing:true},
+  {key:"taxcalc", label:"양도세계산"},
 ];
 
 let state = { gu:"기흥구", dong:"전체", feature:"overview", housingType:"아파트",
@@ -1181,6 +1253,9 @@ function renderMain(){
       ${isOfficetel ? officetelListingContent() : ''}`;
   } else if(state.feature==='trend'){
     el.innerHTML = renderSnapshotDiffPanel();
+  } else if(state.feature==='taxcalc'){
+    el.innerHTML = renderTaxCalcPanel();
+    initTaxCalc();
   }
 }
 
@@ -1393,6 +1468,349 @@ function renderSnapshotDiffPanel(){
     </div>
     <button id="shareTrendBtn" class="share-btn" onclick="copyShareLink('shareTrendBtn')">🔗 이 결과 URL 공유</button>
   </div>`;
+}
+
+/* ── 양도세 계산기 (업로드된 독립형 계산기를 앱 탭 패턴에 맞게 통합) ── */
+let tcOwners = [
+  {label:'소유자1', share:50},
+  {label:'소유자2', share:50},
+];
+
+function renderTaxCalcPanel(){
+  return `<div class="panel"><div class="taxcalc">
+    <div class="tc-header">
+      <div class="tc-eyebrow">Capital Gains Tax Estimator · 대한민국</div>
+      <h2>양도소득세 계산기</h2>
+      <p>부동산(주택·조합원입주권·분양권·토지·건물)을 양도할 때 예상되는 양도소득세를 간단히 추산합니다. 실제 신고세액은 개별 사정에 따라 달라질 수 있으니 참고용으로만 사용하세요.</p>
+    </div>
+    <div class="tc-grid">
+      <div class="tc-card">
+        <h3><span class="no">1</span> 자산 정보</h3>
+        <div class="tc-field">
+          <label for="tcAssetType">자산 종류</label>
+          <select id="tcAssetType">
+            <option value="house">주택 · 조합원입주권</option>
+            <option value="right">분양권</option>
+            <option value="land">토지 · 건물 (일반 부동산)</option>
+          </select>
+        </div>
+        <div class="tc-toggle-row">
+          <input type="checkbox" id="tcUnregistered">
+          <div class="txt"><b>미등기 양도자산</b>입니다 — 미등기 자산은 각종 공제가 배제되고 70% 단일세율이 적용됩니다.</div>
+        </div>
+        <div class="tc-row2">
+          <div class="tc-field">
+            <label for="tcAcqDate">취득일</label>
+            <input type="date" id="tcAcqDate">
+          </div>
+          <div class="tc-field">
+            <label for="tcDispDate">양도일 (예정)</label>
+            <input type="date" id="tcDispDate">
+          </div>
+        </div>
+        <h3 style="margin-top:22px;"><span class="no">2</span> 금액 정보 <span style="font-weight:400;font-size:11px;color:#8a93a3;">(단위: 만원, 물건 전체 기준)</span></h3>
+        <div class="tc-field">
+          <label for="tcSalePrice">양도가액</label>
+          <input type="number" id="tcSalePrice" placeholder="예: 90000 (= 9억원)">
+        </div>
+        <div class="tc-field">
+          <label for="tcAcqPrice">취득가액</label>
+          <input type="number" id="tcAcqPrice" placeholder="예: 60000 (= 6억원)">
+        </div>
+        <div class="tc-field">
+          <label for="tcExpenses">기타 필요경비</label>
+          <input type="number" id="tcExpenses" placeholder="취득세·중개수수료·법무비용·자본적지출 등 합계">
+          <div class="hint">취득 시 취득세·법무사비, 매도 시 중개수수료, 새시·구조변경 등 자본적지출을 합산해 입력하세요.</div>
+        </div>
+        <h3 style="margin-top:22px;"><span class="no">3</span> 공동명의</h3>
+        <div class="tc-toggle-row">
+          <input type="checkbox" id="tcJointOwnership">
+          <div class="txt"><b>공동명의</b>로 보유 중입니다 — 지분별로 나누어 각자 기본공제(250만원)와 누진세율을 따로 적용해 계산합니다. 대부분 단독명의보다 세액이 줄어듭니다.</div>
+        </div>
+        <div class="tc-sub-panel" id="tcOwnersPanel">
+          <div id="tcOwnersList"></div>
+          <button type="button" id="tcAddOwnerBtn" class="tc-btn-add">+ 소유자 추가</button>
+          <div class="tc-share-total" id="tcShareTotal"></div>
+          <div class="hint" id="tcShareWarning" style="color:var(--tc-seal);display:none;">지분 합계가 100%가 아닙니다. 입력한 비율대로 자동 환산해 계산하지만, 정확한 지분율을 넣어주세요.</div>
+        </div>
+        <h3 style="margin-top:22px;"><span class="no">4</span> 비과세 · 중과 판단</h3>
+        <div class="tc-toggle-row">
+          <input type="checkbox" id="tcOnehouseExempt">
+          <div class="txt"><b>1세대 1주택 비과세 요건 충족</b> — 보유기간 2년 이상 등 요건을 충족한 1세대 1주택자입니다. (양도가액 12억원 초과분만 과세)</div>
+        </div>
+        <div class="tc-sub-panel" id="tcLivingPanel">
+          <div class="tc-field">
+            <label for="tcLivingYears">거주기간 (년, 정수)</label>
+            <input type="number" id="tcLivingYears" min="0" placeholder="예: 5" value="0">
+            <div class="hint">고가주택(12억 초과) 특례 장기보유특별공제 계산에 사용됩니다. (보유·거주 각 연 4%, 최대 각 40%)</div>
+          </div>
+        </div>
+        <div class="tc-field">
+          <label for="tcMultiHouse">다주택자 조정대상지역 중과 여부</label>
+          <select id="tcMultiHouse">
+            <option value="none">해당 없음 (1주택 등 · 기본세율)</option>
+            <option value="2house">조정대상지역 2주택 (기본세율 +20%p)</option>
+            <option value="3house">조정대상지역 3주택 이상 (기본세율 +30%p)</option>
+          </select>
+          <div class="hint">다주택자 중과세는 2022년 5월부터 한시적으로 유예되어 왔으나, 정부가 <b>2026년 5월 9일자로 유예를 종료</b>했습니다(강남3구·서초구·송파구·용산구 등 일부 지역은 최대 3~4개월 추가 유예). 2026년 5월 10일부터는 조정대상지역 내 다주택자에게 원칙적으로 중과세율이 적용됩니다. 매도 시점 기준 최신 시행 여부는 국세청 홈택스에서 다시 확인하세요.</div>
+        </div>
+      </div>
+      <div class="tc-card tc-result-card">
+        <h3><span class="no">5</span> 계산 결과</h3>
+        <div id="tcResultBody"></div>
+        <div class="tc-note" id="tcPeriodNote"></div>
+      </div>
+    </div>
+    <div class="tc-footer">
+      <b>안내</b> · 이 계산기는 2025년 개정 소득세법 기준 양도소득세 기본세율·장기보유특별공제·기본공제 구조를 반영한 단순 추정 도구입니다. 공동명의는 입력한 지분율대로 양도소득금액을 나눠 소유자별로 기본공제·누진세율을 각각 적용한 뒤 합산합니다(부부 등 세대원 간 실제 지분율은 등기부등본 기준으로 입력하세요). 상속·증여 취득자산, 겸용주택, 재건축·재개발 조합원입주권의 세부 특례, 필요경비 인정 범위, 다주택 중과 유예의 최신 시행 여부 등은 반영하지 않을 수 있습니다. 실제 신고·납부 전에는 국세청 홈택스 모의계산 또는 세무사 상담을 통해 반드시 확인하시기 바랍니다. 지방소득세(산출세액의 10%)는 국세인 양도소득세와 별도로 위택스에서 신고·납부합니다.
+    </div>
+  </div></div>`;
+}
+
+function initTaxCalc(){
+  const tc$ = id => document.getElementById(id);
+
+  function tcRenderOwners(){
+    const list = tc$('tcOwnersList');
+    list.innerHTML = tcOwners.map((o,i)=>`
+      <div class="tc-owner-row" data-i="${i}">
+        <input type="text" class="tc-owner-label" value="${o.label}" data-i="${i}" placeholder="소유자명">
+        <input type="number" class="tc-owner-share" value="${o.share}" data-i="${i}" min="0" max="100" step="0.1">
+        <span class="pct">%</span>
+        ${tcOwners.length>2 ? `<button type="button" class="tc-owner-remove" data-i="${i}" title="삭제">✕</button>` : '<span></span>'}
+      </div>
+    `).join('');
+    list.querySelectorAll('.tc-owner-label').forEach(elx=>elx.addEventListener('input', e=>{
+      tcOwners[+e.target.dataset.i].label = e.target.value; tcCalc();
+    }));
+    list.querySelectorAll('.tc-owner-share').forEach(elx=>elx.addEventListener('input', e=>{
+      tcOwners[+e.target.dataset.i].share = parseFloat(e.target.value)||0; tcCalc();
+    }));
+    list.querySelectorAll('.tc-owner-remove').forEach(elx=>elx.addEventListener('click', e=>{
+      tcOwners.splice(+e.target.dataset.i,1); tcRenderOwners(); tcCalc();
+    }));
+  }
+  tcRenderOwners();
+
+  tc$('tcAddOwnerBtn').addEventListener('click', ()=>{
+    if(tcOwners.length>=6) return;
+    tcOwners.push({label:'소유자'+(tcOwners.length+1), share:0});
+    tcRenderOwners(); tcCalc();
+  });
+  tc$('tcJointOwnership').addEventListener('change', e=>{
+    tc$('tcOwnersPanel').classList.toggle('show', e.target.checked);
+    tcCalc();
+  });
+  tc$('tcOnehouseExempt').addEventListener('change', e=>{
+    tc$('tcLivingPanel').classList.toggle('show', e.target.checked);
+    tcCalc();
+  });
+  ['tcAssetType','tcUnregistered','tcAcqDate','tcDispDate','tcSalePrice','tcAcqPrice','tcExpenses','tcLivingYears','tcMultiHouse']
+    .forEach(id => tc$(id).addEventListener('input', tcCalc));
+
+  function tcWon(n){
+    n = Math.round(n);
+    return n.toLocaleString('ko-KR') + '원';
+  }
+  function tcEok(n){
+    const abs = Math.abs(n);
+    if(abs < 10000) return '';
+    const man = Math.round(n/10000);
+    return ' (' + man.toLocaleString('ko-KR') + '만원)';
+  }
+  function tcProgressiveTax(base){
+    const table = [
+      [14000000, 0.06, 0],
+      [50000000, 0.15, 1260000],
+      [88000000, 0.24, 5760000],
+      [150000000, 0.35, 15440000],
+      [300000000, 0.38, 19940000],
+      [500000000, 0.40, 25940000],
+      [1000000000, 0.42, 35940000],
+      [Infinity, 0.45, 65940000],
+    ];
+    for(const [limit, rate, ded] of table){
+      if(base <= limit) return {rate, ded};
+    }
+  }
+
+  function tcCalc(){
+    const assetType = tc$('tcAssetType').value;
+    const unregistered = tc$('tcUnregistered').checked;
+    const acqDate = tc$('tcAcqDate').value ? new Date(tc$('tcAcqDate').value) : null;
+    const dispDate = tc$('tcDispDate').value ? new Date(tc$('tcDispDate').value) : null;
+    const salePrice = (parseFloat(tc$('tcSalePrice').value)||0) * 10000;
+    const acqPrice = (parseFloat(tc$('tcAcqPrice').value)||0) * 10000;
+    const expenses = (parseFloat(tc$('tcExpenses').value)||0) * 10000;
+    const onehouse = tc$('tcOnehouseExempt').checked;
+    const livingYears = parseInt(tc$('tcLivingYears').value)||0;
+    const multiHouse = tc$('tcMultiHouse').value;
+
+    const resultBody = tc$('tcResultBody');
+    const periodNote = tc$('tcPeriodNote');
+
+    if(!acqDate || !dispDate || salePrice<=0){
+      resultBody.innerHTML = '<div class="tc-note" style="margin-top:0;">취득일·양도일과 양도가액을 입력하면 결과가 표시됩니다.</div>';
+      periodNote.style.display='none';
+      return;
+    }
+    periodNote.style.display='block';
+
+    const days = Math.max(0, Math.round((dispDate - acqDate)/86400000));
+    const years = days/365;
+    const wholeYears = Math.floor(years);
+    const yearsLabel = wholeYears + '년 ' + Math.round((years-wholeYears)*12) + '개월';
+
+    let gain = salePrice - acqPrice - expenses;
+    const loss = gain < 0;
+    if(loss) gain = 0;
+
+    let taxableGain = gain;
+    let exemptRatioNote = '';
+    let fullyExempt = false;
+    if(onehouse && assetType==='house'){
+      const THRESHOLD = 1200000000;
+      if(salePrice <= THRESHOLD){
+        fullyExempt = true;
+      } else {
+        const ratio = (salePrice - THRESHOLD)/salePrice;
+        taxableGain = gain * ratio;
+        exemptRatioNote = '과세대상 양도차익 = 양도차익 × (양도가액-12억)/양도가액';
+      }
+    }
+
+    if(fullyExempt){
+      resultBody.innerHTML = `<div class="tc-exempt-msg">양도가액이 12억원 이하로<br>1세대 1주택 비과세 요건상 양도소득세가 없습니다.</div>`;
+      periodNote.innerHTML = `보유기간 <b>${yearsLabel}</b> · 양도차익(참고) ${tcWon(gain)}${tcEok(gain)}`;
+      return;
+    }
+
+    let ltdRate = 0, ltdLabel='';
+    if(unregistered){
+      ltdRate = 0; ltdLabel='미등기자산 — 공제 배제';
+    } else if(assetType==='right'){
+      ltdRate = 0; ltdLabel='분양권 — 장기보유특별공제 적용 대상 아님';
+    } else if(onehouse && assetType==='house'){
+      const hold = wholeYears>=3 ? Math.min(wholeYears*0.04,0.40) : 0;
+      const live = livingYears>=2 ? Math.min(livingYears*0.04,0.40) : 0;
+      ltdRate = Math.min(hold+live, 0.80);
+      ltdLabel = `1세대1주택 특례 (보유 ${Math.round(hold*100)}% + 거주 ${Math.round(live*100)}%)`;
+    } else {
+      ltdRate = wholeYears>=3 ? Math.min(wholeYears*0.02, 0.30) : 0;
+      ltdLabel = wholeYears>=3 ? `보유 ${wholeYears}년 × 2%` : '보유기간 3년 미만 — 공제 없음';
+    }
+    const ltdAmount = taxableGain * ltdRate;
+    const gainAfterLtd = Math.max(0, taxableGain - ltdAmount);
+
+    const jointOwnership = tc$('tcJointOwnership').checked;
+    tc$('tcOwnersPanel').classList.toggle('show', jointOwnership);
+
+    let ownersRaw = jointOwnership
+      ? tcOwners.filter(o => o.share > 0)
+      : [{label:'단독소유', share:100}];
+    if(ownersRaw.length === 0) ownersRaw = [{label:'소유자', share:100}];
+
+    const totalShare = ownersRaw.reduce((s,o)=>s+o.share, 0) || 100;
+    const shareOff = jointOwnership && Math.abs(totalShare-100) > 0.5;
+    tc$('tcShareWarning').style.display = shareOff ? 'block' : 'none';
+    tc$('tcShareTotal').textContent = jointOwnership ? `지분 합계: ${totalShare.toFixed(1)}%` : '';
+
+    function ownerRateAndTax(ownerTaxBase){
+      let oRate, oDed=0, oLabel;
+      if(unregistered){
+        oRate = 0.70; oLabel = '미등기자산 단일세율 70%';
+      } else if(assetType==='right'){
+        oRate = years<1 ? 0.70 : 0.60;
+        oLabel = years<1 ? '분양권 · 1년 미만 70%' : '분양권 · 1년 이상 60%';
+      } else if(years<1){
+        oRate = assetType==='house' ? 0.70 : 0.50;
+        oLabel = (assetType==='house'?'보유 1년 미만 · 주택 70%':'보유 1년 미만 · 그 외자산 50%');
+      } else if(years<2){
+        oRate = assetType==='house' ? 0.60 : 0.40;
+        oLabel = (assetType==='house'?'보유 1~2년 · 주택 60%':'보유 1~2년 · 그 외자산 40%');
+      } else {
+        const p = tcProgressiveTax(ownerTaxBase);
+        oRate = p.rate; oDed = p.ded;
+        let extra = 0;
+        if(multiHouse==='2house') extra = 0.20;
+        if(multiHouse==='3house') extra = 0.30;
+        oRate += extra;
+        oLabel = `기본세율 ${Math.round((oRate-extra)*100)}%` + (extra? ` +중과 ${Math.round(extra*100)}%p` : '') + ` (누진공제 ${tcWon(oDed)})`;
+      }
+      const oCalcTax = Math.max(0, ownerTaxBase*oRate - oDed);
+      return {oRate, oDed, oLabel, oCalcTax};
+    }
+
+    let totalBasic=0, totalTaxBase=0, totalCalcTax=0;
+    const ownerRows = ownersRaw.map(o=>{
+      const shareRatio = o.share / totalShare;
+      const ownerGainAfterLtd = gainAfterLtd * shareRatio;
+      const ownerBasic = unregistered ? 0 : Math.min(2500000, ownerGainAfterLtd);
+      const ownerTaxBase = Math.max(0, ownerGainAfterLtd - ownerBasic);
+      const {oLabel, oCalcTax} = ownerRateAndTax(ownerTaxBase);
+      totalBasic += ownerBasic;
+      totalTaxBase += ownerTaxBase;
+      totalCalcTax += oCalcTax;
+      return {
+        label: o.label || '소유자',
+        sharePct: (shareRatio*100).toFixed(1),
+        taxBase: ownerTaxBase,
+        rateLabel: oLabel,
+        calcTax: oCalcTax,
+      };
+    });
+
+    const calcTax = totalCalcTax;
+    const localTax = calcTax * 0.10;
+    const totalTax = calcTax + localTax;
+    const isJoint = jointOwnership && ownerRows.length > 1;
+
+    const ownerTableHtml = isJoint ? `
+      <table class="owner-table">
+        <tr><th>소유자</th><th>지분</th><th>과세표준</th><th>세율</th><th>산출세액</th></tr>
+        ${ownerRows.map(r=>`
+          <tr>
+            <td class="oname">${r.label}</td>
+            <td>${r.sharePct}%</td>
+            <td>${tcWon(r.taxBase)}</td>
+            <td>${r.rateLabel.split('(')[0].trim()}</td>
+            <td>${tcWon(r.calcTax)}</td>
+          </tr>`).join('')}
+      </table>
+    ` : '';
+
+    const rateSummaryLabel = isJoint
+      ? '지분별 상이 — 위 소유자별 내역 참고'
+      : ownerRows[0].rateLabel;
+
+    resultBody.innerHTML = `
+      <div class="tc-total-box">
+        <div class="tc-seal">산출<br>세액<br>(국세)</div>
+        <div class="label">산출세액 합계 — 홈택스 "자진납부할세액"과 동일 항목</div>
+        <div class="amount">${tcWon(calcTax)}<span>${tcEok(calcTax)}</span></div>
+      </div>
+      ${ownerTableHtml}
+      <table class="ledger">
+        <tr><td class="k">① 양도가액</td><td class="v">${tcWon(salePrice)}</td></tr>
+        <tr><td class="k">② 취득가액</td><td class="v">${tcWon(acqPrice)}</td></tr>
+        <tr><td class="k">③ 기타 필요경비</td><td class="v">${tcWon(expenses)}</td></tr>
+        <tr class="sum"><td class="k">④ 양도차익 (①-②-③)</td><td class="v">${tcWon(gain)}</td></tr>
+        ${exemptRatioNote ? `<tr class="sub"><td class="k" colspan="2">${exemptRatioNote} → 과세대상 ${tcWon(taxableGain)}</td></tr>` : ''}
+        <tr class="neg"><td class="k">⑤ 장기보유특별공제 <span style="font-weight:400;">(${ltdLabel})</span></td><td class="v">-${tcWon(ltdAmount)}</td></tr>
+        <tr class="sum"><td class="k">⑥ 양도소득금액</td><td class="v">${tcWon(gainAfterLtd)}</td></tr>
+        <tr class="neg"><td class="k">⑦ 양도소득 기본공제 ${isJoint ? `<span style="font-weight:400;">(인당 최대 250만원 × ${ownerRows.length}명)</span>` : ''}</td><td class="v">-${tcWon(totalBasic)}</td></tr>
+        <tr class="sum highlight"><td class="k">⑧ 과세표준 합계</td><td class="v">${tcWon(totalTaxBase)}</td></tr>
+        <tr class="sub"><td class="k" colspan="2">적용세율: ${rateSummaryLabel}</td></tr>
+        <tr class="sum highlight"><td class="k">⑨ 산출세액 합계 (국세, 홈택스 신고·납부)</td><td class="v">${tcWon(calcTax)}</td></tr>
+        <tr><td class="k">⑩ 지방소득세 <span style="font-weight:400;">(⑨×10%, 위택스에 별도 신고·납부)</span></td><td class="v">${tcWon(localTax)}</td></tr>
+        <tr class="sum"><td class="k">참고: 총 부담세액 (국세+지방세)</td><td class="v">${tcWon(totalTax)}</td></tr>
+      </table>
+    `;
+
+    periodNote.innerHTML = `보유기간 <b>${yearsLabel}</b> (${days}일)` + (loss ? ' · 양도차익이 0 이하로 계산되어 세액이 발생하지 않습니다.' : '');
+  }
+
+  tcCalc();
 }
 
 function renderFinderPanel(scopeLabel){
