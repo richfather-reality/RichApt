@@ -31,13 +31,13 @@
   :root{
     --bg:#0A1420;
     --surface:#0F1F2E;
-    --surface-2:#132738;
-    --line:rgba(234,243,240,0.08);
-    --teal:#12615A;
-    --teal-light:#1C9187;
+    --surface-2:#16304A;
+    --line:rgba(234,243,240,0.14);
+    --teal:#1B7A6E;
+    --teal-light:#2FD9BE;
     --gold:#CBA35C;
     --text:#EAF3F0;
-    --text-muted:#8098A6;
+    --text-muted:#A7BAC7;
     --danger:#C96A5A;
     --price-down:#4A8FE0;
     --radius:14px;
@@ -200,7 +200,7 @@
     display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;
   }
   .stat-card{
-    background:var(--surface);border:1px solid var(--line);
+    background:var(--surface-2);border:1px solid var(--line);
     border-radius:var(--radius);padding:18px 20px;
   }
   .stat-card .label{font-size:12px;color:var(--text-muted);}
@@ -312,10 +312,16 @@
   .footer .brand-small{font-weight:700;color:var(--text);}
 
   @media (max-width:900px){
-    .summary-grid{grid-template-columns:repeat(2,1fr);}
+    .summary-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
     .gu-nav{flex-direction:column;}
-    header,.gu-nav,.dong-nav,.feature-tabs,main,.footer{padding-left:16px;padding-right:16px;}
+    header,.gu-nav,.dong-nav,.feature-tabs,main,.footer{padding-left:14px;padding-right:14px;}
     .footer{flex-direction:column;align-items:flex-start;gap:10px;}
+    .panel{padding:16px 14px;border-radius:12px;}
+    .panel h2{font-size:15.5px;}
+    .stat-card{padding:14px 12px;}
+    .stat-card .value{font-size:21px;}
+    table{font-size:12.5px;}
+    th,td{padding:8px 8px;}
   }  /* ── 인쇄(레포트) 버튼 ── */
   .print-fab{
     position:fixed;right:18px;bottom:18px;z-index:500;
