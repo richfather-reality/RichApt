@@ -64,7 +64,7 @@
   .ticker{
     display:inline-block;
     padding-left:100%;
-    animation:scroll 32s linear infinite;
+    animation:scroll 42s linear infinite;
     font-family:'IBM Plex Mono',monospace;
     font-size:12.5px;
     color:var(--text-muted);
@@ -184,11 +184,15 @@
   .feature-tabs{
     display:flex;gap:4px;padding:20px 32px 0;
     border-bottom:1px solid var(--line);
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
   }
+  .feature-tabs::-webkit-scrollbar{display:none;}
   .feature-tab{
     background:none;border:none;color:var(--text-muted);
     font-size:14px;font-weight:600;padding:10px 16px;
     cursor:pointer;border-bottom:2px solid transparent;
+    white-space:nowrap;flex-shrink:0;
   }
   .feature-tab.active{color:var(--text);border-bottom-color:var(--gold);}
   .feature-tab:disabled{opacity:0.35;cursor:not-allowed;}
@@ -322,6 +326,7 @@
     .stat-card .value{font-size:21px;}
     table{font-size:12.5px;}
     th,td{padding:8px 8px;}
+    .feature-tab{font-size:13px;padding:10px 12px;}
   }  /* ── 인쇄(레포트) 버튼 ── */
   .print-fab{
     position:fixed;right:18px;bottom:18px;z-index:500;
@@ -335,6 +340,7 @@
 
   /* ── 인쇄용 스타일: 화면용 다크 테마 대신 종이에 맞는 밝은 레이아웃으로 전환 ── */
   @media print{
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
     body{background:#fff !important;color:#111 !important;}
     .ticker-wrap,.gu-nav,.dong-nav,#typeToggle,.feature-tabs,
     .contact-banner,#installBanner,#iosInstallModal,.print-fab,
@@ -342,7 +348,7 @@
     .inquiry-form,.summary-cta{display:none !important;}
     .print-only{display:block !important;}
     header{padding:0 0 12px !important;border:none !important;display:flex !important;justify-content:space-between !important;align-items:center !important;}
-    header .brand-mark{background:var(--teal) !important;color:#fff !important;}
+    header .brand-mark{background:var(--teal) !important;background-image:none !important;color:#fff !important;}
     header h1{color:#111 !important;}
     header .sub{color:#555 !important;}
     .char-wrap{display:flex !important;}
@@ -359,8 +365,14 @@
     main{padding:0 !important;}
     .panel{
       background:#fff !important;border:1px solid #ccc !important;
-      box-shadow:none !important;page-break-inside:avoid;margin-bottom:14px !important;
+      box-shadow:none !important;margin-bottom:14px !important;
     }
+    /* 세로로 긴 패널(양도세 계산기 등)은 통째로 다음 페이지로 밀리면 앞장이 텅 비므로
+       작은 패널만 페이지 중간에서 안 끊기게 하고, 큰 패널은 자연스럽게 나눠지도록 둔다.
+       :has()는 일부 인쇄/PDF 엔진에서 지원이 불안정해 전용 클래스로 확실하게 지정한다. */
+    .panel{page-break-inside:avoid;}
+    .taxcalc-panel, .taxcalc-panel *{page-break-inside:auto !important;}
+    .taxcalc .tc-card{page-break-inside:avoid;}
     .panel h2{color:#111 !important;}
     .stat-card{background:#f5f5f5 !important;border:1px solid #ddd !important;}
     .stat-card .label{color:#555 !important;}
@@ -401,8 +413,13 @@
   .taxcalc .tc-field .hint{font-size:11px;color:#8a93a3;margin-top:4px;line-height:1.5;}
   .taxcalc .tc-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   .taxcalc input[type="text"],.taxcalc input[type="number"],.taxcalc input[type="date"],.taxcalc select{
-    width:100%;padding:9px 10px;border:1px solid var(--tc-line);border-radius:6px;
+    width:100%;padding:9px 8px;border:1px solid var(--tc-line);border-radius:6px;
     font-size:14px;font-family:'IBM Plex Mono',monospace;color:var(--tc-ink);background:#fff;
+  }
+  .taxcalc input[type="date"]{font-size:13px;min-width:0;}
+  @media (max-width:420px){
+    .taxcalc .tc-row2{grid-template-columns:1fr;}
+    .taxcalc input[type="date"]{font-size:14px;}
   }
   .taxcalc select{font-family:'Pretendard',sans-serif;}
   .taxcalc input:focus,.taxcalc select:focus{outline:none;border-color:var(--tc-ink);box-shadow:0 0 0 3px var(--tc-line-soft);}
@@ -1498,7 +1515,7 @@ let tcOwners = [
 ];
 
 function renderTaxCalcPanel(){
-  return `<div class="panel"><div class="taxcalc">
+  return `<div class="panel taxcalc-panel"><div class="taxcalc">
     <div class="tc-header">
       <div class="tc-eyebrow">Capital Gains Tax Estimator · 대한민국</div>
       <h2>양도소득세 계산기</h2>
