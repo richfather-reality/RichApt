@@ -337,6 +337,7 @@
   }
   .print-fab:hover{filter:brightness(1.1);}
   .print-only{display:none;}
+  .print-watermark{display:none;}
 
   /* ── 인쇄용 스타일: 화면용 다크 테마 대신 종이에 맞는 밝은 레이아웃으로 전환 ── */
   @media print{
@@ -347,6 +348,10 @@
     .footer,.share-btn,.dong-chip,.close-btn,
     .inquiry-form,.summary-cta{display:none !important;}
     .print-only{display:block !important;}
+    .print-watermark{
+      display:block !important;position:fixed !important;inset:0;z-index:9999;
+      overflow:hidden;pointer-events:none;
+    }
     header{padding:0 0 12px !important;border:none !important;display:flex !important;justify-content:space-between !important;align-items:center !important;}
     header .brand-mark{background:var(--teal) !important;background-image:none !important;color:#fff !important;}
     header h1{color:#111 !important;}
@@ -505,6 +510,7 @@
 
 <main id="mainContent"></main>
 <div id="printFooter" class="print-only">📞 리치부동산 · 010-4897-8240</div>
+<div id="printWatermark" class="print-watermark"></div>
 
 <div class="footer">
   <div><span class="brand-small">리치부동산연구소</span> · 리치아파트 통합 시세 플랫폼 (내부 검토용 · 미공개)</div>
@@ -2526,6 +2532,22 @@ function printReport(){
       <div class="title">리치아파트 · ${featureLabel} 레포트</div>
       <div>${scopeParts.join(' · ')} &nbsp;|&nbsp; 출력일시: ${dateStr} &nbsp;|&nbsp; 리치부동산연구소 (내부검토용 · 미공개)</div>
     `;
+  }
+  // 페이지마다 자동으로 반복되는 대각선 워터마크 (타 부동산의 무단 상업적 활용 방지)
+  const wmEl = document.getElementById('printWatermark');
+  if(wmEl){
+    const text = '리치부동산 · 010-4897-8240';
+    let tiles = '';
+    for(let r=0; r<10; r++){
+      for(let c=0; c<4; c++){
+        const top = r*130 - 100;
+        const left = c*280 - 140 + (r%2===0 ? 0 : 140);
+        tiles += `<div style="position:absolute;top:${top}px;left:${left}px;transform:rotate(-30deg);
+          white-space:nowrap;font-size:14px;font-weight:700;color:rgba(0,0,0,0.09);
+          font-family:'Pretendard',sans-serif;">${text}</div>`;
+      }
+    }
+    wmEl.innerHTML = tiles;
   }
   try{
     window.print();
