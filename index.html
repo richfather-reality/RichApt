@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>리치아파트 | 리치부동산연구소</title>
 <meta property="og:title" content="리치아파트 - 기흥구·영통구 통합 시세">
-<meta property="og:description" content="리치부동산연구소가 만드는 기흥구·영통구 통합 아파트 시세 플랫폼">
+<meta property="og:description" content="🔥 오늘 사라진 매물 6건 — 영통SK뷰 12억, 힐스테이트영통 14억 등. 실시간 매물·실거래 확인은 리치아파트에서!">
 <meta property="og:type" content="website">
 <meta property="og:url" content="TBD-배포후-canonical-URL로-교체">
-<meta property="og:image" content="character.jpg">
-<meta property="og:image:width" content="600">
-<meta property="og:image:height" content="600">
+<meta property="og:image" content="icon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -93,6 +93,11 @@
     display:flex;align-items:center;justify-content:center;
     font-weight:800;font-size:17px;letter-spacing:-0.5px;
     border:1px solid var(--line);
+    position:relative;
+  }
+  .update-badge{
+    position:absolute;top:-3px;right:-3px;width:11px;height:11px;
+    border-radius:50%;background:var(--danger);border:2px solid var(--bg);
   }
   .brand h1{
     font-size:21px;font-weight:800;letter-spacing:-0.3px;margin:0;
@@ -480,7 +485,7 @@
 
 <header>
   <div class="brand">
-    <div class="brand-mark">R</div>
+    <div class="brand-mark">R<span id="updateBadge" class="update-badge" style="display:none;"></span></div>
     <div>
       <h1>리치아파트</h1>
       <div class="sub">리치부동산연구소<br>RICH APT MARKET INDEX</div>
@@ -625,6 +630,9 @@ let state = { gu:"기흥구", dong:"전체", feature:"overview", housingType:"�
     phone:"", name:"", category:"아파트", complex:"", dong:"", ho:"", price:"", message:"" } };
 
 const CRM_LEADS_URL = 'https://richfathercrm-production.up.railway.app/api/leads';
+/* 매물/실거래 데이터를 마지막으로 갱신한 날짜. 새 데이터를 올려서 처리할 때마다 이 값을 갱신한다.
+   갱신이 없는 날은 이 값이 그대로 유지되어, "최근 갱신일"이 항상 정확하게 표시된다. */
+const DATA_LAST_UPDATED = '2026-08-29';
 /* CRM 전용 모드: CRM에서 이 비밀 파라미터를 붙여서 링크를 열었을 때만
    매물을 눌렀을 때 어느 부동산이 올린 매물인지 보여준다. 일반 방문자에게는 절대 노출 안 됨.
    예: https://.../index.html?agentKey=richfather-crm-2026 */
@@ -1202,17 +1210,21 @@ function renderMain(){
   };
 
   if(state.feature==='overview'){
+    const newTxSection = (newRows) => `<div class="panel" style="border:1px solid rgba(203,163,92,0.35);">
+        <h2>🆕 오늘 새로 올라온 실거래 (${newRows.length}건)</h2>
+        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">
+          📅 최근 갱신일: <b style="color:var(--gold);">${DATA_LAST_UPDATED}</b> — 데이터를 다시 올리기 전까지는 이 날짜 기준 최신 상태가 그대로 유지됩니다.<br>
+          ⚠️ 계약일이 오늘이라는 뜻이 아니라, 국토부 시스템에 이 날짜에 새로 공개된 거래입니다 (신고 기한이 최대 30일이라 계약은 몇 달 전일 수 있어요). 신고가 배지·(±억)는 기존 최고가 대비 변동폭입니다.
+        </p>
+        ${newRows.length ? realTxTable(newRows, true) : emptyState('이번 갱신에는 새로 올라온 실거래가 없습니다', `${DATA_LAST_UPDATED} 기준, 매물 추적 단지 중 새로 공개된 거래가 없었어요`)}
+      </div>`;
     if(isOfficetel){
       const txRows = trackedRealTxList();
       const newRows = newTxList();
       const complexRows = realComplexBreakdown();
       const recordCount = txRows.filter(r=>r.isRecordHigh).length;
       el.innerHTML = summaryHtml + officetelNotice + `
-      ${newRows.length ? `<div class="panel" style="border:1px solid rgba(203,163,92,0.35);">
-        <h2>🆕 오늘 새로 올라온 실거래 (${newRows.length}건)</h2>
-        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">⚠️ 계약일이 오늘이라는 뜻이 아니라, 국토부 시스템에 오늘 새로 공개된 거래입니다 (신고 기한이 최대 30일이라 계약은 몇 달 전일 수 있어요). 신고가 배지·(±억)는 기존 최고가 대비 변동폭입니다.</p>
-        ${realTxTable(newRows, true)}
-      </div>` : ''}
+      ${newTxSection(newRows)}
       <div class="panel">
         <h2>${scopeLabel} 단지별 최고가 현황 (${state.housingType})</h2>
         <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">매물 추적 단지 기준, 지금까지 확인된 실거래 중 가장 높은 가격입니다.</p>
@@ -1229,11 +1241,7 @@ function renderMain(){
       const newRows = newTxList();
       const complexRows = realComplexBreakdown();
       el.innerHTML = summaryHtml + `
-      ${newRows.length ? `<div class="panel" style="border:1px solid rgba(203,163,92,0.35);">
-        <h2>🆕 오늘 새로 올라온 실거래 (${newRows.length}건)</h2>
-        <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">⚠️ 계약일이 오늘이라는 뜻이 아니라, 국토부 시스템에 오늘 새로 공개된 거래입니다 (신고 기한이 최대 30일이라 계약은 몇 달 전일 수 있어요). 신고가 배지·(±억)는 기존 최고가 대비 변동폭입니다.</p>
-        ${realTxTable(newRows, true)}
-      </div>` : ''}
+      ${newTxSection(newRows)}
       <div class="panel">
         <h2>${scopeLabel} 단지별 최고가 현황 (${state.housingType})</h2>
         <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">매물 추적 단지 기준, 지금까지 확인된 실거래 중 가장 높은 가격입니다.</p>
@@ -2554,13 +2562,18 @@ function printReport(){
     `;
   }
   // 페이지 중앙에 대각선으로 하나만 크게 뜨는 워터마크 (타 부동산의 무단 상업적 활용 방지)
+  // 단, CRM 전용 링크로 접속한 경우(우리 쪽 직원/고객 응대용 출력)는 워터마크를 넣지 않는다.
   const wmEl = document.getElementById('printWatermark');
   if(wmEl){
-    const text = '리치부동산 · 010-4897-8240';
-    wmEl.innerHTML = `<div style="position:absolute;top:50%;left:50%;
-      transform:translate(-50%,-50%) rotate(-30deg);
-      white-space:nowrap;font-size:38px;font-weight:800;color:rgba(0,0,0,0.10);
-      font-family:'Pretendard',sans-serif;letter-spacing:1px;">${text}</div>`;
+    if(CRM_MODE){
+      wmEl.innerHTML = '';
+    } else {
+      const text = '리치부동산 · 010-4897-8240';
+      wmEl.innerHTML = `<div style="position:absolute;top:50%;left:50%;
+        transform:translate(-50%,-50%) rotate(-30deg);
+        white-space:nowrap;font-size:38px;font-weight:800;color:rgba(0,0,0,0.10);
+        font-family:'Pretendard',sans-serif;letter-spacing:1px;">${text}</div>`;
+    }
   }
   try{
     window.print();
@@ -2569,6 +2582,19 @@ function printReport(){
     alert('이 화면(미리보기)에서는 인쇄가 지원되지 않을 수 있습니다.\n실제 배포된 주소(예: https://richfather-reality.github.io/...)로 접속해서 다시 시도해주세요.');
   }
 }
+
+/* 데이터 갱신 알림 배지: localStorage에 "마지막으로 확인한 갱신일"을 저장해두고,
+   DATA_LAST_UPDATED가 그것보다 새로우면 R마크에 빨간 점을 띄운다.
+   이번에 배지를 보여준 뒤엔 "확인함"으로 저장해서 다음 방문부턴 다시 안 뜬다. */
+try{
+  const SEEN_KEY = 'richapt_lastSeenUpdate';
+  const lastSeen = localStorage.getItem(SEEN_KEY);
+  if(lastSeen !== DATA_LAST_UPDATED){
+    const badgeEl = document.getElementById('updateBadge');
+    if(badgeEl) badgeEl.style.display = 'block';
+    localStorage.setItem(SEEN_KEY, DATA_LAST_UPDATED);
+  }
+}catch(e){ /* localStorage 사용 불가 환경(예: 미리보기)에서는 그냥 배지 없이 진행 */ }
 
 renderInstallBanner();
 
