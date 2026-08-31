@@ -577,7 +577,7 @@ const EXISTING_MAX = {"아파트": {"e편한세상구성역플랫폼시티": {"5
 
 
 ;
-const NEW_TX = {"아파트": {"상떼빌구성역플랫폼시티": [{"date": "2026.08.28", "size": 84.86, "sizeFloor": 84.862, "floor": "13", "amount": 7.9, "dong": "-", "isRecordHigh": false, "deltaVsExisting": -0.9}], "신동백롯데캐슬에코1단지": [{"date": "2026.08.27", "size": 134.61, "sizeFloor": 134.61, "floor": "12", "amount": 8.2, "dong": "-", "isRecordHigh": false, "deltaVsExisting": -0.2}], "신흥덕롯데캐슬레이시티": [{"date": "2026.07.31", "size": 59.57, "sizeFloor": 59.5731, "floor": "28", "amount": 6.55, "dong": "-", "isRecordHigh": false, "deltaVsExisting": -0.05}], "죽현마을아이파크": [{"date": "2026.08.26", "size": 84.76, "sizeFloor": 84.7616, "floor": "21", "amount": 12.4, "dong": "-", "isRecordHigh": true, "deltaVsExisting": 0.4}]}, "오피스텔": {"기흥역 파크 푸르지오": [{"date": "2026.08.22", "size": 84.02, "sizeFloor": 84.018, "floor": "40", "amount": 5.1, "dong": "-", "isRecordHigh": true, "deltaVsExisting": null}], "다원캐슬": [{"date": "2026.08.28", "size": 66.71, "sizeFloor": 66.71, "floor": "10", "amount": 3.89, "dong": "-", "isRecordHigh": false, "deltaVsExisting": -0.16}]}}
+const NEW_TX = {"아파트": {}, "오피스텔": {}};
 
 
 
@@ -646,7 +646,7 @@ const DATA_LAST_UPDATED = '2026-08-31';
    예: https://.../index.html?agentKey=richfather-crm-2026 */
 const CRM_SECRET_KEY = 'richfather-crm-2026';
 const CRM_MODE = new URLSearchParams(window.location.search).get('agentKey') === CRM_SECRET_KEY;
-let expandedListingKey = null; // CRM 모드에서 클릭해서 펼친 매물 행 추적
+let expandedListingKeys = new Set(); // CRM 모드에서 클릭해서 펼친 매물 행들 추적 (여러 개 동시에 열어둘 수 있음)
 
 /* 예산 구간: max는 배타적 상한(해당 값 미포함)으로 취급해 경계값이 두 구간에 동시에 걸리지 않게 함.
    예) 12~15억은 15억 미만, 15억~은 15억 이상(포함)까지 — 구간이 서로 겹치지 않음. */
@@ -1356,7 +1356,9 @@ function groupRowsByComplex(rows){
 }
 
 function toggleListingAgency(key){
-  expandedListingKey = (expandedListingKey === key) ? null : key;
+  // 이미 열려있으면 그 행만 닫고, 아니면 열기 — 다른 행이 열려있어도 그대로 유지됨
+  if(expandedListingKeys.has(key)) expandedListingKeys.delete(key);
+  else expandedListingKeys.add(key);
   render();
 }
 
@@ -1378,10 +1380,10 @@ function listingTable(rows){
             const rowKey = `${complex}_${r.building||'-'}_${r.floor}_${type}_${i}`;
             // CRM 모드가 아니면 클릭해도 아무 반응 없음 — 일반 방문자에게 부동산 정보 절대 노출 안 됨
             const clickAttr = CRM_MODE ? `onclick="toggleListingAgency('${rowKey.replace(/'/g,"\\'")}')" style="cursor:pointer;"` : '';
-            const isOpen = CRM_MODE && expandedListingKey === rowKey;
+            const isOpen = CRM_MODE && expandedListingKeys.has(rowKey);
             const agencyRow = isOpen ? `<tr><td colspan="5" style="background:var(--surface-2);font-family:'Pretendard';font-size:12px;color:var(--gold);">
               ${(r.agencies && r.agencies.length)
-                ? `🏢 ${r.agencies.length}곳에 등록됨: ${r.agencies.join(' · ')}`
+                ? `🏢 ${r.agencies.length}곳에 등록됨: ${r.agencies.map(a=>a.replace(/공인중개사사무소/g,'')).join(' · ')}`
                 : '이 매물은 부동산 정보가 저장되기 전 데이터라 확인할 수 없어요'}
             </td></tr>` : '';
             return `<tr ${clickAttr}>
