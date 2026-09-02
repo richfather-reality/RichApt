@@ -1423,6 +1423,26 @@ function toggleListingAgency(key){
   render();
 }
 
+/* 특정 매물(동/층/타입 조합)이 매물 이력상 언제부터 계속 있었는지 추적해서 "등록 며칠째"를 계산.
+   중간에 하루라도 빠졌다가 다시 나타났으면 그 재등장 시점부터 새로 센다.
+   우리가 갖고 있는 이력 범위(LISTING_HISTORY 첫날)보다 더 예전부터 있었을 수도 있어서,
+   이력 첫날에 걸리면 "그 이상"이라는 뜻으로 물결표(~)를 붙인다. */
+function getListingAgeDays(complex, building, floor, unitType){
+  const dates = Object.keys(LISTING_HISTORY).sort();
+  if(!dates.length) return null;
+  const matches = (snap) => snap.some(l=> l.complex===complex && l.building===building && l.floor===floor && l.unitType===unitType);
+  let firstSeenIdx = null;
+  for(let i=dates.length-1;i>=0;i--){
+    if(matches(LISTING_HISTORY[dates[i]])) firstSeenIdx = i;
+    else break;
+  }
+  if(firstSeenIdx===null) return null;
+  const firstSeenDate = dates[firstSeenIdx];
+  const lastDate = dates[dates.length-1];
+  const days = Math.round((new Date(lastDate) - new Date(firstSeenDate)) / 86400000);
+  return { days, uncertain: firstSeenIdx===0 };
+}
+
 function listingTable(rows){
   if(!rows.length) return emptyState('표시할 매물이 없습니다','해당 범위에 매물 데이터가 없습니다');
   const groups = groupRowsByComplex(rows);
@@ -1447,13 +1467,18 @@ function listingTable(rows){
                 ? `🏢 ${r.agencies.length}곳에 등록됨: ${r.agencies.map(a=>a.replace(/공인중개사사무소/g,'')).join(' · ')}`
                 : '이 매물은 부동산 정보가 저장되기 전 데이터라 확인할 수 없어요'}
             </td></tr>` : '';
+            // 오래 안 팔린 매물만(14일 이상) 눈에 띄게 배지로 표시 — 신선한 매물은 화면 안 지저분하게 그대로 둠
+            const age = getListingAgeDays(complex, r.building, r.floor, type);
+            const ageRow = (age && age.days >= 14)
+              ? `<tr><td colspan="5" style="padding-top:0;padding-bottom:8px;"><span style="background:rgba(203,163,92,0.15);color:var(--gold);border-radius:6px;padding:2px 8px;font-size:10.5px;font-family:'Pretendard';">등록 ${age.days}일째${age.uncertain?'~':''}</span></td></tr>`
+              : '';
             return `<tr ${clickAttr}>
             <td style="font-family:'Pretendard'">${dongType}</td>
             <td>${r.floor}</td>
             <td style="font-family:'Pretendard'">${r.direction ?? '-'}</td>
             <td>${r.price}억</td>
             <td>${r.gap ? '<span class="tag-gap">갭투자</span>' : '-'}</td>
-          </tr>${agencyRow}`;}).join('')}
+          </tr>${agencyRow}${ageRow}`;}).join('')}
         </tbody>
       </table>
     </div>`;
@@ -1707,6 +1732,34 @@ function renderSnapshotDiffPanel(){
     return m ? m.direction : null;
   };
 
+  /* 소멸매물 → 실거래 매칭 추정.
+     조건: 같은 단지+같은 평형, 매물이 사라진 시점 기준 -10일~+45일 안에 신고된 실거래,
+     실거래가가 호가의 85~100% 사이. 여러 개면 가격이 가장 비슷한 것 하나만.
+     같은 실거래를 다른 소멸매물에 중복으로 갖다붙이지 않도록 한 번 쓴 건 제외. */
+  const usedTx = new Set();
+  const estimateSoldMatch = (goneListing, baseDateStr) => {
+    if(!goneListing.area) return null;
+    const areaFloor = Math.floor(goneListing.area);
+    const baseDate = new Date(baseDateStr);
+    const list = (REAL_TX[goneListing.type]?.[goneListing.complex]) || [];
+    const candidates = list.filter((tx,idx)=>{
+      const txKey = goneListing.complex+'|'+tx.date+'|'+tx.amount+'|'+idx;
+      if(usedTx.has(txKey)) return false;
+      if(Math.floor(tx.sizeFloor) !== areaFloor) return false;
+      const txDate = new Date(tx.date.replace(/\./g,'-'));
+      const diffDays = (txDate - baseDate) / 86400000;
+      if(diffDays < -10 || diffDays > 45) return false;
+      if(tx.amount > goneListing.price || tx.amount < goneListing.price*0.85) return false;
+      return true;
+    });
+    if(!candidates.length) return null;
+    candidates.sort((a,b)=> Math.abs(a.amount-goneListing.price) - Math.abs(b.amount-goneListing.price));
+    const best = candidates[0];
+    const bestIdx = list.indexOf(best);
+    usedTx.add(goneListing.complex+'|'+best.date+'|'+best.amount+'|'+bestIdx);
+    return best;
+  };
+
   const rowsHtml = (arr, kind) => {
     if(!arr.length) return `<div style="color:var(--text-muted);font-size:12.5px;padding:8px 0;">해당 없음</div>`;
     return `<table><thead><tr><th>단지</th><th>동·타입·향</th><th>층</th>${kind==='changed' ? '<th>가격변동</th>' : '<th>가격</th>'}</tr></thead><tbody>
@@ -1721,7 +1774,14 @@ function renderSnapshotDiffPanel(){
           return `<tr><td style="font-family:'Pretendard'">${nameCell}</td><td style="font-family:'Pretendard'">${dongTypeDir}</td><td>${l.floor}</td><td>${l.oldPrice}억 → ${l.newPrice}억 <span style="color:${diffColor};">${arrow}${Math.abs(l.diff)}억</span></td></tr>`;
         }
         const dongTypeDir = `${l.building} · ${l.unitType}${l.direction ? ' · '+l.direction : ''}`;
-        return `<tr><td style="font-family:'Pretendard'">${nameCell}</td><td style="font-family:'Pretendard'">${dongTypeDir}</td><td>${l.floor}</td><td>${l.price}억</td></tr>`;
+        let matchRow = '';
+        if(kind==='gone'){
+          const match = estimateSoldMatch(l, SNAPSHOT_DIFF.oldDate);
+          if(match){
+            matchRow = `<tr><td colspan="4" style="padding-top:0;padding-bottom:8px;font-family:'Pretendard';font-size:11px;color:var(--text-muted);">🔍 ${match.date} 실거래 ${match.amount}억과 유사 · 이 가격 근처에 팔렸을 가능성</td></tr>`;
+          }
+        }
+        return `<tr><td style="font-family:'Pretendard'">${nameCell}</td><td style="font-family:'Pretendard'">${dongTypeDir}</td><td>${l.floor}</td><td>${l.price}억</td></tr>${matchRow}`;
       }).join('')}
     </tbody></table>`;
   };
