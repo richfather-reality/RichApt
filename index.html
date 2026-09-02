@@ -697,7 +697,7 @@ const DATA_LAST_UPDATED = '2026-09-01';
 let LISTING_HISTORY = {}; // 별도 파일(listing_history.json)에서 비동기로 불러옴 -- 메인 파일 용량 절약
 fetch('listing_history.json').then(function(r){return r.json();}).then(function(data){
   LISTING_HISTORY = data;
-  if(state.feature==='predict') render();
+  render(); // 매물 이력 도착 시 어느 탭을 보고 있든 새로고침 (내집시세예측·매물변동 둘 다 이 데이터 사용)
 }).catch(function(e){console.warn('매물 이력 로드 실패:', e);});
 
 
@@ -1555,6 +1555,105 @@ function exactAreasForComplex(){
   return areas;
 }
 
+/* 평형별(단지+평형) 매물 수 · 평균가 추이를 스파크라인으로 보여주는 패널.
+   LISTING_HISTORY의 날짜별 스냅샷을 훑어서 (단지, 평형) 조합별 그날의 매물건수/평균가를 뽑고,
+   점 하나하나를 연결한 미니 SVG 그래프로 그린다. */
+function sparklineSvg(values, color, w, h){
+  if(values.length < 2) return `<div style="height:${h}px;display:flex;align-items:center;color:var(--text-muted);font-size:11px;">데이터 부족</div>`;
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = (max - min) || 1;
+  const pad = 4;
+  const step = (w - pad*2) / (values.length - 1);
+  const points = values.map((v,i)=>{
+    const x = pad + i*step;
+    const y = h - pad - ((v-min)/range) * (h - pad*2);
+    return [x,y];
+  });
+  const pathD = points.map((p,i)=> (i===0?'M':'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const dots = points.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.2" fill="${color}"/>`).join('');
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${pathD}" fill="none" stroke="${color}" stroke-width="1.6"/>${dots}</svg>`;
+}
+
+function renderAreaTrendPanel(){
+  const dates = Object.keys(LISTING_HISTORY).sort();
+  if(dates.length < 2){
+    return `<div class="panel" style="opacity:0.75;">
+      <h2>평형별 매물·호가 변화</h2>
+      <p style="color:var(--text-muted);font-size:13px;">아직 2일 이상의 매물 이력이 쌓이지 않아 추이를 볼 수 없습니다. 데이터가 쌓일수록 자동으로 채워집니다.</p>
+    </div>`;
+  }
+  // (단지, 평형) 조합별로 날짜마다 매물건수/평균가 집계
+  const groups = {}; // key: complex|areaFloor -> {complex, areaFloor, byDate:{date:{count,avg}}}
+  dates.forEach(date=>{
+    const snap = LISTING_HISTORY[date];
+    const bucket = {}; // key -> [prices]
+    snap.forEach(l=>{
+      if(l.gu!==state.gu || l.type!==state.housingType) return;
+      if(state.dong!=='전체' && (complexDongMap()[l.complex]||l.dong)!==state.dong) return;
+      if(!l.area) return;
+      const areaFloor = Math.floor(l.area);
+      const key = l.complex + '|' + areaFloor;
+      if(!bucket[key]) bucket[key] = [];
+      bucket[key].push(l.price);
+    });
+    Object.keys(bucket).forEach(key=>{
+      const [complex, areaFloorStr] = key.split('|');
+      if(!groups[key]) groups[key] = {complex, areaFloor: Number(areaFloorStr), byDate:{}};
+      const prices = bucket[key];
+      groups[key].byDate[date] = {count: prices.length, avg: Math.round(prices.reduce((a,b)=>a+b,0)/prices.length*100)/100};
+    });
+  });
+
+  const byComplex = {};
+  Object.values(groups).forEach(g=>{ (byComplex[g.complex] = byComplex[g.complex]||[]).push(g); });
+  const complexNames = Object.keys(byComplex).sort();
+  if(!complexNames.length){
+    return `<div class="panel" style="opacity:0.75;"><h2>평형별 매물·호가 변화</h2><p style="color:var(--text-muted);font-size:13px;">해당 조건의 매물 이력이 없습니다.</p></div>`;
+  }
+
+  const firstDate = dates[0], lastDate = dates[dates.length-1];
+  const cards = complexNames.map(complex=>{
+    const dotColor = COLORS[complex] || DEFAULT_COLOR;
+    const areaGroups = byComplex[complex].sort((a,b)=>a.areaFloor-b.areaFloor);
+    const areaBlocks = areaGroups.map(g=>{
+      const countSeries = dates.map(d=> g.byDate[d] ? g.byDate[d].count : null).filter(v=>v!==null);
+      const avgSeries = dates.map(d=> g.byDate[d] ? g.byDate[d].avg : null).filter(v=>v!==null);
+      const firstCount = g.byDate[firstDate]?.count, lastCount = g.byDate[lastDate]?.count;
+      const firstAvg = g.byDate[firstDate]?.avg, lastAvg = g.byDate[lastDate]?.avg;
+      const countDelta = (firstCount!=null && lastCount!=null) ? lastCount-firstCount : null;
+      const avgDelta = (firstAvg!=null && lastAvg!=null) ? Math.round((lastAvg-firstAvg)*100)/100 : null;
+      const badge = (delta, unit) => {
+        if(delta===null) return '';
+        const color = delta>0 ? 'var(--danger)' : delta<0 ? 'var(--price-down)' : 'var(--text-muted)';
+        const bg = delta>0 ? 'rgba(192,57,43,0.12)' : delta<0 ? 'rgba(47,111,187,0.12)' : 'var(--surface-2)';
+        const sign = delta>0 ? '+' : '';
+        return `<span style="background:${bg};color:${color};border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;">매물${unit==='건'?'':''} ${sign}${delta}${unit}</span>`;
+      };
+      return `<div style="border-top:1px solid var(--line);padding-top:12px;margin-top:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="background:var(--surface-2);border-radius:6px;padding:3px 10px;font-weight:700;font-size:13px;">${g.areaFloor}㎡</span>
+          <div style="display:flex;gap:6px;">
+            ${badge(countDelta, '건')}
+            ${badge(avgDelta, '억').replace('매물', '평균가')}
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px;">매물 수</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">${firstCount ?? '-'}건 → ${lastCount ?? '-'}건</div>
+        ${sparklineSvg(countSeries, dotColor, 260, 40)}
+        <div style="font-size:12px;color:var(--text-muted);margin:8px 0 2px;">평균가</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">${firstAvg ?? '-'}억 → ${lastAvg ?? '-'}억</div>
+        ${sparklineSvg(avgSeries, 'var(--gold)', 260, 40)}
+      </div>`;
+    }).join('');
+    return `<div class="panel">
+      <h2><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${dotColor};margin-right:7px;"></span>${complex}</h2>
+      ${areaBlocks}
+    </div>`;
+  }).join('');
+
+  return `<div style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">${firstDate.replace(/-/g,'.')} → ${lastDate.replace(/-/g,'.')} 평형별 변화 (매물 데이터가 쌓일수록 그래프가 촘촘해집니다)</div>${cards}`;
+}
+
 function renderSnapshotDiffPanel(){
   const complexGuMap = {};
   LISTINGS_ALL.forEach(l=>{ complexGuMap[l.complex] = l.gu; });
@@ -1640,6 +1739,11 @@ function renderSnapshotDiffPanel(){
       <div class="value" style="color:var(--danger);">${persistGoneFiltered.length}건</div>
     </div>
     ${persistGoneHtml()}
+  </div>
+  <div class="panel trend-panel">
+    <h2>📈 평형별 매물·호가 변화</h2>
+    <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">단지·평형별로 매물 수와 평균 호가가 어떻게 움직였는지 한눈에 보여줍니다.</p>
+    ${collapsiblePanel('📈 평형별 변화 보기', '단지별로 펼쳐서 보기', renderAreaTrendPanel())}
   </div>`;
 }
 
