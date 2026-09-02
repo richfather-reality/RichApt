@@ -687,6 +687,7 @@ let state = { gu:"기흥구", dong:"전체", feature:"overview", housingType:"�
   finder: { budget:"전체", areaBucket:"전체", exactArea:"전체", gapOnly:false, complex:"전체", searched:false },
   predict: { complex:null, area:84, unitType:"전체", floor:"중", building:"전체", direction:"전체" },
   realprice: { complex:"전체", area:"전체" },
+  areaTrend: { complex:"전체" },
   inquiry: { open:false, kind:"buy", submitting:false, done:false, error:"",
     phone:"", name:"", category:"아파트", complex:"", dong:"", ho:"", price:"", message:"" } };
 
@@ -1558,7 +1559,7 @@ function exactAreasForComplex(){
 /* 평형별(단지+평형) 매물 수 · 평균가 추이를 스파크라인으로 보여주는 패널.
    LISTING_HISTORY의 날짜별 스냅샷을 훑어서 (단지, 평형) 조합별 그날의 매물건수/평균가를 뽑고,
    점 하나하나를 연결한 미니 SVG 그래프로 그린다. */
-function sparklineSvg(values, color, w, h){
+function sparklineSvg(values, color, w, h, labels){
   if(values.length < 2) return `<div style="height:${h}px;display:flex;align-items:center;color:var(--text-muted);font-size:11px;">데이터 부족</div>`;
   const min = Math.min(...values), max = Math.max(...values);
   const range = (max - min) || 1;
@@ -1571,7 +1572,22 @@ function sparklineSvg(values, color, w, h){
   });
   const pathD = points.map((p,i)=> (i===0?'M':'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
   const dots = points.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.2" fill="${color}"/>`).join('');
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${pathD}" fill="none" stroke="${color}" stroke-width="1.6"/>${dots}</svg>`;
+  const svg = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${pathD}" fill="none" stroke="${color}" stroke-width="1.6"/>${dots}</svg>`;
+  if(!labels || !labels.length) return svg;
+  // 날짜가 너무 많으면 겹치지 않게 최대 5개 정도만 골라서 x축에 표시 (나머지는 점만 찍힘)
+  const maxLabels = 5;
+  const labelEvery = Math.max(1, Math.ceil(labels.length / maxLabels));
+  const labelSpans = labels.map((lb,i)=>{
+    if(i!==0 && i!==labels.length-1 && i%labelEvery!==0) return '';
+    return `<span style="position:absolute;left:${(points[i][0]/w*100).toFixed(1)}%;transform:translateX(-50%);">${lb}</span>`;
+  }).join('');
+  return `${svg}<div style="position:relative;height:14px;font-size:9.5px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;margin-top:2px;">${labelSpans}</div>`;
+}
+
+/* 날짜가 많이 쌓이면(3주 이상) 일 단위 라벨 대신 주 단위(MM.DD)로 성기게 표시해서 안 겹치게 함 */
+function formatAxisLabel(dateStr, totalCount){
+  const short = dateStr.slice(5).replace('-','.'); // MM.DD
+  return short;
 }
 
 function renderAreaTrendPanel(){
@@ -1582,6 +1598,7 @@ function renderAreaTrendPanel(){
       <p style="color:var(--text-muted);font-size:13px;">아직 2일 이상의 매물 이력이 쌓이지 않아 추이를 볼 수 없습니다. 데이터가 쌓일수록 자동으로 채워집니다.</p>
     </div>`;
   }
+  const axisLabels = dates.map(d=>formatAxisLabel(d, dates.length));
   // (단지, 평형) 조합별로 날짜마다 매물건수/평균가 집계
   const groups = {}; // key: complex|areaFloor -> {complex, areaFloor, byDate:{date:{count,avg}}}
   dates.forEach(date=>{
@@ -1606,43 +1623,55 @@ function renderAreaTrendPanel(){
 
   const byComplex = {};
   Object.values(groups).forEach(g=>{ (byComplex[g.complex] = byComplex[g.complex]||[]).push(g); });
-  const complexNames = Object.keys(byComplex).sort();
+  let complexNames = Object.keys(byComplex).sort();
   if(!complexNames.length){
     return `<div class="panel" style="opacity:0.75;"><h2>평형별 매물·호가 변화</h2><p style="color:var(--text-muted);font-size:13px;">해당 조건의 매물 이력이 없습니다.</p></div>`;
   }
+
+  // 단지 선택 칩 (전체 + 단지별) — state.areaTrend.complex로 필터
+  const selected = state.areaTrend.complex;
+  const chips = ['전체', ...complexNames].map(name=>{
+    const active = selected===name;
+    return `<span onclick="event.stopPropagation();setAreaTrendComplex('${name.replace(/'/g,"\\'")}')" style="display:inline-block;padding:5px 12px;margin:0 6px 6px 0;border-radius:20px;font-size:12px;cursor:pointer;white-space:nowrap;
+      background:${active?'var(--teal)':'var(--surface-2)'};color:${active?'#fff':'var(--text)'};border:1px solid ${active?'var(--teal)':'var(--line)'};">${name}</span>`;
+  }).join('');
+
+  if(selected!=='전체') complexNames = complexNames.filter(n=>n===selected);
 
   const firstDate = dates[0], lastDate = dates[dates.length-1];
   const cards = complexNames.map(complex=>{
     const dotColor = COLORS[complex] || DEFAULT_COLOR;
     const areaGroups = byComplex[complex].sort((a,b)=>a.areaFloor-b.areaFloor);
     const areaBlocks = areaGroups.map(g=>{
-      const countSeries = dates.map(d=> g.byDate[d] ? g.byDate[d].count : null).filter(v=>v!==null);
-      const avgSeries = dates.map(d=> g.byDate[d] ? g.byDate[d].avg : null).filter(v=>v!==null);
+      const countSeries = [], avgSeries = [], usedLabels = [];
+      dates.forEach((d,i)=>{
+        if(g.byDate[d]){ countSeries.push(g.byDate[d].count); avgSeries.push(g.byDate[d].avg); usedLabels.push(axisLabels[i]); }
+      });
       const firstCount = g.byDate[firstDate]?.count, lastCount = g.byDate[lastDate]?.count;
       const firstAvg = g.byDate[firstDate]?.avg, lastAvg = g.byDate[lastDate]?.avg;
       const countDelta = (firstCount!=null && lastCount!=null) ? lastCount-firstCount : null;
       const avgDelta = (firstAvg!=null && lastAvg!=null) ? Math.round((lastAvg-firstAvg)*100)/100 : null;
-      const badge = (delta, unit) => {
+      const badge = (delta, unit, label) => {
         if(delta===null) return '';
         const color = delta>0 ? 'var(--danger)' : delta<0 ? 'var(--price-down)' : 'var(--text-muted)';
         const bg = delta>0 ? 'rgba(192,57,43,0.12)' : delta<0 ? 'rgba(47,111,187,0.12)' : 'var(--surface-2)';
         const sign = delta>0 ? '+' : '';
-        return `<span style="background:${bg};color:${color};border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;">매물${unit==='건'?'':''} ${sign}${delta}${unit}</span>`;
+        return `<span style="background:${bg};color:${color};border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;">${label} ${sign}${delta}${unit}</span>`;
       };
       return `<div style="border-top:1px solid var(--line);padding-top:12px;margin-top:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
           <span style="background:var(--surface-2);border-radius:6px;padding:3px 10px;font-weight:700;font-size:13px;">${g.areaFloor}㎡</span>
           <div style="display:flex;gap:6px;">
-            ${badge(countDelta, '건')}
-            ${badge(avgDelta, '억').replace('매물', '평균가')}
+            ${badge(countDelta, '건', '매물')}
+            ${badge(avgDelta, '억', '평균가')}
           </div>
         </div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px;">매물 수</div>
         <div style="font-weight:700;font-size:14px;margin-bottom:4px;">${firstCount ?? '-'}건 → ${lastCount ?? '-'}건</div>
-        ${sparklineSvg(countSeries, dotColor, 260, 40)}
+        ${sparklineSvg(countSeries, dotColor, 260, 40, usedLabels)}
         <div style="font-size:12px;color:var(--text-muted);margin:8px 0 2px;">평균가</div>
         <div style="font-weight:700;font-size:14px;margin-bottom:4px;">${firstAvg ?? '-'}억 → ${lastAvg ?? '-'}억</div>
-        ${sparklineSvg(avgSeries, 'var(--gold)', 260, 40)}
+        ${sparklineSvg(avgSeries, 'var(--gold)', 260, 40, usedLabels)}
       </div>`;
     }).join('');
     return `<div class="panel">
@@ -1651,8 +1680,12 @@ function renderAreaTrendPanel(){
     </div>`;
   }).join('');
 
-  return `<div style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">${firstDate.replace(/-/g,'.')} → ${lastDate.replace(/-/g,'.')} 평형별 변화 (매물 데이터가 쌓일수록 그래프가 촘촘해집니다)</div>${cards}`;
+  return `<div style="color:var(--text-muted);font-size:13px;margin-bottom:10px;">${firstDate.replace(/-/g,'.')} → ${lastDate.replace(/-/g,'.')} 평형별 변화 (매물 데이터가 쌓일수록 그래프가 촘촘해집니다)</div>
+    <div style="margin-bottom:14px;">${chips}</div>
+    ${cards}`;
 }
+
+function setAreaTrendComplex(name){ state.areaTrend.complex = name; render(); }
 
 function renderSnapshotDiffPanel(){
   const complexGuMap = {};
