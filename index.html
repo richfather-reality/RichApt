@@ -361,6 +361,14 @@
     cursor:pointer;display:flex;align-items:center;justify-content:center;
   }
   .print-fab:hover{filter:brightness(1.1);}
+  .app-share-fab{
+    position:fixed;left:18px;bottom:18px;z-index:500;
+    border:none;border-radius:24px;padding:12px 18px;
+    background:linear-gradient(135deg, var(--teal), #0B2B28);
+    color:#fff;font-size:13.5px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,0.4);
+    cursor:pointer;display:flex;align-items:center;gap:6px;
+  }
+  .app-share-fab:hover{filter:brightness(1.1);}
   .print-only{display:none;}
   .print-watermark{display:none;}
 
@@ -369,7 +377,7 @@
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
     body{background:#fff !important;color:#111 !important;}
     .ticker-wrap,.gu-nav,.dong-nav,#typeToggle,.feature-tabs,
-    .contact-banner,#installBanner,#iosInstallModal,.print-fab,
+    .contact-banner,#installBanner,#iosInstallModal,.print-fab,.app-share-fab,
     .footer,.share-btn,.dong-chip,.close-btn,
     .inquiry-form,.summary-cta{display:none !important;}
     .print-only{display:block !important;}
@@ -528,6 +536,7 @@
 
 <div id="printHeader" class="print-only"></div>
 <button class="print-fab" onclick="printReport()" title="레포트 인쇄">🖨️</button>
+<button class="app-share-fab" onclick="shareApp()" title="앱 공유하기">📤 앱 공유</button>
 
 <nav class="gu-nav" id="guNav"></nav>
 <nav class="dong-nav" id="dongNav"></nav>
@@ -2838,6 +2847,24 @@ function loadStateFromURL(){
     if(p.get('pFloor')) state.predict.floor = p.get('pFloor');
     if(p.get('pBuilding')) state.predict.building = p.get('pBuilding');
     if(p.get('pDirection')) state.predict.direction = p.get('pDirection');
+  }
+}
+
+function shareApp(){
+  const appUrl = window.location.href.split('?')[0].split('#')[0];
+  const shareData = {
+    title: '리치아파트 - 리치부동산연구소',
+    text: '기흥구·영통구 아파트·오피스텔 실거래가와 매물 시세를 한눈에 — 리치아파트',
+    url: appUrl,
+  };
+  if(navigator.share){
+    navigator.share(shareData).catch(()=>{}); // 사용자가 공유창을 취소한 경우 등은 조용히 무시
+  } else if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(appUrl).then(()=>{
+      alert('앱 링크가 복사되었습니다. 카카오톡이나 문자에 붙여넣어 보내주세요.');
+    }).catch(()=>fallbackCopy(appUrl, ()=>alert('앱 링크가 복사되었습니다.')));
+  } else {
+    fallbackCopy(appUrl, ()=>alert('앱 링크가 복사되었습니다.'));
   }
 }
 
