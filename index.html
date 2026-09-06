@@ -340,6 +340,30 @@
   }
   .footer .brand-small{font-weight:700;color:var(--text);}
 
+  /* ── CRM 가로모드 레이아웃(태블릿·PC로 CRM 접속 시): 일반 방문자에겐 영향 없음 ── */
+  @media (min-width:900px){
+    body.crm-landscape .crm-shell{display:flex;align-items:flex-start;}
+    body.crm-landscape .crm-sidebar{
+      width:210px;flex-shrink:0;position:sticky;top:0;align-self:flex-start;
+      max-height:100vh;overflow-y:auto;padding:18px 12px;
+      border-right:1px solid var(--line);background:var(--surface);
+    }
+    body.crm-landscape .crm-sidebar .gu-nav,
+    body.crm-landscape .crm-sidebar .dong-nav,
+    body.crm-landscape .crm-sidebar .feature-tabs{
+      flex-direction:column;display:flex;padding:0;margin-bottom:14px;
+    }
+    body.crm-landscape .crm-sidebar .gu-btn,
+    body.crm-landscape .crm-sidebar .dong-chip,
+    body.crm-landscape .crm-sidebar .feature-tab{
+      width:100%;text-align:left;box-sizing:border-box;
+    }
+    body.crm-landscape .crm-main{flex:1;min-width:0;padding:0 24px;}
+    body.crm-landscape .summary-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+    body.crm-landscape .crm-side-by-side{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;}
+    body.crm-landscape .crm-side-by-side .panel{margin:0;}
+  }
+
   @media (max-width:900px){
     .summary-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
     .gu-nav{flex-direction:column;}
@@ -538,13 +562,17 @@
 <button class="print-fab" onclick="printReport()" title="레포트 인쇄">🖨️</button>
 <button class="app-share-fab" onclick="shareApp()" title="앱 공유하기">📤 앱 공유</button>
 
-<nav class="gu-nav" id="guNav"></nav>
-<nav class="dong-nav" id="dongNav"></nav>
-<nav class="dong-nav" id="typeToggle" style="padding-top:0;"></nav>
-
-<div class="feature-tabs" id="featureTabs"></div>
-
-<main id="mainContent"></main>
+<div class="crm-shell" id="crmShell">
+  <aside class="crm-sidebar" id="crmSidebar">
+    <nav class="gu-nav" id="guNav"></nav>
+    <nav class="dong-nav" id="dongNav"></nav>
+    <nav class="dong-nav" id="typeToggle" style="padding-top:0;"></nav>
+    <div class="feature-tabs" id="featureTabs"></div>
+  </aside>
+  <div class="crm-main" id="crmMain">
+    <main id="mainContent"></main>
+  </div>
+</div>
 <div id="printFooter" class="print-only">📞 리치부동산 · 010-4897-8240</div>
 <div id="printWatermark" class="print-watermark"></div>
 
@@ -764,6 +792,17 @@ fetch('listing_history.json').then(function(r){return r.json();}).then(function(
    예: https://.../index.html?agentKey=richfather-crm-2026 */
 const CRM_SECRET_KEY = 'richfather-crm-2026';
 const CRM_MODE = new URLSearchParams(window.location.search).get('agentKey') === CRM_SECRET_KEY;
+/* CRM으로 접속했고 화면이 넓으면(태블릿 가로·PC) 좌측 고정 메뉴 + 여러 열 배치 레이아웃 적용.
+   일반 방문자나 좁은 화면(휴대폰 세로)에서는 이 클래스가 안 붙어서 기존 레이아웃 그대로 유지된다. */
+function updateCrmLayout(){
+  if(CRM_MODE && window.innerWidth >= 900){
+    document.body.classList.add('crm-landscape');
+  } else {
+    document.body.classList.remove('crm-landscape');
+  }
+}
+updateCrmLayout();
+window.addEventListener('resize', updateCrmLayout);
 let expandedListingKeys = new Set(); // CRM 모드에서 클릭해서 펼친 매물 행들 추적 (여러 개 동시에 열어둘 수 있음)
 
 /* 예산 구간: max는 배타적 상한(해당 값 미포함)으로 취급해 경계값이 두 구간에 동시에 걸리지 않게 함.
