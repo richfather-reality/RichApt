@@ -1108,12 +1108,26 @@ function complexRankingByChange(){
   return results.sort((a,b)=> b.changePct-a.changePct);
 }
 
+/* 표를 반으로 쪼개서 CRM 가로모드에서 2열로 나란히 보여주는 공통 헬퍼.
+   renderRowsFn(rows)는 <table>...</table> 문자열을 반환해야 함(뒤에 붙는 안내문구 없이 표 자체만).
+   일반/좁은 화면에서는 원래 표 하나 그대로, CRM 넓은 화면에서만 2열로 전환된다. */
+function crmSplitTable(rows, renderRowsFn){
+  const full = renderRowsFn(rows);
+  if(rows.length <= 4) return full; // 너무 적으면 굳이 안 쪼갬
+  const half = Math.ceil(rows.length/2);
+  const left = rows.slice(0, half), right = rows.slice(half);
+  const oneCol = `<div class="crm-only-1col">${full}</div>`;
+  const twoCol = `<div class="crm-only-2col" style="display:none;"><div class="crm-side-by-side"><div>${renderRowsFn(left)}</div><div>${renderRowsFn(right)}</div></div></div>`;
+  return oneCol + twoCol;
+}
+
 function complexRankingTable(rows){
   if(!rows.length) return emptyState('순위를 매길 데이터가 부족합니다','최근90일·직전90일 각각 2건 이상 거래된 단지가 없습니다 (84㎡ 기준)');
-  return `<table>
+  const renderRows = (arr) => `<table>
     <thead><tr><th>순위</th><th>단지</th><th>동</th><th>최근90일 평균</th><th>변동률</th></tr></thead>
     <tbody>
-      ${rows.map((r,i)=>{
+      ${arr.map((r)=>{
+        const i = rows.indexOf(r);
         const dotColor = COLORS[r.complex] || DEFAULT_COLOR;
         const color = r.changePct>0 ? 'var(--danger)' : r.changePct<0 ? 'var(--price-down)' : 'var(--text-muted)';
         const arrow = r.changePct>0 ? '▲' : r.changePct<0 ? '▼' : '-';
@@ -1125,8 +1139,9 @@ function complexRankingTable(rows){
         <td style="color:${color};font-weight:700;">${arrow}${Math.abs(r.changePct)}%</td>
       </tr>`;}).join('')}
     </tbody>
-  </table>
-  <div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">84.0000~84.9999㎡ 거래 기준 · 최근90일 vs 직전90일 평균가 비교 · 표본 부족(각 2건 미만) 단지는 제외</div>`;
+  </table>`;
+  return crmSplitTable(rows, renderRows) +
+    `<div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">84.0000~84.9999㎡ 거래 기준 · 최근90일 vs 직전90일 평균가 비교 · 표본 부족(각 2건 미만) 단지는 제외</div>`;
 }
 
 /* 분석②: 선택한 단지+평형의 저/중/고층 가격 비교
@@ -1252,10 +1267,10 @@ function sizeTxHistoryTable(complex, area){
 
 function realComplexTable(rows){
   if(!rows.length) return emptyState('실거래 데이터가 없습니다','해당 범위에 추적 중인 단지의 실거래가 없습니다');
-  return `<table>
+  const renderRows = (arr) => `<table>
     <thead><tr><th>단지</th><th>동</th><th>거래건수</th><th>평균가</th><th>가격범위</th></tr></thead>
     <tbody>
-      ${rows.map(r=>{
+      ${arr.map(r=>{
         const dotColor = COLORS[r.complex] || DEFAULT_COLOR;
         const active = state.realprice.complex===r.complex;
         return `<tr onclick="setRealpriceComplex('${r.complex.replace(/'/g,"\\'")}')" style="cursor:pointer;${active?'background:rgba(28,145,135,0.12);':''}">
@@ -1266,8 +1281,9 @@ function realComplexTable(rows){
         <td>${r.minPrice}~${r.maxPrice}억</td>
       </tr>`;}).join('')}
     </tbody>
-  </table>
-  <div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">단지를 탭하면 그 단지 실거래로 좁혀지고, 평형도 고를 수 있어요.</div>`;
+  </table>`;
+  return crmSplitTable(rows, renderRows) +
+    `<div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">단지를 탭하면 그 단지 실거래로 좁혀지고, 평형도 고를 수 있어요.</div>`;
 }
 
 function setRealpriceComplex(c){ state.realprice.complex = c; state.realprice.area = '전체'; render(); }
@@ -1349,10 +1365,10 @@ function existingMaxSummaryTable(){
   });
   rows.sort((a,b)=> b.amount-a.amount);
   if(!rows.length) return emptyState('기존 실거래 데이터가 없습니다','추적 중인 단지의 이전 실거래 최고가가 없습니다');
-  return `<table>
+  const renderRows = (arr) => `<table>
     <thead><tr><th>동</th><th>단지</th><th>평형</th><th>기존 최고가</th><th>거래건수</th></tr></thead>
     <tbody>
-      ${rows.map(r=>{
+      ${arr.map(r=>{
         const dotColor = COLORS[r.complex] || DEFAULT_COLOR;
         return `<tr>
         <td style="font-family:'Pretendard'">${r.dong||'-'}</td>
@@ -1363,6 +1379,7 @@ function existingMaxSummaryTable(){
       </tr>`;}).join('')}
     </tbody>
   </table>`;
+  return crmSplitTable(rows, renderRows);
 }
 
 function renderMain(){
@@ -1514,10 +1531,10 @@ function renderMain(){
 
 function realTable(rows){
   if(!rows.length) return emptyState('표시할 거래 데이터가 없습니다','해당 범위에 최근 거래가 없습니다');
-  return `<table>
+  const renderRows = (arr) => `<table>
     <thead><tr><th>동</th><th>단지</th><th>전용면적</th><th>층</th><th>계약일</th><th>거래금액</th></tr></thead>
     <tbody>
-      ${rows.map(r=>`<tr>
+      ${arr.map(r=>`<tr>
         <td style="font-family:'Pretendard'">${r.dong}</td>
         <td style="font-family:'Pretendard'">${r.name}</td>
         <td>${Math.floor(r.area)}㎡</td>
@@ -1527,6 +1544,7 @@ function realTable(rows){
       </tr>`).join('')}
     </tbody>
   </table>`;
+  return crmSplitTable(rows, renderRows);
 }
 
 /* 단지별로 묶어서 반복 표시 없이 한눈에 보이게. 그룹 순서는 첫 등장 순서를 유지. */
@@ -1570,7 +1588,7 @@ function getListingAgeDays(complex, building, floor, unitType){
 function listingTable(rows){
   if(!rows.length) return emptyState('표시할 매물이 없습니다','해당 범위에 매물 데이터가 없습니다');
   const groups = groupRowsByComplex(rows);
-  return groups.map(({complex, rows: grp})=>{
+  const blocksHtml = groups.map(({complex, rows: grp})=>{
     const dotColor = COLORS[complex] || DEFAULT_COLOR;
     return `<div style="margin-bottom:16px;">
       <div style="font-weight:700;font-size:13.5px;margin-bottom:6px;font-family:'Pretendard';">
@@ -1607,6 +1625,7 @@ function listingTable(rows){
       </table>
     </div>`;
   }).join('');
+  return `<div class="crm-side-by-side">${blocksHtml}</div>`;
 }
 
 /* 접이식 패널: 클릭 전엔 요약 한 줄, 클릭하면 상세 테이블/내용이 펼쳐짐 */
@@ -1661,10 +1680,10 @@ function complexBreakdown(){
 
 function complexTable(rows){
   if(!rows.length) return emptyState('단지 데이터가 없습니다','해당 범위에 매물이 없습니다');
-  return `<table>
+  const renderRows = (arr) => `<table>
     <thead><tr><th>단지</th><th>동</th><th>매물수</th><th>평균호가</th><th>가격범위</th><th>갭투자</th></tr></thead>
     <tbody>
-      ${rows.map(r=>{
+      ${arr.map(r=>{
         const activeRow = state.finder.complex===r.complex;
         const dotColor = COLORS[r.complex] || DEFAULT_COLOR;
         return `<tr onclick="setFinderComplex('${r.complex.replace(/'/g,"\\'")}')" style="cursor:pointer;${activeRow?'background:rgba(28,145,135,0.12);':''}">
@@ -1676,8 +1695,9 @@ function complexTable(rows){
         <td>${r.gapCount>0 ? `<span class="tag-gap">${r.gapCount}건 (${r.gapPct}%)</span>` : '-'}</td>
       </tr>`;}).join('')}
     </tbody>
-  </table>
-  <div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">단지를 탭하면 아래 필터·결과가 그 단지로 좁혀집니다.</div>`;
+  </table>`;
+  return crmSplitTable(rows, renderRows) +
+    `<div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">단지를 탭하면 아래 필터·결과가 그 단지로 좁혀집니다.</div>`;
 }
 
 function filteredListings(){
@@ -1896,8 +1916,8 @@ function renderSnapshotDiffPanel(){
 
   const rowsHtml = (arr, kind) => {
     if(!arr.length) return `<div style="color:var(--text-muted);font-size:12.5px;padding:8px 0;">해당 없음</div>`;
-    return `<table><thead><tr><th>단지</th><th>동·타입·향</th><th>층</th>${kind==='changed' ? '<th>가격변동</th>' : '<th>가격</th>'}</tr></thead><tbody>
-      ${arr.map(l=>{
+    const renderRows = (sub) => `<table><thead><tr><th>단지</th><th>동·타입·향</th><th>층</th>${kind==='changed' ? '<th>가격변동</th>' : '<th>가격</th>'}</tr></thead><tbody>
+      ${sub.map(l=>{
         const dotColor = COLORS[l.complex] || DEFAULT_COLOR;
         const nameCell = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${dotColor};margin-right:6px;"></span>${l.complex}`;
         if(kind==='changed'){
@@ -1918,6 +1938,7 @@ function renderSnapshotDiffPanel(){
         return `<tr><td style="font-family:'Pretendard'">${nameCell}</td><td style="font-family:'Pretendard'">${dongTypeDir}</td><td>${l.floor}</td><td>${l.price}억</td></tr>${matchRow}`;
       }).join('')}
     </tbody></table>`;
+    return crmSplitTable(arr, renderRows);
   };
 
   const persistGoneFiltered = (PERSIST_GONE.list || []).filter(l => {
@@ -1929,13 +1950,14 @@ function renderSnapshotDiffPanel(){
 
   const persistGoneHtml = () => {
     if(!persistGoneFiltered.length) return `<div style="color:var(--text-muted);font-size:12.5px;padding:8px 0;">해당 없음</div>`;
-    return `<table><thead><tr><th>단지</th><th>동·타입</th><th>층</th><th>가격</th><th>마지막 확인일</th></tr></thead><tbody>
-      ${persistGoneFiltered.map(l=>{
+    const renderRows = (sub) => `<table><thead><tr><th>단지</th><th>동·타입</th><th>층</th><th>가격</th><th>마지막 확인일</th></tr></thead><tbody>
+      ${sub.map(l=>{
         const dotColor = COLORS[l.complex] || DEFAULT_COLOR;
         const nameCell = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${dotColor};margin-right:6px;"></span>${l.complex}`;
         return `<tr><td style="font-family:'Pretendard'">${nameCell}</td><td style="font-family:'Pretendard'">${l.building} · ${l.unitType}</td><td>${l.floor}</td><td>${l.price}억</td><td style="color:var(--text-muted);">${l.lastSeenDate}</td></tr>`;
       }).join('')}
     </tbody></table>`;
+    return crmSplitTable(persistGoneFiltered, renderRows);
   };
 
   return `<div class="panel trend-panel">
