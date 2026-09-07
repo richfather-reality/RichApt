@@ -1590,14 +1590,16 @@ function listingTable(rows){
   const groups = groupRowsByComplex(rows);
   const blocksHtml = groups.map(({complex, rows: grp})=>{
     const dotColor = COLORS[complex] || DEFAULT_COLOR;
-    return `<div style="margin-bottom:16px;">
-      <div style="font-weight:700;font-size:13.5px;margin-bottom:6px;font-family:'Pretendard';">
+    const header = `<div style="font-weight:700;font-size:13.5px;margin-bottom:6px;font-family:'Pretendard';">
         <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${dotColor};margin-right:6px;"></span>${complex}
-      </div>
-      <table>
+      </div>`;
+    // 행마다 고유 rowKey를 만들 때 쓰는 인덱스를 미리 붙여둠 — 2열로 쪼갠 뒤에도(왼쪽/오른쪽 각각 0부터 다시 세지 않도록) 안 겹치게 하기 위함
+    const grpIndexed = grp.map((r,i)=>({...r, _gidx:i}));
+    const renderRowsFn = (subset) => `<table>
         <thead><tr><th>동·타입</th><th>층</th><th>향</th><th>가격</th><th>비고</th></tr></thead>
         <tbody>
-          ${grp.map((r,i)=>{
+          ${subset.map((r)=>{
+            const i = r._gidx;
             const type = (r.unitType !== undefined ? r.unitType : r.type) || '';
             const dongType = r.building ? `${r.building} · ${type}` : type;
             const rowKey = `${complex}_${r.building||'-'}_${r.floor}_${type}_${i}`;
@@ -1622,8 +1624,10 @@ function listingTable(rows){
             <td>${r.gap ? '<span class="tag-gap">갭투자</span>' : '-'}</td>
           </tr>${agencyRow}${ageRow}`;}).join('')}
         </tbody>
-      </table>
-    </div>`;
+      </table>`;
+    // CRM 가로모드(넓은 화면)에선 매물이 많은 단지는 표를 절반으로 쪼개 2열로,
+    // 일반/좁은 화면 및 매물이 적은 단지는 기존처럼 표 하나 그대로.
+    return `<div style="margin-bottom:16px;">${header}${crmSplitTable(grpIndexed, renderRowsFn)}</div>`;
   }).join('');
   return `<div class="crm-side-by-side">${blocksHtml}</div>`;
 }
