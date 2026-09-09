@@ -11,6 +11,16 @@ REAL_TX 전체를 다시 만든다. 신고가(isRecordHigh)는 같은 단지+정
 import openpyxl, json, sys
 from collections import defaultdict
 
+def parse_gu_dong(sigungu):
+    parts = (sigungu or '').split()
+    gu = parts[2] if len(parts) > 2 else ''
+    dong = ''
+    for p in reversed(parts):
+        if p.endswith('동'):
+            dong = p
+            break
+    return gu, dong
+
 def load_rows(path):
     wb = openpyxl.load_workbook(path, read_only=True)
     ws = wb.active
@@ -18,6 +28,7 @@ def load_rows(path):
     for r in ws.iter_rows(min_row=14, max_row=999999, max_col=21, values_only=True):
         if not r or r[1] is None:
             continue
+        sigungu = r[1]
         complex_name = r[5]
         area, ym, day = r[6], r[7], r[8]
         amount_raw, building, floor = r[9], r[10], r[11]
@@ -27,12 +38,26 @@ def load_rows(path):
             continue
         ym = str(int(ym)); day = str(int(day)).zfill(2)
         date_dot = f"{ym[:4]}.{ym[4:6]}.{day}"
+        gu, neighborhood_dong = parse_gu_dong(sigungu)
         rows.append({
             'complex': complex_name, 'size': float(str(area).replace(',','')),
             'date': date_dot, 'amount': round(amount, 4), 'floor': str(floor),
             'dong': None if building in (None, '-', '') else str(building),
+            'gu': gu, 'neighborhoodDong': neighborhood_dong,
         })
     return rows
+
+def build_location_map(rows):
+    # 단지별로 가장 많이 등장한 구/동을 그 단지의 대표 위치로 사용
+    # (매물 데이터에 없는 단지도 실거래분석에 나올 수 있게, LISTINGS_ALL이 아니라 이 실거래 원본에서 직접 구/동을 뽑음)
+    counts = defaultdict(lambda: defaultdict(int))
+    for r in rows:
+        counts[r['complex']][(r['gu'], r['neighborhoodDong'])] += 1
+    location = {}
+    for complex_name, cnt in counts.items():
+        (gu, dong), _ = max(cnt.items(), key=lambda kv: kv[1])
+        location[complex_name] = {'gu': gu, 'dong': dong}
+    return location
 
 def build_real_tx(rows):
     by_complex = defaultdict(list)
@@ -73,8 +98,15 @@ def main():
         '아파트': build_real_tx(apt_rows),
         '오피스텔': build_real_tx(officetel_rows),
     }
+    location = {
+        '아파트': build_location_map(apt_rows),
+        '오피스텔': build_location_map(officetel_rows),
+    }
     json.dump(result, open(out_path, 'w', encoding='utf-8'), ensure_ascii=False)
+    loc_path = out_path.replace('.json', '_location.json') if out_path.endswith('.json') else out_path + '_location.json'
+    json.dump(location, open(loc_path, 'w', encoding='utf-8'), ensure_ascii=False)
     print(f"아파트 {len(apt_rows)}건 / 오피스텔 {len(officetel_rows)}건 처리 -> {out_path}")
+    print(f"단지 위치정보(구/동) -> {loc_path}")
 
 if __name__ == '__main__':
     main()
