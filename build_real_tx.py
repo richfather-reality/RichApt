@@ -41,21 +41,25 @@ def build_real_tx(rows):
     out = {}
     for cx, items in by_complex.items():
         items_sorted = sorted(items, key=lambda r: r['date'])
-        # 정확한 전용면적(sizeFloor) 그룹별로 최고가를 누적 추적하면서 순서대로 처리
-        running_max = {}
+        # 정확한 전용면적(sizeFloor) 그룹별로 "역대 진짜 최고가" 하나만 찾음.
+        # (예전엔 그 시점 기준으로 신고가였던 기록마다 전부 배지를 붙여서 한 평형에 배지가 여러 개 붙는
+        #  문제가 있었음 — "최고가"는 지금 기준으로 딱 하나(역대 가장 비쌌던 거래)에만 붙어야 함)
+        true_max = {}
+        for r in items_sorted:
+            size_key = round(r['size'], 2)
+            if size_key not in true_max or r['amount'] > true_max[size_key]:
+                true_max[size_key] = r['amount']
+
         entries = []
         for r in items_sorted:
             size_key = round(r['size'], 2)
-            prior_max = running_max.get(size_key)
-            is_record = prior_max is None or r['amount'] > prior_max
-            delta = None if is_record else round(r['amount'] - prior_max, 2)
+            is_record = r['amount'] == true_max[size_key]
+            delta = None if is_record else round(r['amount'] - true_max[size_key], 2)
             entries.append({
                 'date': r['date'], 'size': round(r['size'], 1), 'sizeFloor': size_key,
                 'floor': r['floor'], 'amount': round(r['amount'], 2), 'dong': r['dong'] or '-',
                 'isRecordHigh': is_record, 'isTopPrice': is_record, 'deltaVsRecentHigh': delta,
             })
-            if is_record or size_key not in running_max:
-                running_max[size_key] = max(running_max.get(size_key, r['amount']), r['amount'])
         # 최신순으로 보여주는 게 기존 화면 관례와 맞음
         entries.sort(key=lambda e: e['date'], reverse=True)
         out[cx] = entries
