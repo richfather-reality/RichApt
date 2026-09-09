@@ -1461,7 +1461,7 @@ function newTxList(){
   const typeData = NEW_TX[state.housingType] || {};
   let rows = [];
   Object.keys(typeData).forEach(complex=>{
-    const complexGu = LISTINGS_ALL.find(l=>l.complex===complex && l.type===state.housingType)?.gu;
+    const complexGu = complexGuOf(complex);
     if(complexGu !== state.gu) return;
     const dong = dongMap[complex];
     if(state.dong!=='전체' && dong!==state.dong) return;
@@ -1679,7 +1679,7 @@ function renderMain(){
         <div style="font-size:18px;">⚠️</div>
         <div>
           <div style="font-weight:700;margin-bottom:4px;">오피스텔 구·동 단위 종합 통계는 준비중입니다</div>
-          <div style="color:var(--text-muted);font-size:12.5px;line-height:1.5;">평균 실거래가·변동률 같은 구/동 전체 집계는 아직 오피스텔용으로 준비되지 않았어요. 다만 <b>기흥구 구갈동</b>은 오피스텔 실거래 데이터를 단지별로 확보해뒀어서, 아래 <b>단지별 개별 실거래</b>와 <b>내집시세예측</b>에는 오피스텔 실거래가 반영됩니다. 그 외 지역의 오피스텔 실제 시세는 <b>매물찾기</b> 탭의 리치부동산연구소 매물 데이터를 참고해주세요.</div>
+          <div style="color:var(--text-muted);font-size:12.5px;line-height:1.5;">평균 실거래가·변동률 같은 구/동 전체 집계는 아직 오피스텔용으로 준비되지 않았어요. 다만 국토부 오피스텔 실거래는 <b>기흥구 여러 동에 걸쳐</b> 단지별로 확보돼 있어서, 아래 <b>단지별 개별 실거래</b>와 <b>내집시세예측</b>에는 반영됩니다.</div>
         </div>
       </div>
     </div>` : '';
@@ -1728,6 +1728,7 @@ function renderMain(){
       const complexRows = realComplexBreakdown();
       const recordCount = txRows.filter(r=>r.isRecordHigh).length;
       el.innerHTML = summaryOrNotice + `
+      ${newTxSection(newRows)}
       <div class="panel">
         <h2>${scopeLabel} 단지별 최고가 현황 (${state.housingType})</h2>
         <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">매물 추적 단지 기준, 지금까지 확인된 실거래 중 가장 높은 가격입니다.</p>
@@ -1806,8 +1807,7 @@ function renderMain(){
         <div style="display:flex;flex-wrap:wrap;gap:8px;">${areaChips}</div>
       </div>` : ''}
       ${analysisSection}
-      ${sizeDetailSection}
-      ${isOfficetel ? officetelListingContent() : ''}`;
+      ${sizeDetailSection}`;
   } else if(state.feature==='trend'){
     el.innerHTML = state.dealType==='매매' ? renderSnapshotDiffPanel() : rentTrendPanel();
   } else if(state.feature==='taxcalc'){
