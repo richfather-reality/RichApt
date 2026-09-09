@@ -11,6 +11,17 @@ from collections import defaultdict
 # 하나라도 걸리면 갭투자로 집계. 세입자가 있어 즉시입주가 어려움을 뜻하는 표현들.
 GAP_KEYWORDS = ['세안고', '전세안고', '갭투자', '긴잔금', '무주택', '긴전세', '임차인', '명도불가', '입주불가']
 
+
+# 원본 파일마다 같은 단지를 다른 이름으로 표기하는 경우가 있어서(집셀 vs 국토부, 혹은 부제 유무 등)
+# 여기서 통일함. 안 그러면 실거래분석/시세현황에서 같은 단지가 두 개로 쪼개져서 잡힘.
+COMPLEX_NAME_ALIASES = {
+    '기흥역지웰푸르지오': '기흥역더퍼스트푸르지오',
+    '기흥역롯데캐슬스카이(주상복합)': '기흥역롯데캐슬스카이',
+}
+def normalize_complex_name(name):
+    return COMPLEX_NAME_ALIASES.get(name, name)
+
+
 def detect_gap(items):
     for i in items:
         text = (i.get('feature') or '')
@@ -42,7 +53,7 @@ def process_file(path):
         for row in ws.iter_rows(min_row=1, max_row=999999, max_col=5, values_only=True):
             if row and row[0]:
                 info[row[0]] = row[1]
-    complex_name = info.get('단지명', '?')
+    complex_name = normalize_complex_name(info.get('단지명', '?'))
     addr = info.get('주소', '')
     gu, dong = parse_gu_dong(addr)
     housing_type = info.get('부동산유형', '아파트')

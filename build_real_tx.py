@@ -11,6 +11,17 @@ REAL_TX 전체를 다시 만든다. 신고가(isRecordHigh)는 같은 단지+정
 import openpyxl, json, sys
 from collections import defaultdict
 
+
+# 원본 파일마다 같은 단지를 다른 이름으로 표기하는 경우가 있어서(집셀 vs 국토부, 혹은 부제 유무 등)
+# 여기서 통일함. 안 그러면 실거래분석/시세현황에서 같은 단지가 두 개로 쪼개져서 잡힘.
+COMPLEX_NAME_ALIASES = {
+    '기흥역지웰푸르지오': '기흥역더퍼스트푸르지오',
+    '기흥역롯데캐슬스카이(주상복합)': '기흥역롯데캐슬스카이',
+}
+def normalize_complex_name(name):
+    return COMPLEX_NAME_ALIASES.get(name, name)
+
+
 def parse_gu_dong(sigungu):
     parts = (sigungu or '').split()
     gu = parts[2] if len(parts) > 2 else ''
@@ -29,7 +40,7 @@ def load_rows(path):
         if not r or r[1] is None:
             continue
         sigungu = r[1]
-        complex_name = r[5]
+        complex_name = normalize_complex_name(r[5])
         area, ym, day = r[6], r[7], r[8]
         amount_raw, building, floor = r[9], r[10], r[11]
         try:
