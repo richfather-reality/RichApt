@@ -2986,13 +2986,21 @@ function submitInquiry(){
       website: websiteEl ? websiteEl.value : ''
     })
   }).then(res=>{
-    if(!res.ok) throw new Error('request failed');
+    // 실패 원인 진단용: 실제 CRM 서버가 뭐라고 응답했는지 콘솔에 남김
+    // (신규 필드를 서버가 거부하는 건지, 다른 문제인지 브라우저 개발자도구 콘솔에서 확인 가능)
+    if(!res.ok){
+      return res.text().then(bodyText=>{
+        console.error('CRM 응답 실패:', res.status, bodyText);
+        throw new Error('request failed: ' + res.status);
+      });
+    }
     return res.json();
   }).then(()=>{
     s.submitting = false;
     s.done = true;
     render();
-  }).catch(()=>{
+  }).catch(err=>{
+    console.error('CRM 문의 전송 오류:', err);
     s.submitting = false;
     s.error = '문의 접수에 실패했습니다. 상단 전화번호로 문의해주세요.';
     render();
