@@ -28,7 +28,7 @@ def parse_gu(sigungu):
     parts = (sigungu or '').split()
     return parts[2] if len(parts) > 2 else (parts[-1] if parts else '')
 
-def load_rows(path):
+def load_rows(path, is_officetel=False):
     wb = openpyxl.load_workbook(path, read_only=True)
     ws = wb.active
     rows = []
@@ -37,7 +37,13 @@ def load_rows(path):
             continue
         sigungu, complex_name = r[1], normalize_complex_name(r[5])
         area, ym, day = r[6], r[7], r[8]
-        amount_raw, building, floor = r[9], r[10], r[11]
+        amount_raw = r[9]
+        # 국토부 원본 컬럼 순서가 아파트/오피스텔에서 다름(아파트만 "동" 컬럼이 하나 더 있음) —
+        # 구분 안 하고 같은 인덱스로 읽으면 오피스텔의 "층" 자리에 "매수자" 값이 잘못 들어감.
+        if is_officetel:
+            building, floor = None, r[10]
+        else:
+            building, floor = r[10], r[11]
         try:
             amount = float(str(amount_raw).replace(',', ''))/10000  # 억
         except:
@@ -121,8 +127,8 @@ def main():
     result = {'아파트': apt_new_tx, '오피스텔': {}}
 
     if args.officetel_old and args.officetel_new:
-        off_old = load_rows(args.officetel_old)
-        off_new = load_rows(args.officetel_new)
+        off_old = load_rows(args.officetel_old, is_officetel=True)
+        off_new = load_rows(args.officetel_new, is_officetel=True)
         off_diff = diff_new(off_old, off_new)
         result['오피스텔'] = build_new_tx_for_type(off_diff, real_tx.get('오피스텔', {}))
 

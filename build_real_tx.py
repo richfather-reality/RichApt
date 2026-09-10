@@ -32,7 +32,7 @@ def parse_gu_dong(sigungu):
             break
     return gu, dong
 
-def load_rows(path):
+def load_rows(path, is_officetel=False):
     wb = openpyxl.load_workbook(path, read_only=True)
     ws = wb.active
     rows = []
@@ -42,7 +42,16 @@ def load_rows(path):
         sigungu = r[1]
         complex_name = normalize_complex_name(r[5])
         area, ym, day = r[6], r[7], r[8]
-        amount_raw, building, floor = r[9], r[10], r[11]
+        amount_raw = r[9]
+        # 국토부 원본 컬럼 순서가 아파트/오피스텔 파일에서 서로 다름 — 아파트는 거래금액 다음에
+        # "동" 컬럼이 하나 더 있어서 그 뒤 컬럼들이 오피스텔보다 한 칸씩 밀려있음.
+        # 아파트: ...거래금액,동,층,매수자,매도자...  /  오피스텔: ...거래금액,층,매수자,매도자...
+        # 이걸 구분 안 하고 똑같은 인덱스로 읽으면 오피스텔의 "층" 자리에 "매수자"(개인) 값이 들어와서
+        # "개인층"처럼 잘못 표시됨.
+        if is_officetel:
+            building, floor = None, r[10]
+        else:
+            building, floor = r[10], r[11]
         try:
             amount = float(str(amount_raw).replace(',', '')) / 10000
         except:
@@ -104,7 +113,7 @@ def build_real_tx(rows):
 def main():
     apt_path, officetel_path, out_path = sys.argv[1], sys.argv[2], sys.argv[3]
     apt_rows = load_rows(apt_path)
-    officetel_rows = load_rows(officetel_path)
+    officetel_rows = load_rows(officetel_path, is_officetel=True)
     result = {
         '아파트': build_real_tx(apt_rows),
         '오피스텔': build_real_tx(officetel_rows),
