@@ -2981,7 +2981,14 @@ function submitInquiry(){
       ho: s.ho || '',
       budgetEok: parseFloat(s.price),
       askingPriceEok: isSell ? parseFloat(s.price) : null,
+      // CRM이 월세/전세 등록에서 "희망 보증금과 월세를 입력해주세요" 400 에러를 냄 —
+      // 정확한 필드명을 몰라서, 가능성 있는 이름들을 전부 같이 보내 CRM이 아는 이름이 걸리게 함.
+      deposit: parseFloat(s.price),
+      depositEok: parseFloat(s.price),
+      depositManwon: Math.round(parseFloat(s.price) * 10000),
+      rent: L.needsRent ? parseFloat(s.rent) : null,
       rentManwon: L.needsRent ? parseFloat(s.rent) : null,
+      monthlyRent: L.needsRent ? parseFloat(s.rent) : null,
       source: '리치아파트 대시보드',
       website: websiteEl ? websiteEl.value : ''
     })
