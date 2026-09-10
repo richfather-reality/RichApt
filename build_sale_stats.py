@@ -142,6 +142,17 @@ def build_real(rows):
         'maxdate': maxdate, 'dong': dong_out,
     }
 
+def trimmed_avg(prices):
+    # 하위 20% 제외 평균 — 시세예측에서 극단적으로 싼 급매/특수거래가 평균을 왜곡하지 않게 함.
+    # 표본이 5건 미만이면 20%를 잘라도 통계적으로 의미가 없어서(반올림하면 0건 제외되는 경우가 많음)
+    # 그냥 전체 평균을 그대로 씀.
+    if len(prices) < 5:
+        return round(sum(prices)/len(prices), 2)
+    s = sorted(prices)
+    cut = int(len(s) * 0.2)
+    kept = s[cut:]
+    return round(sum(kept)/len(kept), 2)
+
 def build_complex_stats(rows):
     out = {}
     by_complex = defaultdict(list)
@@ -153,12 +164,12 @@ def build_complex_stats(rows):
         cx_out = {}
         for area_key, area_items in area_buckets.items():
             prices = [i['price'] for i in area_items]
-            entry = {'_all': {'avg': round(sum(prices)/len(prices),2), 'count': len(prices)}}
+            entry = {'_all': {'avg': round(sum(prices)/len(prices),2), 'avgTrimmed': trimmed_avg(prices), 'count': len(prices)}}
             by_building = defaultdict(list)
             for i in area_items:
                 if i['building']: by_building[i['building']].append(i['price'])
             for b, bprices in by_building.items():
-                entry[b] = {'avg': round(sum(bprices)/len(bprices),2), 'count': len(bprices)}
+                entry[b] = {'avg': round(sum(bprices)/len(bprices),2), 'avgTrimmed': trimmed_avg(bprices), 'count': len(bprices)}
             cx_out[area_key] = entry
         out[cx] = cx_out
     return out
