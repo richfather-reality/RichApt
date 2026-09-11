@@ -2131,10 +2131,15 @@ function renderAreaTrendPanel(){
       dates.forEach((d,i)=>{
         if(g.byDate[d]){ countSeries.push(g.byDate[d].count); avgSeries.push(g.byDate[d].avg); usedLabels.push(axisLabels[i]); }
       });
-      const firstCount = g.byDate[firstDate]?.count, lastCount = g.byDate[lastDate]?.count;
-      const firstAvg = g.byDate[firstDate]?.avg, lastAvg = g.byDate[lastDate]?.avg;
-      const countDelta = (firstCount!=null && lastCount!=null) ? lastCount-firstCount : null;
-      const avgDelta = (firstAvg!=null && lastAvg!=null) ? Math.round((lastAvg-firstAvg)*100)/100 : null;
+      // "-건 → N건" 요약은 이 단지+평형이 실제로 처음 잡힌 날과 마지막 날 기준으로 비교해야 함.
+      // 예전엔 전체 데이터의 가장 오래된 날짜(dates[0], 보통 8/25)를 무조건 기준으로 써서,
+      // 나중에 추적 시작한 단지는 그 날짜에 데이터가 없어 항상 "-건"으로 잘못 표시됐음.
+      const groupDates = dates.filter(d => g.byDate[d]);
+      const groupFirstDate = groupDates[0], groupLastDate = groupDates[groupDates.length-1];
+      const firstCount = g.byDate[groupFirstDate]?.count, lastCount = g.byDate[groupLastDate]?.count;
+      const firstAvg = g.byDate[groupFirstDate]?.avg, lastAvg = g.byDate[groupLastDate]?.avg;
+      const countDelta = (firstCount!=null && lastCount!=null && groupFirstDate!==groupLastDate) ? lastCount-firstCount : null;
+      const avgDelta = (firstAvg!=null && lastAvg!=null && groupFirstDate!==groupLastDate) ? Math.round((lastAvg-firstAvg)*100)/100 : null;
       const badge = (delta, unit, label) => {
         if(delta===null) return '';
         const color = delta>0 ? 'var(--danger)' : delta<0 ? 'var(--price-down)' : 'var(--text-muted)';
