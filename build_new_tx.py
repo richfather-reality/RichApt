@@ -50,7 +50,10 @@ def load_rows(path, is_officetel=False):
             continue
         ym = str(int(ym)); day = str(int(day)).zfill(2)
         date_dot = f"{ym[:4]}.{ym[4:6]}.{day}"  # 기존 REAL_TX 표기(점 구분)와 맞춤
-        key = (complex_name, str(area), ym, day, str(amount_raw), str(building))
+        # 매칭 키에서 "동" 정보는 뺌 — 국토부가 처음엔 동을 "-"(공란)로 공개했다가 나중에
+        # 실제 동 번호로 보완해서 재공개하는 경우가 있는데, 동을 키에 넣으면 같은 거래를
+        # "동이 바뀐 새 거래"로 잘못 인식해버림. 단지+평형+계약일+금액이면 사실상 유일하게 식별됨.
+        key = (complex_name, str(area), ym, day, str(amount_raw))
         rows.append({
             'key': key, 'gu': parse_gu(sigungu), 'complex': complex_name,
             'area': float(str(area).replace(',','')), 'date': date_dot, 'amount': round(amount,4),
