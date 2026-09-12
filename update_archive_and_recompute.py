@@ -21,6 +21,7 @@
   <out-prefix>_persist_gone.json : index.html의 PERSIST_GONE에 그대로 붙여넣을 JSON
 """
 import json, argparse
+from collections import defaultdict
 from datetime import datetime
 
 def key(d):
@@ -67,8 +68,36 @@ def main():
         fresh_keys = set(new_map) - set(old_map)
         gone_keys = set(old_map) - set(new_map)
         common_keys = set(old_map) & set(new_map)
+
+        # "동·층·타입"만 보고 매칭하면, 같은 매물인데 집셀이 층 표기를 바꾸는 경우(예: "고/47"->"32/47")
+        # 매물번호(idSet)는 그대로인데 소멸+신규로 쌍을 이뤄 잘못 잡힘. idSet이 겹치면 같은 매물로 보고
+        # gone/fresh에서 빼고, 가격이 바뀌었으면 changed로만 반영함.
+        gone_by_complex = defaultdict(list)
+        for k in gone_keys: gone_by_complex[old_map[k]['complex']].append(k)
+        fresh_by_complex = defaultdict(list)
+        for k in fresh_keys: fresh_by_complex[new_map[k]['complex']].append(k)
+        reconciled_changed = []
+        for cx, gk_list in gone_by_complex.items():
+            for gk in list(gk_list):
+                old_ids = set(old_map[gk].get('idSet', []))
+                if not old_ids: continue
+                for fk in list(fresh_by_complex.get(cx, [])):
+                    new_ids = set(new_map[fk].get('idSet', []))
+                    if old_ids & new_ids:
+                        # 같은 매물로 판단 -> gone/fresh에서 제거
+                        gone_keys.discard(gk); fresh_keys.discard(fk)
+                        if old_map[gk]['price'] != new_map[fk]['price']:
+                            reconciled_changed.append({
+                                'complex': cx, 'type': old_map[gk]['type'], 'building': new_map[fk]['building'],
+                                'floor': new_map[fk]['floor'], 'unitType': new_map[fk]['unitType'],
+                                'oldPrice': old_map[gk]['price'], 'newPrice': new_map[fk]['price'],
+                                'diff': round(new_map[fk]['price']-old_map[gk]['price'], 2),
+                            })
+                        break
+
         snapshot_diff['gone'] = [old_map[k] for k in gone_keys]
         snapshot_diff['fresh'] = [new_map[k] for k in fresh_keys]
+        snapshot_diff['changed'] = reconciled_changed
         for k in common_keys:
             o, n = old_map[k], new_map[k]
             if o['price'] != n['price']:
@@ -80,6 +109,12 @@ def main():
         snapshot_diff['oldDate'] = old_date
 
     # ── PERSIST_GONE: 마지막으로 보인 날짜가 "직전 날짜"보다도 더 예전인 매물 (최소 한 번의 비교 주기 이상 계속 없음) ──
+    # SNAPSHOT_DIFF와 같은 이유로, 오늘 실제로 살아있는 매물번호(idSet)와 겹치면 "지속소멸"에서 제외함
+    # (동·층·타입 표기만 바뀌고 매물 자체는 계속 있는 경우를 걸러내기 위함)
+    latest_id_set = set()
+    for e in archive[args.new_date]:
+        latest_id_set.update(e.get('idSet', []))
+
     last_seen = {}
     for d in dates_sorted:
         for e in archive[d]:
@@ -90,6 +125,8 @@ def main():
         latest_keys = {key(e) for e in archive[args.new_date]}
         for k, (d, e) in last_seen.items():
             if k in latest_keys:
+                continue
+            if set(e.get('idSet', [])) & latest_id_set:
                 continue
             if d < cutoff_date:
                 persist_gone_list.append({
