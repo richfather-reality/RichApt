@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>리치아파트</title>
 <meta property="og:title" content="리치아파트 - 기흥구 통합 시세">
-<meta property="og:description" content="오늘 사라진 매물 중 최고가 — 죽현마을아이파크 12.7억. 기흥구 실거래·매물 시세를 한눈에.">
+<meta property="og:description" content="기흥구 아파트·오피스텔 실거래가와 매물 시세를 한눈에.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="TBD-배포후-canonical-URL로-교체">
 <meta property="og:image" content="icon-512.png">
@@ -3462,9 +3462,11 @@ function loadStateFromURL(){
 
 function shareApp(){
   const appUrl = window.location.href.split('?')[0].split('#')[0];
+  // text를 따로 넣으면 카톡에서 "링크 카드"(흰 배경 카드, og태그 기반)랑 별개로
+  // 노란 말풍선 텍스트가 하나 더 생겨서 두 번 보내는 것처럼 됨. url만 공유해서
+  // 카톡이 og태그로 만든 카드 하나만 뜨게 함.
   const shareData = {
     title: '리치아파트',
-    text: '리치아파트 - 기흥구 통합 시세: 오늘 사라진 매물 중 최고가 — 죽현마을아이파크 12.7억. 기흥구 실거래·매물 시세를 한눈에.',
     url: appUrl,
   };
   if(navigator.share){
