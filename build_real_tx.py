@@ -86,18 +86,20 @@ def build_real_tx(rows):
     out = {}
     for cx, items in by_complex.items():
         items_sorted = sorted(items, key=lambda r: r['date'])
-        # 정확한 전용면적(sizeFloor) 그룹별로 "역대 진짜 최고가" 하나만 찾음.
-        # (예전엔 그 시점 기준으로 신고가였던 기록마다 전부 배지를 붙여서 한 평형에 배지가 여러 개 붙는
-        #  문제가 있었음 — "최고가"는 지금 기준으로 딱 하나(역대 가장 비쌌던 거래)에만 붙어야 함)
+        # 정확한 전용면적 "정수부"(84, 113, 114...) 그룹별로 "역대 진짜 최고가" 하나만 찾음.
+        # 국민평형 표기(예: "84타입")는 84.0~84.9999까지 다 84로 묶이는 게 맞고, 113.94짜리와
+        # 114.03짜리처럼 정수 자체가 다르면(=서로 다른 타입일 가능성) 별도로 묶임.
+        # 소수점 2자리 반올림으로 묶었을 때는 84.9954 같은 값이 반올림되어 "85"로 잘못 튀어나오는
+        # 문제가 있었어서, 반올림이 아니라 정수부(버림)로 그룹핑함.
         true_max = {}
         for r in items_sorted:
-            size_key = round(r['size'], 2)
+            size_key = int(r['size'])
             if size_key not in true_max or r['amount'] > true_max[size_key]:
                 true_max[size_key] = r['amount']
 
         entries = []
         for r in items_sorted:
-            size_key = round(r['size'], 2)
+            size_key = int(r['size'])
             is_record = r['amount'] == true_max[size_key]
             delta = None if is_record else round(r['amount'] - true_max[size_key], 2)
             entries.append({

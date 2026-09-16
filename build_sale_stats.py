@@ -164,6 +164,8 @@ def build_complex_stats(rows):
     by_complex = defaultdict(list)
     for r in rows: by_complex[r['complex']].append(r)
     for cx, items in by_complex.items():
+        # 정수 버림(int()) 기준으로 묶음 — 84.0~84.9999는 항상 "84"로 통일되고, 113.94짜리와
+        # 114.03짜리처럼 정수 자체가 다르면(=서로 다른 타입일 가능성) 따로 집계됨.
         area_buckets = defaultdict(list)
         for i in items:
             area_buckets[str(int(i['area']))].append(i)
