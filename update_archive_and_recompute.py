@@ -115,9 +115,19 @@ def main():
     for e in archive[args.new_date]:
         latest_id_set.update(e.get('idSet', []))
 
+    # 특정 단지는 예전 보관 이력이 오염돼서(예: 9/16에 집셀 내보내기가 불완전했던 단지), 그 이전 기록을
+    # 지속소멸 판정에 그대로 쓰면 나중에 한꺼번에 대량으로 잘못 잡힐 수 있음. 이런 단지는 지정한 날짜부터
+    # 새로 추적을 시작한 것처럼(그 이전 기록은 무시하고) 지속소멸을 계산함.
+    COMPLEX_TRACKING_RESET = {
+        '강남마을6단지자연앤': '2026-09-17',
+    }
+
     last_seen = {}
     for d in dates_sorted:
         for e in archive[d]:
+            reset_date = COMPLEX_TRACKING_RESET.get(e['complex'])
+            if reset_date and d < reset_date:
+                continue
             last_seen[key(e)] = (d, e)
     persist_gone_list = []
     if len(dates_sorted) >= 2:
