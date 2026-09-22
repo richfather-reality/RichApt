@@ -1,5 +1,35 @@
 """
 매물 변동추이(SNAPSHOT_DIFF)·지속소멸매물(PERSIST_GONE) 재계산 스크립트.
+
+핵심 아이디어: 대화가 바뀌어도 데이터가 안 끊기게, 상세정보(중개사·확인일자·매물번호 등)까지
+전부 담은 "완전 보관함"(listing_full_archive.json)을 깃허브에 계속 쌓아두고, 이 스크립트가
+그걸 읽어서 새 날짜를 추가한 뒤 SNAPSHOT_DIFF·PERSIST_GONE을 다시 계산한다.
+
+매칭 로직(중요): (단지,동,층,타입)만으로는 같은 표기 안에 실제로는 서로 다른 여러 집이
+섞여있는 경우가 흔함(예: 같은 층에 같은 타입이 여러 호수 있음). 그래서 키 하나에 항목 하나가
+아니라 리스트로 모아두고, 그 안에서 아래 순서로 짝을 맞춘다:
+  1차: 매물번호(idSet) 겹치는 것끼리 (대표가 바뀌어도 중복 목록에 예전 매물번호가 남아있으면 잡힘)
+  2차: 그래도 안 맞으면 가격이 정확히 같은 것끼리 (매물번호가 통째로 바뀐 경우)
+  3차: 그래도 남았는데 옛날 개수와 오늘 개수가 똑같으면, 시장에서 뭔가 빠지거나 늘어난 게
+       아니라 그냥 재등록된 걸로 보고 가격순으로 짝지어 가격변동으로 처리
+       (개수가 그대로인데 소멸+신규로 쪼개면 실제로 안 바뀐 매물이 나갔다 들어온 것처럼
+       과장되게 보임 — 기흥역세권 자료와 비교해서 확인된 방식)
+개수가 안 맞을 때만 진짜로 소멸/신규로 본다.
+
+사용법:
+  python3 update_archive_and_recompute.py \
+    --archive listing_full_archive.json \
+    --new-date 2026-09-09 \
+    --new-deals all_deals_0909.json \
+    --out-prefix out_0909
+
+--new-deals는 extract_all_deals.py의 출력 파일(그 안의 'sale' 배열만 사용).
+--archive에 --new-date가 이미 있으면 그 날짜만 덮어씀(당일 재업로드 대응).
+
+출력:
+  <out-prefix>_archive.json      : 갱신된 전체 보관함 (다음날 이걸 다시 --archive로 넘기면 됨)
+  <out-prefix>_snapshot_diff.json: index.html의 SNAPSHOT_DIFF에 그대로 붙여넣을 JSON
+  <out-prefix>_persist_gone.json : index.html의 PERSIST_GONE에 그대로 붙여넣을 JSON
 """
 import json, argparse
 from collections import defaultdict
@@ -42,10 +72,6 @@ def main():
     snapshot_diff = {'gone': [], 'fresh': [], 'changed': [], 'oldDate': None, 'newDate': args.new_date}
     if len(dates_sorted) >= 2:
         old_date = dates_sorted[-2]
-        # 같은 (단지,동,층,타입) 키 안에 실제로는 서로 다른 집이 여러 개 있는 경우가 있음
-        # (예: "고/44"라는 층 표기 하나에 진짜 다른 두 집이 같이 묶임). 그래서 키 하나에 항목 하나가
-        # 아니라 리스트로 모아두고, 그 안에서 매물번호(idSet)로 짝을 맞춰 어떤 게 남고 어떤 게
-        # 없어졌는지 가려냄.
         old_by_key = defaultdict(list)
         for e in archive[old_date]: old_by_key[key(e)].append(e)
         new_by_key = defaultdict(list)
@@ -54,10 +80,6 @@ def main():
         unmatched_old, unmatched_new = [], []
         for k in set(old_by_key) | set(new_by_key):
             olds, news = list(old_by_key.get(k, [])), list(new_by_key.get(k, []))
-            # 흔한 경우(키 하나에 옛날도 하나, 오늘도 하나)는 그냥 같은 매물로 봄 — 매물번호는
-            # 다른 중개사가 새로 올리면 자연스럽게 바뀔 수 있어서, 이 경우까지 idSet으로
-            # 재확인하면 오히려 정상적인 "가격만 바뀐" 케이스를 소멸+신규로 잘못 쪼개버림.
-            # 키 하나에 여러 개가 겹칠 때만(위 "고/44" 사례처럼) idSet으로 구분함.
             if len(olds) == 1 and len(news) == 1:
                 o, n = olds[0], news[0]
                 if o['price'] != n['price']:
@@ -68,7 +90,6 @@ def main():
                     })
                 continue
             used = [False]*len(news)
-            # 1차: 매물번호(idSet) 겹치는 것끼리 짝짓기
             for o in olds:
                 o_ids = set(o.get('idSet', []))
                 found = None
@@ -86,9 +107,6 @@ def main():
                             'oldPrice': o['price'], 'newPrice': n['price'], 'diff': round(n['price']-o['price'], 2),
                         })
                     o['_matched'] = True
-            # 2차: 매물번호가 하나도 안 겹쳐도(중개사가 통째로 바뀐 경우), 가격이 정확히 같으면
-            # 같은 집으로 봄 — 같은 키(동일 층표기·타입) 안에 가격까지 같은 게 우연히 여럿일 확률은
-            # 낮아서 안전한 매칭임.
             for o in olds:
                 if o.get('_matched'): continue
                 found = None
@@ -99,15 +117,26 @@ def main():
                 if found is not None:
                     used[found] = True
                     o['_matched'] = True
-                else:
+            remaining_old = [o for o in olds if not o.get('_matched')]
+            remaining_new = [n for j, n in enumerate(news) if not used[j]]
+            if len(remaining_old) == len(remaining_new) and remaining_old:
+                for o, n in zip(sorted(remaining_old, key=lambda x: x['price']),
+                                 sorted(remaining_new, key=lambda x: x['price'])):
+                    if o['price'] != n['price']:
+                        snapshot_diff['changed'].append({
+                            'complex': o['complex'], 'type': o['type'], 'building': n['building'],
+                            'floor': n['floor'], 'unitType': n['unitType'],
+                            'oldPrice': o['price'], 'newPrice': n['price'], 'diff': round(n['price']-o['price'], 2),
+                        })
+                    o['_matched'] = True
+                for j in range(len(news)):
+                    used[j] = True
+            else:
+                for o in remaining_old:
                     unmatched_old.append(o)
             for j, n in enumerate(news):
                 if not used[j]: unmatched_new.append(n)
 
-        # 위에서 짝을 못 찾은 것들 중에는 "표기(층 등)가 통째로 바뀌어서 키 자체가 달라진" 같은 매물이
-        # 섞여있을 수 있음(예: "고/47"->"32/47"). 매물번호가 겹치고 가격도 같을 때만 같은 매물로 봄
-        # — 가격이 다르면 표기만 바뀐 게 아니라 그냥 다른 매물이 매물번호를 우연히 공유하는 경우일
-        # 수 있어서(예: 한 중개사가 같은 단지 여러 집을 동시에 광고) 소멸/신규 그대로 둠.
         gone_by_complex = defaultdict(list)
         for o in unmatched_old: gone_by_complex[o['complex']].append(o)
         fresh_by_complex = defaultdict(list)
@@ -128,7 +157,6 @@ def main():
                     consumed_fresh.add(match)
                 else:
                     final_gone.append(o)
-        # 단지별로 소멸-신규 매칭에서 못 짝지어진 신규만 최종 "신규"로 남김
         final_fresh = []
         for cx, news in fresh_by_complex.items():
             olds = gone_by_complex.get(cx, [])
@@ -148,22 +176,17 @@ def main():
         snapshot_diff['fresh'] = final_fresh
         snapshot_diff['oldDate'] = old_date
 
-    # "매물번호 -> 그 매물번호를 포함한 최신 매물들의 가격 목록"으로 만들어서,
-    # 가격까지 같을 때만 "여전히 살아있는 매물"로 봄 (매물번호만 겹치고 가격이 다르면 다른 매물).
     latest_id_prices = defaultdict(set)
     for e in archive[args.new_date]:
         for i in e.get('idSet', []):
             latest_id_prices[i].add(e['price'])
 
-    # 지속소멸도 SNAPSHOT_DIFF와 같은 문제(같은 키 안에 실제로는 여러 채가 섞여있음)를 그대로 갖고
-    # 있었음 — 그것도 이틀이 아니라 전체 날짜에 걸쳐 누적되는 거라 영향이 더 클 수 있음. 그래서 키
-    # 하나당 항목 하나만 기억하는 대신, 날짜 순으로 훑으면서 "그 키 안의 여러 채" 각각을 매물번호
-    # (안 겹치면 가격)로 이어붙여 계속 추적함.
     COMPLEX_TRACKING_RESET = {
         '강남마을6단지자연앤': '2026-09-17',
     }
 
-    tracked_units = []  # 각 원소: {'key','last_date','entry','ids','price'}
+    tracked_units = []
+    prev_date_walk = None
     for d in dates_sorted:
         by_key_today = defaultdict(list)
         for e in archive[d]:
@@ -172,7 +195,7 @@ def main():
                 continue
             by_key_today[key(e)].append(e)
 
-        used_today = defaultdict(set)  # key -> {인덱스,...}
+        used_today = defaultdict(set)
         for unit in tracked_units:
             candidates = by_key_today.get(unit['key'], [])
             found = None
@@ -188,11 +211,33 @@ def main():
                 unit['ids'] = unit['ids'] | set(cand.get('idSet', []))
                 unit['price'] = cand['price']
 
+        if prev_date_walk is not None:
+            pending_by_key = defaultdict(list)
+            for unit in tracked_units:
+                if unit['last_date'] != prev_date_walk: continue
+                k = unit['key']
+                cands = by_key_today.get(k, [])
+                if len(used_today[k]) >= len(cands): continue
+                pending_by_key[k].append(unit)
+            for k, pending_units in pending_by_key.items():
+                cands = by_key_today.get(k, [])
+                remaining_cands = [idx for idx in range(len(cands)) if idx not in used_today[k]]
+                if len(pending_units) == len(remaining_cands) and pending_units:
+                    for unit, idx in zip(sorted(pending_units, key=lambda u: u['price']),
+                                          sorted(remaining_cands, key=lambda i: cands[i]['price'])):
+                        used_today[k].add(idx)
+                        cand = cands[idx]
+                        unit['last_date'] = d
+                        unit['entry'] = cand
+                        unit['ids'] = unit['ids'] | set(cand.get('idSet', []))
+                        unit['price'] = cand['price']
+
         for k, candidates in by_key_today.items():
             for idx, cand in enumerate(candidates):
                 if idx not in used_today[k]:
                     tracked_units.append({'key': k, 'last_date': d, 'entry': cand,
                                            'ids': set(cand.get('idSet', [])), 'price': cand['price']})
+        prev_date_walk = d
 
     persist_gone_list = []
     if len(dates_sorted) >= 2:
