@@ -46,9 +46,16 @@ def parse_dong(sigungu):
 def load_rows(path, is_officetel=False):
     wb = openpyxl.load_workbook(path, read_only=True)
     ws = wb.active
+    # 해제(계약취소)된 거래 제외 — 국토부 원본의 '해제사유발생일' 칸에 날짜가 있으면 취소된 계약임.
+    # 이걸 안 빼면 취소된 거래가 실거래·신고가·새 실거래 목록에 그대로 잡힘(2026-09-30에 발견, 약 5%).
+    # 아파트/오피스텔 파일마다 컬럼 위치가 달라서 13행 헤더에서 이름으로 위치를 찾음.
+    header = next(ws.iter_rows(min_row=13, max_row=13, max_col=25, values_only=True), ())
+    cancel_idx = list(header).index('해제사유발생일') if '해제사유발생일' in header else None
     rows = []
-    for r in ws.iter_rows(min_row=14, max_row=999999, max_col=21, values_only=True):
+    for r in ws.iter_rows(min_row=14, max_row=999999, max_col=25, values_only=True):
         if not r or r[1] is None:
+            continue
+        if cancel_idx is not None and r[cancel_idx] not in (None, '', '-'):
             continue
         sigungu, complex_name = r[1], normalize_complex_name(r[5])
         area, ym, day = r[6], r[7], r[8]
