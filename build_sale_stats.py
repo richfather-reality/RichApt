@@ -19,6 +19,11 @@ import openpyxl, json, re, argparse
 from datetime import datetime, timedelta
 from collections import defaultdict
 
+# 변동률·시세예측 비교 기준 기간(일). 2026-10-02에 90일 → 120일로 변경:
+# 90일은 6/30 같은 거래 몰림이 구간 경계를 넘을 때 하루에 5%p 넘게 출렁여서, 표본을 늘려 안정화함.
+# 변동률 = 최근 120일 평균 ㎡당 단가 vs 그 이전 120일(240~120일 전) 평균. 시세예측용 단지+평형 평균도 최근 120일만 사용.
+WINDOW_DAYS = 120
+
 
 # 원본 파일마다 같은 단지를 다른 이름으로 표기하는 경우가 있어서(집셀 vs 국토부, 혹은 부제 유무 등)
 # 여기서 통일함. 안 그러면 실거래분석/시세현황에서 같은 단지가 두 개로 쪼개져서 잡힘.
@@ -100,8 +105,8 @@ def build_real(rows):
     # 변동률: "최근 3개월 평균 ㎡당 단가" vs "6개월 전부터 3개월 전까지의 3개월 평균 ㎡당 단가" 비교
     # (30일 vs 이전 60일 비교로 했을 때 원래 값과 부호가 반대로 나와서, 3개월/3개월 비교로 바꾸니
     #  기존에 알려진 값(예: 기흥구 84㎡ +3.68%)과 거의 일치해 이 방식으로 확정함)
-    cur_start = maxdate_dt - timedelta(days=90)
-    prev_start = maxdate_dt - timedelta(days=180)
+    cur_start = maxdate_dt - timedelta(days=WINDOW_DAYS)
+    prev_start = maxdate_dt - timedelta(days=WINDOW_DAYS*2)
     prev_end = cur_start
     cutoff30 = maxdate_dt - timedelta(days=30)
 
@@ -178,6 +183,11 @@ def trimmed_avg(prices):
     return round(sum(kept)/len(kept), 2)
 
 def build_complex_stats(rows):
+    # 시세예측용 평균은 최근 WINDOW_DAYS일 거래만 사용(예전엔 1년치 전체를 써서 화면 문구 '최근 3개월'과도 안 맞았음)
+    if rows:
+        maxdate_dt = datetime.strptime(max(r['date'] for r in rows), '%Y-%m-%d')
+        cutoff = maxdate_dt - timedelta(days=WINDOW_DAYS)
+        rows = [r for r in rows if datetime.strptime(r['date'], '%Y-%m-%d') > cutoff]
     out = {}
     by_complex = defaultdict(list)
     for r in rows: by_complex[r['complex']].append(r)

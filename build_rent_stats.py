@@ -10,6 +10,11 @@ import openpyxl, sys, json, re, argparse
 from datetime import datetime, timedelta
 from collections import defaultdict
 
+# 변동률·시세예측 비교 기준 기간(일). 2026-10-02에 90일 → 120일로 변경:
+# 90일은 6/30 같은 거래 몰림이 구간 경계를 넘을 때 하루에 5%p 넘게 출렁여서, 표본을 늘려 안정화함.
+# 변동률 = 최근 120일 평균 ㎡당 단가 vs 그 이전 120일(240~120일 전) 평균. 시세예측용 단지+평형 평균도 최근 120일만 사용.
+WINDOW_DAYS = 120
+
 
 # 원본 파일마다 같은 단지를 다른 이름으로 표기하는 경우가 있어서(집셀 vs 국토부, 혹은 부제 유무 등)
 # 여기서 통일함. 안 그러면 실거래분석/시세현황에서 같은 단지가 두 개로 쪼개져서 잡힘.
@@ -96,8 +101,8 @@ def build_stats(rows):
         # 보증금 변동률: 매매와 같은 방식 — 최근 3개월 평균 ㎡당 보증금 vs 6개월 전부터 3개월 전까지 평균 비교
         changePct = None
         if maxdate_dt:
-            cur_start = maxdate_dt - timedelta(days=90)
-            prev_start = maxdate_dt - timedelta(days=180)
+            cur_start = maxdate_dt - timedelta(days=WINDOW_DAYS)
+            prev_start = maxdate_dt - timedelta(days=WINDOW_DAYS*2)
             cur_up = avg_dep_unit_price(in_window(subset, cur_start, maxdate_dt+timedelta(days=1)))
             prev_up = avg_dep_unit_price(in_window(subset, prev_start, cur_start))
             if cur_up and prev_up:
@@ -171,7 +176,11 @@ def build_stats(rows):
 
         # 단지+평형별 평균 (내집시세예측용 — 매매의 COMPLEX_STATS와 같은 역할) — 여긴 84㎡로 제한하지 않고 전체 평형 다 포함
         by_complex_all = defaultdict(list)
+        # 시세예측용 평균은 최근 WINDOW_DAYS일 거래만 사용(매매 COMPLEX_STATS와 같은 기준)
+        recent_cut = (maxdate_dt - timedelta(days=WINDOW_DAYS)) if maxdate_dt else None
         for r in subset:
+            if recent_cut and datetime.strptime(r['date'], '%Y-%m-%d') <= recent_cut:
+                continue
             by_complex_all[r['complex']].append(r)
         by_area_complex = {}
         for cx, items in by_complex_all.items():
