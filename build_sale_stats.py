@@ -41,6 +41,12 @@ COMPLEX_NAME_ALIASES = {
     '성호샤인힐즈아파트': '성호샤인힐즈',
     # 상갈메트로파크는 국토부에 옛 이름(금화마을4단지주공그린빌)으로 등록돼 있음 — 상갈동 463, 금화로58번길 10 주소로 확인
     '금화마을4단지주공그린빌': '상갈메트로파크',
+    # 2026-10-08 추가: 국토부가 단지명에 띄어쓰기를 넣어 공개하는 단지들 — 매물(집셀) 이름과 연결이 안 돼서
+    # 실거래·신고가·시세예측에 매물 단지로 안 잡혔음(아파트 레이시티, 오피스텔 4개 단지)
+    '기흥역 롯데캐슬 레이시티': '기흥역롯데캐슬레이시티',
+    '기흥역 더샵': '기흥역더샵',
+    '기흥역 센트럴 푸르지오': '기흥역센트럴푸르지오',
+    '기흥역 파크 푸르지오': '기흥역파크푸르지오',
 }
 def normalize_complex_name(name):
     return COMPLEX_NAME_ALIASES.get(name, name)
@@ -183,6 +189,14 @@ def trimmed_avg(prices):
     return round(sum(kept)/len(kept), 2)
 
 def build_complex_stats(rows):
+    # 2026-10-08: 같은 정수 평형(84) 안에 타입(정확한 전용면적 84.5327/84.9545 등)이 여러 개인 단지가 많아서,
+    # 각 평형 아래 '_exact'에 국토부 정확한 면적별 최근 WINDOW_DAYS일 거래가격 목록을 같이 넣어둠.
+    # 화면(내집시세예측)에서 선택한 타입의 정확한 면적과 맞는 거래가 3건 이상이면 그 타입만으로 평균을 내고,
+    # 부족하면 기존처럼 정수 평형 전체 평균을 씀. 최근 1년 안에 거래가 있었던 면적은 0건이어도 키를 남김
+    # (그래야 '이 평형에 타입이 여러 개'인지 화면에서 알 수 있음).
+    year_sizes = defaultdict(set)
+    for r in rows:
+        year_sizes[(r['complex'], str(int(r['area'])))].add(round(r['area'], 4))
     # 시세예측용 평균은 최근 WINDOW_DAYS일 거래만 사용(예전엔 1년치 전체를 써서 화면 문구 '최근 3개월'과도 안 맞았음)
     if rows:
         maxdate_dt = datetime.strptime(max(r['date'] for r in rows), '%Y-%m-%d')
@@ -208,6 +222,16 @@ def build_complex_stats(rows):
                 entry[b] = {'avg': round(sum(bprices)/len(bprices),2), 'avgTrimmed': trimmed_avg(bprices), 'count': len(bprices)}
             cx_out[area_key] = entry
         out[cx] = cx_out
+    for (cx, area_key), sizes in year_sizes.items():
+        if len(sizes) < 2:
+            continue  # 타입이 하나뿐인 평형은 정수 평균 = 타입 평균이라 따로 둘 필요 없음
+        recent = defaultdict(list)
+        for r in by_complex.get(cx, []):
+            if str(int(r['area'])) == area_key:
+                recent[round(r['area'], 4)].append(round(r['price'], 2))
+        if area_key not in out.get(cx, {}):
+            continue  # 최근 WINDOW_DAYS일에 이 평형 거래가 아예 없으면 기존처럼 통계 없음으로 둠
+        out[cx][area_key]['_exact'] = {f"{s:.4f}": {'prices': sorted(recent.get(s, []))} for s in sorted(sizes)}
     return out
 
 def main():

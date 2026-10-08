@@ -28,6 +28,12 @@ COMPLEX_NAME_ALIASES = {
     '성호샤인힐즈아파트': '성호샤인힐즈',
     # 상갈메트로파크는 국토부에 옛 이름(금화마을4단지주공그린빌)으로 등록돼 있음 — 상갈동 463, 금화로58번길 10 주소로 확인
     '금화마을4단지주공그린빌': '상갈메트로파크',
+    # 2026-10-08 추가: 국토부가 단지명에 띄어쓰기를 넣어 공개하는 단지들 — 매물(집셀) 이름과 연결이 안 돼서
+    # 실거래·신고가·시세예측에 매물 단지로 안 잡혔음(아파트 레이시티, 오피스텔 4개 단지)
+    '기흥역 롯데캐슬 레이시티': '기흥역롯데캐슬레이시티',
+    '기흥역 더샵': '기흥역더샵',
+    '기흥역 센트럴 푸르지오': '기흥역센트럴푸르지오',
+    '기흥역 파크 푸르지오': '기흥역파크푸르지오',
 }
 def normalize_complex_name(name):
     return COMPLEX_NAME_ALIASES.get(name, name)
@@ -109,19 +115,22 @@ def build_real_tx(rows):
         # 114.03짜리처럼 정수 자체가 다르면(=서로 다른 타입일 가능성) 별도로 묶임.
         # 소수점 2자리 반올림으로 묶었을 때는 84.9954 같은 값이 반올림되어 "85"로 잘못 튀어나오는
         # 문제가 있었어서, 반올림이 아니라 정수부(버림)로 그룹핑함.
+        # 2026-10-08: 신고가·최고가는 국토부 "정확한 전용면적"(예: 84.5327) 기준으로 판단.
+        # 예전처럼 정수(84)로 묶으면 같은 84라도 타입이 다른 집(84.53 vs 84.95)이 섞여서,
+        # 실제로는 그 타입 신고가인데도 다른 타입의 더 비싼 거래 때문에 신고가로 안 잡혔음(힐스테이트기흥 84.5327 12.45억 사례).
         true_max = {}
         for r in items_sorted:
-            size_key = int(r['size'])
+            size_key = round(r['size'], 4)
             if size_key not in true_max or r['amount'] > true_max[size_key]:
                 true_max[size_key] = r['amount']
 
         entries = []
         for r in items_sorted:
-            size_key = int(r['size'])
+            size_key = round(r['size'], 4)
             is_record = r['amount'] == true_max[size_key]
             delta = None if is_record else round(r['amount'] - true_max[size_key], 2)
             entries.append({
-                'date': r['date'], 'size': round(r['size'], 1), 'sizeFloor': size_key,
+                'date': r['date'], 'size': round(r['size'], 2), 'sizeFloor': size_key,  # sizeFloor = 정확한 전용면적(소수 4자리)
                 'floor': r['floor'], 'amount': round(r['amount'], 2), 'dong': r['dong'] or '-',
                 'isRecordHigh': is_record, 'isTopPrice': is_record, 'deltaVsRecentHigh': delta,
             })

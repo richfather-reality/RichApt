@@ -30,6 +30,12 @@ COMPLEX_NAME_ALIASES = {
     '성호샤인힐즈아파트': '성호샤인힐즈',
     # 상갈메트로파크는 국토부에 옛 이름(금화마을4단지주공그린빌)으로 등록돼 있음 — 상갈동 463, 금화로58번길 10 주소로 확인
     '금화마을4단지주공그린빌': '상갈메트로파크',
+    # 2026-10-08 추가: 국토부가 단지명에 띄어쓰기를 넣어 공개하는 단지들 — 매물(집셀) 이름과 연결이 안 돼서
+    # 실거래·신고가·시세예측에 매물 단지로 안 잡혔음(아파트 레이시티, 오피스텔 4개 단지)
+    '기흥역 롯데캐슬 레이시티': '기흥역롯데캐슬레이시티',
+    '기흥역 더샵': '기흥역더샵',
+    '기흥역 센트럴 푸르지오': '기흥역센트럴푸르지오',
+    '기흥역 파크 푸르지오': '기흥역파크푸르지오',
 }
 def normalize_complex_name(name):
     return COMPLEX_NAME_ALIASES.get(name, name)
@@ -111,13 +117,16 @@ def build_new_tx_for_type(new_entries, real_tx_bucket):
     for r in new_entries:
         cx = r['complex']
         existing = real_tx_bucket.get(cx, [])
-        area_floor = int(r['area'])
-        same_size = [t for t in existing if int(t['sizeFloor']) == area_floor]
+        # 2026-10-08: 정확한 전용면적(소수 4자리) 기준으로 같은 타입끼리만 비교 (build_real_tx.py와 같은 기준)
+        area_key = round(r['area'], 4)
+        same_size = [t for t in existing if round(float(t['sizeFloor']), 4) == area_key]
         prior_max = max((t['amount'] for t in same_size), default=None)
         is_record = prior_max is None or r['amount'] > prior_max
-        delta = None if is_record else round(r['amount'] - prior_max, 2)
+        # 신고가면 기존 최고가보다 얼마나 올랐는지(+), 아니면 기존 최고가 대비 얼마나 낮은지(-) — 같은 정확한 전용면적 기준.
+        # (이 면적 첫 거래라 비교 대상이 없으면 None)
+        delta = None if prior_max is None else round(r['amount'] - prior_max, 2)
         entry = {
-            'date': r['date'], 'size': round(r['area'],2), 'sizeFloor': r['area'],
+            'date': r['date'], 'size': round(r['area'],2), 'sizeFloor': area_key,
             'floor': r['floor'], 'amount': round(r['amount'],2),
             'dong': r['building'] if r['building'] else '-',
             'isRecordHigh': is_record, 'isTopPrice': is_record,
