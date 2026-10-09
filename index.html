@@ -4149,6 +4149,26 @@ function brfType(t){ BRF.type=t; render(); }
 function brfDeal(d){ BRF.deal=d; render(); }
 function brfZoom(on){ BRF.zoom=!!on; render(); }
 
+/* 2026-10-10: 갭/입주가능 — 확신 없으면 "" (CRM 확정본 5장) */
+function brfOccupancy(l){
+  if((l.dealType||'매매')!=='매매') return '';
+  if(l.gap===true) return 'gap';
+  if(l.vacant===true) return 'vacant';
+  return '';
+}
+/* CRM 전용 내부 정보: 화면에 표시하지 않고 담기 요청에만 실어 보낸다.
+   공개 페이지에는 상호(전화번호가 붙어 있을 수 있음)만 있으므로 그 범위만 보낸다. */
+function brfInternal(l){
+  const ags = l.agencies || [];
+  const pick = ags.find(isOwnAgency) || ags.find(isPartnerAgency) || '';
+  if(!pick) return undefined;
+  const m = String(pick).match(/\(([0-9\-]{8,})\)/);
+  const name = String(pick).replace(/\(.*?\)/g,'').trim();
+  const o = {agencyName: name};
+  if(m) o.agencyPhone = m[1];
+  return o;
+}
+
 async function brfPick(i){
   const l = BRF.rows[i]; if(!l || BRF.expired) return;
   const {T} = brfCurrent();
@@ -4160,7 +4180,8 @@ async function brfPick(i){
     listing: { listingKey: lk, listingIds: ids, housingType: l.type, complex: l.complex, dealType,
       building: l.building, floor: l.floor, floorTier: floorTierOf(l.floor), unitType: l.unitType, area: l.area,
       price: l.price, monthly: dealType==='월세' ? (l.rent ?? null) : null, direction: l.direction || null,
-      checkedDate: brfFmtDate(l.checkedDate), source: l._src || 'partner' }
+      checkedDate: brfFmtDate(l.checkedDate), occupancy: brfOccupancy(l), source: l._src || 'partner' },
+    internal: brfInternal(l)
   };
   BRF.picks[lk] = 'sending'; renderMain();
   try{
