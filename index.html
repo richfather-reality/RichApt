@@ -641,6 +641,10 @@
   .brf-pick:disabled{cursor:default;}
   .brf-err{font-size:11px;color:var(--danger);margin-top:3px;}
   .brf-admin{position:absolute;right:8px;bottom:4px;font-size:9.5px;color:var(--line-strong);font-family:'IBM Plex Mono',monospace;}
+  .brf-backfab{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:120;background:#F2B400;color:#3A2A00;border:none;border-radius:999px;padding:13px 22px;font-weight:800;font-size:15px;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .brf-src{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+  .brf-src.o{background:#E0A800;}
+  .brf-src.p{background:#9FB7B1;}
   .brf-zoom{position:fixed;inset:0;z-index:200;background:rgba(10,20,18,.88);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;}
   .brf-zoom img{max-width:100%;max-height:100%;border-radius:8px;background:#fff;}
   .brf-zoom .x{position:absolute;top:14px;right:18px;color:#fff;font-weight:700;font-size:15px;}
@@ -649,7 +653,7 @@
   .brf-muted{color:var(--text-muted);} .brf-small{font-size:11.5px;}
   @media (max-width:1100px){ .brf-grid{grid-template-columns:1fr;} }
   @media (max-width:760px){ .brf-list{grid-template-columns:1fr;} .brf-plan-top{grid-template-columns:1fr;} .brf-two{grid-template-columns:1fr;} }
-  @media print{ .brf-bar,.brf-pick,.brf-admin{display:none !important;} }
+  @media print{ .brf-bar,.brf-pick,.brf-backfab{display:none !important;} }
 
 /* </BRIEFING_CSS> */
 </style>
@@ -3905,12 +3909,12 @@ async function brfStart(token){
     if(!r.ok) throw new Error('context '+r.status);
     BRF.ctx = await r.json();
   }catch(e){
-    if(e.code!==401){ BRF.error = 'CRM 서버에 연결하지 못했어요. 잠시 후 CRM에서 다시 열어 주세요.'; }
+    if(e.code!==401){ BRF.error = '화면을 불러오지 못했어요. 잠시 후 다시 열어 주세요.'; }
     brfRenderBar(); return;
   }
   BRF.expired = false; BRF.active = true;
-  // 상담 모드 켜기: 기존 CRM 전용 표시(부동산 펼치기, ◆/★)도 함께 켜짐
-  CRM_MODE = true;
+  // 고객과 함께 보는 화면이므로 CRM_MODE(부동산 이름 펼치기, ◆/★ 표시)는 켜지 않는다.
+  // 협력사·우리 매물 목록은 브리핑 매물 필터에만 쓴다.
   const partnerNames = [];
   (BRF.ctx.partners||[]).forEach(p=>{
     (p.naverNames||[]).forEach(n=>partnerNames.push(agencyShortName(n)));
@@ -3920,7 +3924,7 @@ async function brfStart(token){
   const office = BRF.ctx.office || {};
   const own = (office.naverNames||[]).concat(office.name ? [office.name] : []).map(agencyShortName).filter(Boolean);
   OWN_AGENCIES = own.length ? [...new Set(own)] : ['리치부동산'];
-  if(!FEATURES.some(f=>f.key==='briefing')) FEATURES.unshift({key:'briefing', label:'🔒 단지 브리핑', briefing:true});
+  if(!FEATURES.some(f=>f.key==='briefing')) FEATURES.unshift({key:'briefing', label:'단지 브리핑', briefing:true});
   if(!wasActive){ state.feature = 'briefing'; BRF.view = 'list'; }
   updateCrmLayout(); brfRenderBar(); brfStartTimer(); render();
   brfLoadComplexes();
@@ -3967,38 +3971,38 @@ function brfStartTimer(){
 function brfRenderBar(){
   let bar = document.getElementById('brfBar');
   if(!BRF.token){ if(bar) bar.remove(); return; }
-  if(!bar){ bar = document.createElement('div'); bar.id = 'brfBar'; document.body.insertBefore(bar, document.body.firstChild); }
+  if(!bar){ bar = document.createElement('div'); bar.id = 'brfBar'; bar.onclick = ()=>{ if(BRF.active && !BRF.expired && state.feature!=='briefing') brfGoBack(); }; document.body.insertBefore(bar, document.body.firstChild); }
   if(BRF.error){ bar.className = 'brf-bar err'; bar.innerHTML = `⚠️ ${brfEsc(BRF.error)}`; return; }
-  if(BRF.expired){ bar.className = 'brf-bar err'; bar.innerHTML = `⏱ 상담 시간이 끝났어요 · CRM 고객 카드에서 <b>[연장]</b>을 누르면 바로 이어집니다`; return; }
-  if(!BRF.ctx){ bar.className = 'brf-bar'; bar.innerHTML = 'CRM 연결 중…'; return; }
+  if(BRF.expired){ bar.className = 'brf-bar err'; bar.innerHTML = `⏱ 화면이 잠시 잠겼어요 · 담당자 화면에서 <b>[연장]</b>을 누르면 이어집니다`; return; }
+  if(!BRF.ctx){ bar.className = 'brf-bar'; bar.innerHTML = '불러오는 중…'; return; }
   const c = BRF.ctx.customer || {};
   const left = Math.max(0, Math.round((new Date(BRF.ctx.expiresAt).getTime() - Date.now())/60000));
   bar.className = 'brf-bar' + (left<=5 ? ' warn' : '');
-  bar.innerHTML = `<span class="dot"></span><b>상담 모드</b> · CRM 연결됨 · ${brfEsc(c.name||'고객')}님${c.type?` (${brfEsc(c.type)})`:''}<span class="left">남은 시간 ${left}분</span>`;
+  bar.innerHTML = `<span class="dot"></span><b>리치부동산</b> · ${brfEsc(c.name||'고객')} 고객님 단지 브리핑${left<=5?`<span class="left">⏱ ${left}분</span>`:''}`;
 }
 
 /* ───── 화면 ───── */
 function renderBriefing(el){
   if(BRF.expired){
     el.innerHTML = `<div class="panel brf-expired"><div class="big">⏱</div><h2>상담 시간이 끝났어요</h2>
-      <p>CRM 고객 카드에서 <b>[연장]</b>을 누르면 이 화면이 그대로 다시 열립니다.</p></div>`;
+      <p>담당자 화면에서 <b>[연장]</b>을 누르면 이 화면이 그대로 다시 열립니다.</p></div>`;
     return;
   }
-  if(!BRF.ctx){ el.innerHTML = `<div class="panel"><p style="color:var(--text-muted)">CRM 연결 중…</p></div>`; return; }
+  if(!BRF.ctx){ el.innerHTML = `<div class="panel"><p style="color:var(--text-muted)">불러오는 중…</p></div>`; return; }
   el.innerHTML = BRF.view==='detail' && BRF.key && (BRF.complexes[BRF.key]||{}).status==='ok' ? brfDetailHtml() : brfListHtml();
 }
 
 function brfListHtml(){
   const c = BRF.ctx.customer || {};
   const interest = (c.interestComplexes||[]).filter(k=>BRIEFING_COMPLEXES.some(x=>x.key===k));
-  const quick = interest.map(k=>{
+  const quick = interest.filter(k=>(BRF.complexes[k]||{}).status==='ok').map(k=>{
     const meta = BRIEFING_COMPLEXES.find(x=>x.key===k); const st = (BRF.complexes[k]||{}).status;
     return `<button class="brf-quick" ${st==='ok'?`onclick="brfOpen('${k}')"`:'disabled'}>${brfEsc(meta.name)}${meta.ht==='오피스텔'?' 오피스텔':''} ${st==='ok'?'브리핑 →':'(준비중)'}</button>`;
   }).join('');
-  const rows = [['구분',c.type],['관심 단지',interest.map(k=>{const m=BRIEFING_COMPLEXES.find(x=>x.key===k);return m.name+(m.ht==='오피스텔'?'(오피스텔)':'');}).join(', ')],
-    ['평형',c.area],['예산',c.budget],['메모',c.memo]]
+  const rows = [['관심 단지',interest.filter(k=>(BRF.complexes[k]||{}).status==='ok').map(k=>{const m=BRIEFING_COMPLEXES.find(x=>x.key===k);return m.name+(m.ht==='오피스텔'?'(오피스텔)':'');}).join(', ')],
+    ['평형',c.area],['예산',c.budget]]
     .filter(r=>r[1]).map(r=>`<div class="brf-kv"><span>${r[0]}</span><b>${brfEsc(r[1])}</b></div>`).join('');
-  const cards = BRIEFING_COMPLEXES.map(m=>{
+  const cards = BRIEFING_COMPLEXES.filter(m=>{ const st=(BRF.complexes[m.key]||{}).status; return st==='ok' || st==='loading' || !st; }).map(m=>{
     const st = (BRF.complexes[m.key]||{}).status || 'loading';
     const d = st==='ok' ? BRF.complexes[m.key].data : null;
     const sub = d ? `${brfEsc(d.moveIn||'')} 입주 · ${d.households?d.households.toLocaleString()+'세대':''} · ${(d.types||[]).length}개 타입`
@@ -4009,7 +4013,7 @@ function brfListHtml(){
       <div class="s">${sub}</div></button>`;
   }).join('');
   return `<div class="brf-list">
-    <div class="panel brf-customer"><h2>${brfEsc(c.name||'고객')}님 희망 조건</h2>${rows || '<p class="brf-muted">등록된 조건이 없어요.</p>'}
+    <div class="panel brf-customer"><h2>${brfEsc(c.name||'고객')} 고객님</h2>${rows || '<p class="brf-muted">등록된 조건이 없어요.</p>'}
       ${quick ? `<div class="brf-quick-wrap">${quick}</div>` : ''}</div>
     <div class="panel"><h2>단지 선택</h2><div class="brf-cards">${cards}</div></div>
   </div>`;
@@ -4053,7 +4057,7 @@ function brfDetailHtml(){
   }).join('');
   const chipTypes = BRF.dong && C.dongAreas && C.dongAreas[BRF.dong] ? types.filter(t=>(C.dongAreas[BRF.dong].types||[]).includes(t.type)) : types;
   const chips = chipTypes.map(t=>`<button class="brf-chip ${t.type===T.type?'on':''}" onclick="brfType('${brfEsc(t.type)}')">${brfEsc(t.type)}<small>${t.pyeong?t.pyeong+'평':''}</small></button>`).join('');
-  const dongInfo = BRF.dong && C.dongAreas[BRF.dong] ? `<div class="brf-donginfo"><b>${brfEsc(BRF.dong)}동</b> · ${brfEsc(C.dongAreas[BRF.dong].floors||'')} <button class="brf-link" onclick="brfDong(null)">전체 타입 보기</button></div>` : `<div class="brf-donginfo brf-muted">배치도에서 동을 누르면 그 동의 타입만 보여요</div>`;
+  const dongInfo = BRF.dong && C.dongAreas[BRF.dong] ? `<div class="brf-donginfo"><b>${brfEsc(BRF.dong)}동</b> · ${brfEsc(C.dongAreas[BRF.dong].floors||'')} <button class="brf-link" onclick="brfDong(null)">전체 타입 보기</button></div>` : `<div class="brf-donginfo"></div>`;
   // 평면도
   const planUrl = T.plan ? brfImgUrl(key, T.plan) : null;
   const planMissing = T.plan && BRF.imgPending[key+'/'+T.plan]==='none';
@@ -4064,7 +4068,7 @@ function brfDetailHtml(){
   const txBody = tx.recent.length ? tx.recent.map(txRow).join('')
     : tx.fallback ? `<tr><td colspan="3" class="brf-muted brf-small">최근 4개월 거래가 없어 1년 내 가장 최근 거래를 보여드려요</td></tr>${txRow(tx.fallback)}`
     : `<tr><td colspan="3" class="brf-muted">최근 1년 거래가 없어요</td></tr>`;
-  const shared = T.sharedWith ? `<div class="brf-note">${brfEsc(T.type)}·${brfEsc(T.sharedWith)}는 국토부 전용면적이 같아 실거래를 함께 보여드려요</div>` : '';
+  const shared = T.sharedWith ? `<div class="brf-note">${brfEsc(T.type)}·${brfEsc(T.sharedWith)}는 전용면적이 같아 실거래를 함께 보여드려요</div>` : '';
   // 매물
   const L = brfListingsFor(C, T);
   const counts = {'매매':0,'전세':0,'월세':0}; L.shown.forEach(l=>counts[l.dealType||'매매']++);
@@ -4077,8 +4081,8 @@ function brfDetailHtml(){
     const btn = st==='sending' ? `<button class="brf-pick" disabled>보내는 중…</button>`
       : st==='ok' ? `<button class="brf-pick done" disabled>✓ 담았어요</button>`
       : st==='updated' ? `<button class="brf-pick done" disabled>✓ 다시 담음</button>`
-      : `<button class="brf-pick" onclick="brfPick(${i})">+ 고객에게 담기</button>${st==='err'?'<div class="brf-err">실패 · 다시 눌러 주세요</div>':''}`;
-    return `<tr><td>${brfEsc(l.building)}동<div class="brf-small brf-muted">${brfEsc(l.floor)}층 · ${brfEsc(l.direction||'')}</div></td>
+      : `<button class="brf-pick" onclick="brfPick(${i})">♡ 관심 매물 담기</button>${st==='err'?'<div class="brf-err">실패 · 다시 눌러 주세요</div>':''}`;
+    return `<tr><td><span class="brf-src ${l._src==='own'?'o':'p'}"></span>${brfEsc(l.building)}동<div class="brf-small brf-muted">${brfEsc(l.floor)}층 · ${brfEsc(l.direction||'')}</div></td>
       <td class="num">${priceTxt}<div class="brf-small brf-muted">확인 ${brfFmtDate(l.checkedDate).slice(5)}</div></td><td>${btn}</td></tr>`;
   };
   const dealTabs = ['매매','전세','월세'].map(d=>`<button class="brf-deal ${BRF.deal===d?'on':''}" onclick="brfDeal('${d}')">${d} ${counts[d]}</button>`).join('');
@@ -4114,7 +4118,7 @@ function brfDetailHtml(){
             ${tx.yearMax?`<div class="brf-note">최근 1년 이 타입 최고 ${brfPrice(tx.yearMax)} · ${tx.total}건</div>`:''}</div>
           <div class="brf-box"><h3>지금 나와 있는 매물</h3><div class="brf-deals">${dealTabs}</div>
             <table class="brf-tbl"><tbody>${listBody}</tbody></table>
-            <div class="brf-admin" title="협력사 미확인">${L.hidden ? 'r'+L.hidden : ''}</div></div>
+            <div class="brf-admin">${L.hidden ? 'r'+L.hidden : ''}</div></div>
         </div>
       </div>
     </div>${zoom}</div>`;
@@ -4167,6 +4171,20 @@ async function brfPick(i){
   }catch(e){ BRF.picks[lk] = e.code===401 ? undefined : 'err'; }
   if(state.feature==='briefing') renderMain();
 }
+
+
+/* 다른 탭으로 갔다가 브리핑 화면으로 바로 돌아오는 버튼 (화면 아래 고정) */
+function brfGoBack(){ state.feature='briefing'; render(); window.scrollTo({top:0}); }
+function brfRenderBack(){
+  let btn = document.getElementById('brfBack');
+  const show = BRF.active && state.feature!=='briefing';
+  if(!show){ if(btn) btn.remove(); return; }
+  if(!btn){ btn = document.createElement('button'); btn.id='brfBack'; btn.className='brf-backfab'; btn.onclick=brfGoBack; document.body.appendChild(btn); }
+  const C = BRF.view==='detail' && BRF.key && (BRF.complexes[BRF.key]||{}).data;
+  btn.textContent = '← ' + (C ? (C.displayName||C.listingName)+' 브리핑으로' : '단지 브리핑으로');
+}
+const _brfRender = render;
+render = function(){ _brfRender(); brfRenderBack(); };
 
 /* 시작: 주소에 토큰이 있으면 상담 모드로, [연장] 시 hashchange로 토큰 교체 */
 (function(){
