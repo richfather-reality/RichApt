@@ -570,6 +570,88 @@
   .partner-name{color:var(--teal);}
   .own-mark{color:var(--gold);font-size:11px;margin-right:3px;}
   .own-name{color:var(--gold);}
+/* <BRIEFING_CSS> */
+  /* ───── 단지 브리핑 (CRM 상담 모드 전용) ───── */
+  .brf-bar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    background:#FFF4CC;color:#5A4300;border-bottom:1.5px solid #E8C55A;padding:8px 16px;font-size:13.5px;}
+  .brf-bar .dot{width:9px;height:9px;border-radius:50%;background:#1FA463;box-shadow:0 0 0 3px rgba(31,164,99,.2);}
+  .brf-bar .left{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  .brf-bar.warn{background:#FFE3C2;border-color:#E89A4A;}
+  .brf-bar.err{background:#FDE2DF;color:#8A1F14;border-color:#E39A90;}
+  .feature-tab.brf-tab{color:#7A5A00;background:#FFF4CC;border-radius:8px 8px 0 0;}
+  .feature-tab.brf-tab.active{border-bottom-color:#E0A800;color:#5A4300;}
+  .brf-list{display:grid;grid-template-columns:minmax(240px,1fr) 2fr;gap:18px;align-items:start;}
+  .brf-list .panel{margin:0;}
+  .brf-kv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px;}
+  .brf-kv span{color:var(--text-muted);flex-shrink:0;}
+  .brf-kv b{text-align:right;font-weight:600;}
+  .brf-quick-wrap{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .brf-quick{background:var(--teal);color:#fff;border:none;border-radius:10px;padding:11px 14px;font-weight:700;font-size:14px;cursor:pointer;text-align:left;}
+  .brf-quick:disabled{background:var(--surface-2);color:var(--text-muted);cursor:default;}
+  .brf-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;}
+  .brf-card{text-align:left;background:var(--surface);border:1.5px solid var(--line-strong);border-radius:12px;padding:12px 14px;cursor:pointer;font-family:inherit;color:var(--text);}
+  .brf-card:hover{border-color:var(--teal-light);}
+  .brf-card.star{border-color:#E0A800;background:#FFFBEA;}
+  .brf-card.off{opacity:.5;cursor:default;}
+  .brf-card .t{font-weight:700;font-size:14.5px;}
+  .brf-card .s{font-size:12px;color:var(--text-muted);margin-top:5px;}
+  .brf-ht{font-size:11px;font-weight:600;padding:2px 7px;border-radius:999px;background:var(--surface-2);color:var(--teal);vertical-align:middle;}
+  .brf-ht.ot{color:#6B4FB0;background:#F0EBFA;}
+  .brf-fav{font-size:11px;font-weight:700;color:#7A5A00;background:#FFE58A;padding:2px 7px;border-radius:999px;}
+  .brf-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;}
+  .brf-head .ttl{font-size:20px;font-weight:800;}
+  .brf-head .meta{font-size:13px;color:var(--text-muted);width:100%;}
+  .brf-link{background:none;border:none;color:var(--teal-light);font-weight:700;cursor:pointer;padding:0;font-size:13.5px;font-family:inherit;}
+  .brf-grid{display:grid;grid-template-columns:minmax(320px,1.15fr) 1.5fr;gap:18px;align-items:start;}
+  .brf-grid .panel{margin:0;}
+  .brf-sitebox{position:relative;border-radius:10px;overflow:hidden;background:var(--surface-2);}
+  .brf-sitebox img{display:block;width:100%;height:auto;}
+  .brf-dong{position:absolute;border:2px solid rgba(18,97,90,.0);background:rgba(18,97,90,.0);border-radius:8px;cursor:pointer;padding:0;}
+  .brf-dong span{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-2px);font-size:11px;font-weight:700;background:rgba(255,255,255,.92);color:var(--text);padding:1px 6px;border-radius:6px;white-space:nowrap;}
+  .brf-dong.has{border-color:rgba(14,140,119,.55);background:rgba(14,140,119,.12);}
+  .brf-dong.on{border:3px solid #F2B400;background:rgba(242,180,0,.22);box-shadow:0 0 0 3px rgba(242,180,0,.25);}
+  .brf-dong.on span{background:#F2B400;color:#3A2A00;}
+  .brf-donginfo{font-size:13px;margin:12px 0 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .brf-chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .brf-chip{border:1.5px solid var(--line-strong);background:var(--surface);border-radius:10px;padding:8px 12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;color:var(--text);}
+  .brf-chip small{font-weight:500;color:var(--text-muted);margin-left:5px;font-size:11.5px;}
+  .brf-chip.on{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .brf-chip.on small{color:rgba(255,255,255,.8);}
+  .brf-plan-top{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;align-items:start;}
+  .brf-planbox{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:zoom-in;background:#fff;min-height:160px;}
+  .brf-planbox img{display:block;width:100%;height:auto;}
+  .brf-planbox .zoomhint{position:absolute;right:8px;bottom:8px;font-size:11.5px;background:rgba(16,36,31,.75);color:#fff;padding:3px 8px;border-radius:6px;}
+  .brf-ph{padding:40px 12px;text-align:center;color:var(--text-muted);font-size:13px;}
+  .brf-spec .tt{font-size:22px;font-weight:800;margin-bottom:6px;}
+  .brf-spec .tt small{font-size:14px;color:var(--text-muted);font-weight:600;}
+  .brf-two{display:grid;grid-template-columns:1fr 1.25fr;gap:14px;margin-top:16px;}
+  .brf-box{position:relative;border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .brf-box h3{font-size:14px;margin:0 0 8px;}
+  .brf-box h3 small{font-weight:500;color:var(--text-muted);font-size:11.5px;margin-left:4px;}
+  .brf-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+  .brf-tbl td{font-family:inherit;letter-spacing:normal;word-spacing:normal;text-align:left;padding:7px 4px;border-top:1px solid var(--line);vertical-align:middle;}
+  .brf-tbl td.num{text-align:right;font-weight:700;font-family:'IBM Plex Mono',monospace;white-space:nowrap;}
+  .brf-badge.hi{font-size:10.5px;font-weight:800;color:#fff;background:var(--danger);padding:1px 6px;border-radius:5px;font-family:inherit;}
+  .brf-note{font-size:11.5px;color:var(--text-muted);margin:6px 0;}
+  .brf-deals{display:flex;gap:6px;margin-bottom:6px;}
+  .brf-deal{flex:1;border:1.5px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:6px 0;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text);}
+  .brf-deal.on{background:#10241F;color:#fff;border-color:#10241F;}
+  .brf-pick{background:#F2B400;color:#3A2A00;border:none;border-radius:8px;padding:8px 10px;font-weight:800;font-size:12.5px;cursor:pointer;white-space:nowrap;font-family:inherit;}
+  .brf-pick.done{background:#DDF3E8;color:#12614A;}
+  .brf-pick:disabled{cursor:default;}
+  .brf-err{font-size:11px;color:var(--danger);margin-top:3px;}
+  .brf-admin{position:absolute;right:8px;bottom:4px;font-size:9.5px;color:var(--line-strong);font-family:'IBM Plex Mono',monospace;}
+  .brf-zoom{position:fixed;inset:0;z-index:200;background:rgba(10,20,18,.88);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;}
+  .brf-zoom img{max-width:100%;max-height:100%;border-radius:8px;background:#fff;}
+  .brf-zoom .x{position:absolute;top:14px;right:18px;color:#fff;font-weight:700;font-size:15px;}
+  .brf-expired{text-align:center;padding:40px 20px;}
+  .brf-expired .big{font-size:40px;}
+  .brf-muted{color:var(--text-muted);} .brf-small{font-size:11.5px;}
+  @media (max-width:1100px){ .brf-grid{grid-template-columns:1fr;} }
+  @media (max-width:760px){ .brf-list{grid-template-columns:1fr;} .brf-plan-top{grid-template-columns:1fr;} .brf-two{grid-template-columns:1fr;} }
+  @media print{ .brf-bar,.brf-pick,.brf-admin{display:none !important;} }
+
+/* </BRIEFING_CSS> */
 </style>
 </head>
 <body>
@@ -883,18 +965,18 @@ try {
    매물을 눌렀을 때 어느 부동산이 올린 매물인지 보여준다. 일반 방문자에게는 절대 노출 안 됨.
    예: https://.../index.html?agentKey=richfather-crm-2026 */
 const CRM_SECRET_KEY = 'richfather-crm-2026';
-const CRM_MODE = new URLSearchParams(window.location.search).get('agentKey') === CRM_SECRET_KEY;
+let CRM_MODE = new URLSearchParams(window.location.search).get('agentKey') === CRM_SECRET_KEY;
 /* 2026-10-08: 협력 부동산 표시 — CRM 링크로 접속했을 때만, 아래 부동산이 가진 매물에 작은 ◆ 표시를 붙인다.
    이름은 괄호(전화번호)와 '공인중개사사무소'를 떼고 정확히 같은 것만 인정(예: '래미안탑'·'구성역OK'는 제외).
    부동산이 바뀌면 이 목록만 고치면 됨. */
-const PARTNER_AGENCIES = ['삼촌','기흥역코끼리','기흥역OK','기흥역미소','기흥역퍼스트올','기흥역현대힐스테이트','ACE','기흥역탑','기흥역센트럴푸르지오'];
+let PARTNER_AGENCIES = ['삼촌','기흥역코끼리','기흥역OK','기흥역미소','기흥역퍼스트올','기흥역현대힐스테이트','ACE','기흥역탑','기흥역센트럴푸르지오'];
 function agencyShortName(a){ return String(a||'').replace(/\(.*?\)/g,'').replace(/공인중개사사무소|공인중개사/g,'').trim(); }
 function isPartnerAgency(a){ return PARTNER_AGENCIES.includes(agencyShortName(a)); }
 function partnerAgenciesOf(r){ return CRM_MODE && r && r.agencies ? r.agencies.filter(isPartnerAgency) : []; }
 /* 2026-10-08: 우리 매물(리치부동산) 표시 — CRM 접속 시에만 ★(금색)로 따로 표시.
    네이버 등록 상호가 확정되면 이 목록을 정확한 이름으로 맞출 것.
    '리치부동산중개(주)'·'송파리치' 같은 다른 회사는 이름이 정확히 같지 않아서 제외됨. */
-const OWN_AGENCIES = ['리치부동산']; // 상호: 리치부동산 공인중개사사무소 (띄어쓰기 있어도 인식)
+let OWN_AGENCIES = ['리치부동산']; // 상호: 리치부동산 공인중개사사무소 (띄어쓰기 있어도 인식)
 function isOwnAgency(a){ return OWN_AGENCIES.includes(agencyShortName(a)); }
 function isOwnListing(r){ return CRM_MODE && r && r.agencies ? r.agencies.some(isOwnAgency) : false; }
 /* CRM으로 접속했고 화면이 넓으면(태블릿 가로·PC) 좌측 고정 메뉴 + 여러 열 배치 레이아웃 적용.
@@ -1103,7 +1185,7 @@ function renderFeatureTabs(){
   el.innerHTML = FEATURES.map(f=>{
     const disabled = isFeatureDisabled(f);
     const activeCls = state.feature===f.key ? 'active' : '';
-    return `<button class="feature-tab ${activeCls}" ${disabled?'disabled':''} onclick="${disabled?'':`selectFeature('${f.key}')`}">${f.label}</button>`;
+    return `<button class="feature-tab ${activeCls} ${f.briefing?'brf-tab':''}" ${disabled?'disabled':''} onclick="${disabled?'':`selectFeature('${f.key}')`}">${f.label}</button>`;
   }).join('');
 }
 
@@ -1700,6 +1782,7 @@ function rentComplexAnalysisPanel(scopeLabel){
 
 function renderMain(){
   const el = document.getElementById('mainContent');
+  if(state.feature==='briefing' && typeof renderBriefing==='function'){ renderBriefing(el); return; }
   const stats = currentStats();
   const summaryHtml = `<div class="summary-grid">
     ${stats.map(s=>`<div class="stat-card">
@@ -3492,7 +3575,7 @@ function buildShareParams(){
   p.set('gu', state.gu);
   p.set('dong', state.dong);
   p.set('type', state.housingType);
-  p.set('feature', state.feature);
+  p.set('feature', state.feature==='briefing' ? 'overview' : state.feature);
   if(state.feature==='finder'){
     p.set('budget', state.finder.budget);
     p.set('areaBucket', state.finder.areaBucket);
@@ -3521,7 +3604,7 @@ function loadStateFromURL(){
   if(p.get('gu') && REAL[p.get('gu')]) state.gu = p.get('gu');
   if(p.get('dong')) state.dong = p.get('dong');
   if(p.get('type')) state.housingType = p.get('type');
-  if(p.get('feature')) state.feature = p.get('feature');
+  if(p.get('feature') && FEATURES.some(f=>f.key===p.get('feature'))) state.feature = p.get('feature');
   if(state.feature==='finder'){
     if(p.get('budget')) state.finder.budget = p.get('budget');
     if(p.get('areaBucket')) state.finder.areaBucket = p.get('areaBucket');
@@ -3751,6 +3834,348 @@ try{
 
 renderInstallBanner();
 
+/* <BRIEFING_JS> */
+/* ═══════════════════════════════════════════════════════════════════
+   단지 브리핑 (CRM 상담 모드 전용) — 2026-10-10
+   - CRM 고객 카드 [단지 브리핑 열기] → 이 페이지가 `#briefing=<토큰>` 으로 열림.
+   - 토큰은 메모리에만 두고 주소창에서 바로 지운다. [연장]을 누르면 주소의 # 부분만 바뀌므로 hashchange로 교체.
+   - 브리핑 데이터(단지 정보·배치도·평면도)는 이 파일에 들어 있지 않다. 토큰으로 CRM 서버에서만 받아온다.
+   - 일반 방문자(토큰 없음)에게는 탭도, 데이터도, 이미지 주소도 전혀 생기지 않는다.
+   - 브리핑 화면은 고객이 직접 보는 화면 → 다른 부동산 이름·연락처·공동중개 여부를 표시하지 않는다.
+   - 매물은 우리(리치부동산) 매물 + CRM이 내려준 공동중개 가능 부동산 매물만 보인다.
+   ═══════════════════════════════════════════════════════════════════ */
+const BRIEFING_API = 'https://richfathercrm-production.up.railway.app/api/briefing';
+const BRIEFING_COMPLEXES = [
+  {key:'hillstate-giheung',              name:'힐스테이트기흥',         ht:'아파트'},
+  {key:'giheung-thesharp',               name:'기흥역더샵',             ht:'아파트'},
+  {key:'giheung-thefirst-prugio',        name:'기흥역더퍼스트푸르지오', ht:'아파트'},
+  {key:'giheung-lottecastle-raycity',    name:'기흥역롯데캐슬레이시티', ht:'아파트'},
+  {key:'giheung-central-prugio',         name:'기흥역센트럴푸르지오',   ht:'아파트'},
+  {key:'giheung-park-prugio',            name:'기흥역파크푸르지오',     ht:'아파트'},
+  {key:'giheung-thesharp-ot',            name:'기흥역더샵',             ht:'오피스텔'},
+  {key:'giheung-thefirst-prugio-ot',     name:'기흥역더퍼스트푸르지오', ht:'오피스텔'},
+  {key:'giheung-lottecastle-raycity-ot', name:'기흥역롯데캐슬레이시티', ht:'오피스텔'},
+  {key:'giheung-central-prugio-ot',      name:'기흥역센트럴푸르지오',   ht:'오피스텔'},
+  {key:'giheung-park-prugio-ot',         name:'기흥역파크푸르지오',     ht:'오피스텔'},
+];
+const BRF_TX_DAYS = 120;
+let BRF = {
+  token:null, ctx:null, active:false, expired:false, error:'',
+  complexes:{},          // key -> {status:'loading'|'ok'|'none'|'err', data}
+  view:'list', key:null, dong:null, type:null, deal:'매매',
+  images:{}, imgPending:{}, picks:{}, rows:[], zoom:false, timer:null,
+};
+
+function brfEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function brfKstIso(){ return new Date(Date.now()+9*3600e3).toISOString().replace(/\.\d+Z$/,'+09:00'); }
+function brfFmtDate(d){ d=String(d||''); return d.length===8 ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : d; }
+function brfPrice(v){ if(v==null||isNaN(v)) return '-'; const eok=Math.floor(v+1e-9), man=Math.round((v-eok)*10000);
+  return eok ? (man ? `${eok}억 ${man.toLocaleString()}` : `${eok}억`) : `${man.toLocaleString()}만`; }
+
+/* 주소의 #briefing=토큰 을 읽고 즉시 주소창에서 지운다 */
+function brfReadHash(){
+  const m = (location.hash||'').match(/[#&]briefing=([^&]+)/);
+  if(!m) return null;
+  let t = m[1]; try{ t = decodeURIComponent(t); }catch(e){}
+  try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+  return t;
+}
+
+async function brfFetch(path, opts){
+  opts = opts || {};
+  const headers = Object.assign({'Authorization':'Bearer '+BRF.token}, opts.headers||{});
+  const res = await fetch(BRIEFING_API+path, Object.assign({}, opts, {headers, cache:'no-store'}));
+  if(res.status===401){ brfExpire(); const e = new Error('401'); e.code=401; throw e; }
+  return res;
+}
+
+function brfExpire(){
+  if(BRF.expired) return;
+  BRF.expired = true;
+  Object.values(BRF.images).forEach(u=>{ try{ URL.revokeObjectURL(u); }catch(e){} });
+  BRF.images = {}; BRF.imgPending = {};
+  brfRenderBar(); if(state.feature==='briefing') render();
+}
+
+async function brfStart(token){
+  BRF.token = token; BRF.error = '';
+  const wasActive = BRF.active;
+  try{
+    const r = await brfFetch('/context');
+    if(!r.ok) throw new Error('context '+r.status);
+    BRF.ctx = await r.json();
+  }catch(e){
+    if(e.code!==401){ BRF.error = 'CRM 서버에 연결하지 못했어요. 잠시 후 CRM에서 다시 열어 주세요.'; }
+    brfRenderBar(); return;
+  }
+  BRF.expired = false; BRF.active = true;
+  // 상담 모드 켜기: 기존 CRM 전용 표시(부동산 펼치기, ◆/★)도 함께 켜짐
+  CRM_MODE = true;
+  const partnerNames = [];
+  (BRF.ctx.partners||[]).forEach(p=>{
+    (p.naverNames||[]).forEach(n=>partnerNames.push(agencyShortName(n)));
+    if(p.officeName) partnerNames.push(agencyShortName(p.officeName));
+  });
+  PARTNER_AGENCIES = [...new Set(partnerNames.filter(Boolean))];
+  const office = BRF.ctx.office || {};
+  const own = (office.naverNames||[]).concat(office.name ? [office.name] : []).map(agencyShortName).filter(Boolean);
+  OWN_AGENCIES = own.length ? [...new Set(own)] : ['리치부동산'];
+  if(!FEATURES.some(f=>f.key==='briefing')) FEATURES.unshift({key:'briefing', label:'🔒 단지 브리핑', briefing:true});
+  if(!wasActive){ state.feature = 'briefing'; BRF.view = 'list'; }
+  updateCrmLayout(); brfRenderBar(); brfStartTimer(); render();
+  brfLoadComplexes();
+}
+
+function brfLoadComplexes(){
+  BRIEFING_COMPLEXES.forEach(c=>{
+    const cur = BRF.complexes[c.key];
+    if(cur && cur.status==='ok') return;
+    BRF.complexes[c.key] = {status:'loading'};
+    brfFetch('/complex/'+encodeURIComponent(c.key)).then(async r=>{
+      if(r.status===404){ BRF.complexes[c.key] = {status:'none'}; }
+      else if(!r.ok){ BRF.complexes[c.key] = {status:'err'}; }
+      else { BRF.complexes[c.key] = {status:'ok', data: await r.json()}; }
+    }).catch(e=>{ if(e.code!==401) BRF.complexes[c.key] = {status:'err'}; })
+      .finally(()=>{ if(state.feature==='briefing') renderMain(); });
+  });
+}
+
+/* 이미지는 토큰을 붙여 받아서 blob 주소로만 쓴다 (공개 주소 없음) */
+function brfImgUrl(key, file){
+  const k = key+'/'+file;
+  if(BRF.images[k]) return BRF.images[k];
+  if(!BRF.imgPending[k] && !BRF.expired){
+    BRF.imgPending[k] = true;
+    brfFetch('/image/'+encodeURIComponent(key)+'/'+encodeURIComponent(file)).then(r=>r.ok ? r.blob() : null).then(b=>{
+      if(b && !BRF.expired){ BRF.images[k] = URL.createObjectURL(b); }
+      else { BRF.imgPending[k] = 'none'; }
+      if(state.feature==='briefing') renderMain();
+    }).catch(()=>{ BRF.imgPending[k] = 'none'; });
+  }
+  return null;
+}
+
+function brfStartTimer(){
+  if(BRF.timer) clearInterval(BRF.timer);
+  BRF.timer = setInterval(()=>{
+    if(!BRF.ctx || BRF.expired) return;
+    const left = new Date(BRF.ctx.expiresAt).getTime() - Date.now();
+    if(left <= 0) brfExpire(); else brfRenderBar();
+  }, 20000);
+}
+
+function brfRenderBar(){
+  let bar = document.getElementById('brfBar');
+  if(!BRF.token){ if(bar) bar.remove(); return; }
+  if(!bar){ bar = document.createElement('div'); bar.id = 'brfBar'; document.body.insertBefore(bar, document.body.firstChild); }
+  if(BRF.error){ bar.className = 'brf-bar err'; bar.innerHTML = `⚠️ ${brfEsc(BRF.error)}`; return; }
+  if(BRF.expired){ bar.className = 'brf-bar err'; bar.innerHTML = `⏱ 상담 시간이 끝났어요 · CRM 고객 카드에서 <b>[연장]</b>을 누르면 바로 이어집니다`; return; }
+  if(!BRF.ctx){ bar.className = 'brf-bar'; bar.innerHTML = 'CRM 연결 중…'; return; }
+  const c = BRF.ctx.customer || {};
+  const left = Math.max(0, Math.round((new Date(BRF.ctx.expiresAt).getTime() - Date.now())/60000));
+  bar.className = 'brf-bar' + (left<=5 ? ' warn' : '');
+  bar.innerHTML = `<span class="dot"></span><b>상담 모드</b> · CRM 연결됨 · ${brfEsc(c.name||'고객')}님${c.type?` (${brfEsc(c.type)})`:''}<span class="left">남은 시간 ${left}분</span>`;
+}
+
+/* ───── 화면 ───── */
+function renderBriefing(el){
+  if(BRF.expired){
+    el.innerHTML = `<div class="panel brf-expired"><div class="big">⏱</div><h2>상담 시간이 끝났어요</h2>
+      <p>CRM 고객 카드에서 <b>[연장]</b>을 누르면 이 화면이 그대로 다시 열립니다.</p></div>`;
+    return;
+  }
+  if(!BRF.ctx){ el.innerHTML = `<div class="panel"><p style="color:var(--text-muted)">CRM 연결 중…</p></div>`; return; }
+  el.innerHTML = BRF.view==='detail' && BRF.key && (BRF.complexes[BRF.key]||{}).status==='ok' ? brfDetailHtml() : brfListHtml();
+}
+
+function brfListHtml(){
+  const c = BRF.ctx.customer || {};
+  const interest = (c.interestComplexes||[]).filter(k=>BRIEFING_COMPLEXES.some(x=>x.key===k));
+  const quick = interest.map(k=>{
+    const meta = BRIEFING_COMPLEXES.find(x=>x.key===k); const st = (BRF.complexes[k]||{}).status;
+    return `<button class="brf-quick" ${st==='ok'?`onclick="brfOpen('${k}')"`:'disabled'}>${brfEsc(meta.name)}${meta.ht==='오피스텔'?' 오피스텔':''} ${st==='ok'?'브리핑 →':'(준비중)'}</button>`;
+  }).join('');
+  const rows = [['구분',c.type],['관심 단지',interest.map(k=>{const m=BRIEFING_COMPLEXES.find(x=>x.key===k);return m.name+(m.ht==='오피스텔'?'(오피스텔)':'');}).join(', ')],
+    ['평형',c.area],['예산',c.budget],['메모',c.memo]]
+    .filter(r=>r[1]).map(r=>`<div class="brf-kv"><span>${r[0]}</span><b>${brfEsc(r[1])}</b></div>`).join('');
+  const cards = BRIEFING_COMPLEXES.map(m=>{
+    const st = (BRF.complexes[m.key]||{}).status || 'loading';
+    const d = st==='ok' ? BRF.complexes[m.key].data : null;
+    const sub = d ? `${brfEsc(d.moveIn||'')} 입주 · ${d.households?d.households.toLocaleString()+'세대':''} · ${(d.types||[]).length}개 타입`
+      : st==='loading' ? '불러오는 중…' : st==='err' ? '불러오기 실패' : '준비중';
+    const isInterest = interest.includes(m.key);
+    return `<button class="brf-card ${st==='ok'?'':'off'} ${isInterest?'star':''}" ${st==='ok'?`onclick="brfOpen('${m.key}')"`:'disabled'}>
+      <div class="t">${brfEsc(m.name)} <span class="brf-ht ${m.ht==='오피스텔'?'ot':''}">${m.ht}</span>${isInterest?' <span class="brf-fav">관심</span>':''}</div>
+      <div class="s">${sub}</div></button>`;
+  }).join('');
+  return `<div class="brf-list">
+    <div class="panel brf-customer"><h2>${brfEsc(c.name||'고객')}님 희망 조건</h2>${rows || '<p class="brf-muted">등록된 조건이 없어요.</p>'}
+      ${quick ? `<div class="brf-quick-wrap">${quick}</div>` : ''}</div>
+    <div class="panel"><h2>단지 선택</h2><div class="brf-cards">${cards}</div></div>
+  </div>`;
+}
+
+function brfCurrent(){
+  const C = BRF.complexes[BRF.key].data;
+  const types = C.types || [];
+  const T = types.find(t=>t.type===BRF.type) || types[0];
+  return {C, T, types};
+}
+
+function brfListingsFor(C, T){
+  const nt = new Set(T.naverType||[]);
+  const all = LISTINGS_ALL.filter(l=>l.type===C.housingType && normalizeComplexName(l.complex)===normalizeComplexName(C.listingName) && nt.has(l.unitType));
+  const src = l => (l.agencies||[]).some(isOwnAgency) ? 'own' : (l.agencies||[]).some(isPartnerAgency) ? 'partner' : null;
+  const shown = all.filter(l=>src(l)).map(l=>Object.assign({_src:src(l)}, l));
+  return {shown, hidden: all.length - shown.length};
+}
+
+function brfTxFor(C, T){
+  const tx = ((REAL_TX[C.housingType]||{})[C.listingName]) || [];
+  const areas = new Set((T.molitArea||[]).map(a=>Number(a).toFixed(4)));
+  const rows = tx.filter(t=>areas.has(Number(t.sizeFloor).toFixed(4))).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const cut = new Date(Date.now() - BRF_TX_DAYS*86400e3);
+  const cutStr = `${cut.getFullYear()}.${String(cut.getMonth()+1).padStart(2,'0')}.${String(cut.getDate()).padStart(2,'0')}`;
+  const recent = rows.filter(t=>t.date>=cutStr);
+  const yearMax = rows.reduce((m,t)=>Math.max(m,t.amount||0),0);
+  return {recent, fallback: recent.length ? null : (rows[0]||null), yearMax, total: rows.length};
+}
+
+function brfDetailHtml(){
+  const {C, T, types} = brfCurrent();
+  const key = BRF.key;
+  // 배치도
+  const sp = C.siteplan || {};
+  const spUrl = sp.file ? brfImgUrl(key, sp.file) : null;
+  const dongBtns = Object.entries(C.dongAreas||{}).map(([d,a])=>{
+    const on = BRF.dong===d, has = (a.types||[]).includes(T.type);
+    return `<button class="brf-dong ${on?'on':''} ${has?'has':''}" style="left:${a.left}%;top:${a.top}%;width:${a.width}%;height:${a.height}%;" onclick="brfDong('${brfEsc(d)}')" aria-label="${brfEsc(d)}동"></button>`;
+  }).join('');
+  const chipTypes = BRF.dong && C.dongAreas && C.dongAreas[BRF.dong] ? types.filter(t=>(C.dongAreas[BRF.dong].types||[]).includes(t.type)) : types;
+  const chips = chipTypes.map(t=>`<button class="brf-chip ${t.type===T.type?'on':''}" onclick="brfType('${brfEsc(t.type)}')">${brfEsc(t.type)}<small>${t.pyeong?t.pyeong+'평':''}</small></button>`).join('');
+  const dongInfo = BRF.dong && C.dongAreas[BRF.dong] ? `<div class="brf-donginfo"><b>${brfEsc(BRF.dong)}동</b> · ${brfEsc(C.dongAreas[BRF.dong].floors||'')} <button class="brf-link" onclick="brfDong(null)">전체 타입 보기</button></div>` : `<div class="brf-donginfo brf-muted">배치도에서 동을 누르면 그 동의 타입만 보여요</div>`;
+  // 평면도
+  const planUrl = T.plan ? brfImgUrl(key, T.plan) : null;
+  const planMissing = T.plan && BRF.imgPending[key+'/'+T.plan]==='none';
+  const typeDongs = Object.entries(C.dongAreas||{}).filter(([d,a])=>(a.types||[]).includes(T.type)).map(([d])=>d+'동').join(', ');
+  // 실거래
+  const tx = brfTxFor(C, T);
+  const txRow = t=>`<tr><td>${t.date.slice(2)}</td><td>${brfEsc(t.floor)}층</td><td class="num">${brfPrice(t.amount)}${t.isRecordHigh?' <span class="brf-badge hi">신고가</span>':''}</td></tr>`;
+  const txBody = tx.recent.length ? tx.recent.map(txRow).join('')
+    : tx.fallback ? `<tr><td colspan="3" class="brf-muted brf-small">최근 4개월 거래가 없어 1년 내 가장 최근 거래를 보여드려요</td></tr>${txRow(tx.fallback)}`
+    : `<tr><td colspan="3" class="brf-muted">최근 1년 거래가 없어요</td></tr>`;
+  const shared = T.sharedWith ? `<div class="brf-note">${brfEsc(T.type)}·${brfEsc(T.sharedWith)}는 국토부 전용면적이 같아 실거래를 함께 보여드려요</div>` : '';
+  // 매물
+  const L = brfListingsFor(C, T);
+  const counts = {'매매':0,'전세':0,'월세':0}; L.shown.forEach(l=>counts[l.dealType||'매매']++);
+  const rows = L.shown.filter(l=>(l.dealType||'매매')===BRF.deal).sort((a,b)=>(a.price-b.price)||((a.rent||0)-(b.rent||0)));
+  BRF.rows = rows;
+  const lrow = (l,i)=>{
+    const lk = (l.listingIds||[]).map(String).sort().join('|');
+    const st = BRF.picks[lk];
+    const priceTxt = BRF.deal==='월세' ? `${brfPrice(l.price)} / ${l.rent!=null?l.rent:'-'}만` : brfPrice(l.price);
+    const btn = st==='sending' ? `<button class="brf-pick" disabled>보내는 중…</button>`
+      : st==='ok' ? `<button class="brf-pick done" disabled>✓ 담았어요</button>`
+      : st==='updated' ? `<button class="brf-pick done" disabled>✓ 다시 담음</button>`
+      : `<button class="brf-pick" onclick="brfPick(${i})">+ 고객에게 담기</button>${st==='err'?'<div class="brf-err">실패 · 다시 눌러 주세요</div>':''}`;
+    return `<tr><td>${brfEsc(l.building)}동<div class="brf-small brf-muted">${brfEsc(l.floor)}층 · ${brfEsc(l.direction||'')}</div></td>
+      <td class="num">${priceTxt}<div class="brf-small brf-muted">확인 ${brfFmtDate(l.checkedDate).slice(5)}</div></td><td>${btn}</td></tr>`;
+  };
+  const dealTabs = ['매매','전세','월세'].map(d=>`<button class="brf-deal ${BRF.deal===d?'on':''}" onclick="brfDeal('${d}')">${d} ${counts[d]}</button>`).join('');
+  const listBody = rows.length ? rows.map(lrow).join('') : `<tr><td colspan="3" class="brf-muted">지금 소개해 드릴 ${BRF.deal} 매물이 없어요</td></tr>`;
+  const zoom = BRF.zoom && planUrl ? `<div class="brf-zoom" onclick="brfZoom(false)"><img src="${planUrl}" alt=""><div class="x">✕ 닫기</div></div>` : '';
+  return `<div class="brf-detail">
+    <div class="panel brf-head">
+      <button class="brf-link" onclick="brfBack()">← 단지 목록</button>
+      <div class="ttl">${brfEsc(C.displayName||C.listingName)} <span class="brf-ht ${C.housingType==='오피스텔'?'ot':''}">${brfEsc(C.housingType)}</span></div>
+      <div class="meta">${[C.moveIn?C.moveIn+' 입주':'', C.households?C.households.toLocaleString()+'세대':'', (C.dongs||[]).length?(C.dongs.length+'개 동'):'', C.maxFloors||'', C.location||''].filter(Boolean).map(brfEsc).join(' · ')}</div>
+    </div>
+    <div class="brf-grid">
+      <div class="panel brf-site">
+        <div class="brf-sitebox">${spUrl ? `<img src="${spUrl}" alt="배치도">${dongBtns}` : `<div class="brf-ph">배치도 불러오는 중…</div>`}</div>
+        ${dongInfo}
+        <div class="brf-chips">${chips}</div>
+      </div>
+      <div class="panel brf-plan">
+        <div class="brf-plan-top">
+          <div class="brf-planbox" ${planUrl?'onclick="brfZoom(true)"':''}>${planUrl ? `<img src="${planUrl}" alt="${brfEsc(T.type)} 평면도"><div class="zoomhint">⤢ 크게 보기</div>` : `<div class="brf-ph">${planMissing?'평면도 준비중':'평면도 불러오는 중…'}</div>`}</div>
+          <div class="brf-spec">
+            <div class="tt">${brfEsc(T.type)} <small>${T.pyeong?T.pyeong+'평':''}</small></div>
+            <div class="brf-kv"><span>전용</span><b>${T.exclusive??'-'}㎡</b></div>
+            <div class="brf-kv"><span>공급</span><b>${T.supply??'-'}㎡</b></div>
+            <div class="brf-kv"><span>계약</span><b>${T.contract??'-'}㎡</b></div>
+            <div class="brf-kv"><span>세대수</span><b>${T.households?T.households+'세대':'-'}</b></div>
+            <div class="brf-kv"><span>있는 동</span><b>${brfEsc(typeDongs||'-')}</b></div>
+          </div>
+        </div>
+        <div class="brf-two">
+          <div class="brf-box"><h3>최근 실거래 <small>4개월 · 같은 타입</small></h3>${shared}
+            <table class="brf-tbl"><tbody>${txBody}</tbody></table>
+            ${tx.yearMax?`<div class="brf-note">최근 1년 이 타입 최고 ${brfPrice(tx.yearMax)} · ${tx.total}건</div>`:''}</div>
+          <div class="brf-box"><h3>지금 나와 있는 매물</h3><div class="brf-deals">${dealTabs}</div>
+            <table class="brf-tbl"><tbody>${listBody}</tbody></table>
+            <div class="brf-admin" title="협력사 미확인">${L.hidden ? 'r'+L.hidden : ''}</div></div>
+        </div>
+      </div>
+    </div>${zoom}</div>`;
+}
+
+/* ───── 동작 ───── */
+function brfOpen(key){
+  const c = BRF.complexes[key]; if(!c || c.status!=='ok') return;
+  BRF.view='detail'; BRF.key=key; BRF.dong=null; BRF.zoom=false;
+  const C = c.data, types = C.types||[];
+  // 처음엔 소개할 매물이 가장 많은 타입부터
+  let best = types[0], bestN = -1;
+  types.forEach(t=>{ const n = brfListingsFor(C,t).shown.length; if(n>bestN){ best=t; bestN=n; } });
+  BRF.type = best ? best.type : null;
+  BRF.deal = '매매';
+  if(best){ const L = brfListingsFor(C,best).shown; if(!L.some(l=>(l.dealType||'매매')==='매매')){
+    const d = ['전세','월세'].find(x=>L.some(l=>l.dealType===x)); if(d) BRF.deal=d; } }
+  render(); window.scrollTo({top:0});
+}
+function brfBack(){ BRF.view='list'; BRF.zoom=false; render(); }
+function brfDong(d){
+  BRF.dong = (d && BRF.dong!==d) ? d : null;
+  if(BRF.dong){ const {C,T} = brfCurrent(); const ts = (C.dongAreas[BRF.dong].types||[]);
+    if(!ts.includes(T.type) && ts.length) BRF.type = ts[0]; }
+  render();
+}
+function brfType(t){ BRF.type=t; render(); }
+function brfDeal(d){ BRF.deal=d; render(); }
+function brfZoom(on){ BRF.zoom=!!on; render(); }
+
+async function brfPick(i){
+  const l = BRF.rows[i]; if(!l || BRF.expired) return;
+  const {T} = brfCurrent();
+  const ids = (l.listingIds||[]).map(String).sort();
+  const lk = ids.join('|');
+  const dealType = l.dealType || '매매';
+  const body = {
+    complexKey: BRF.key, typeKey: T.type, shownAt: brfKstIso(),
+    listing: { listingKey: lk, listingIds: ids, housingType: l.type, complex: l.complex, dealType,
+      building: l.building, floor: l.floor, floorTier: floorTierOf(l.floor), unitType: l.unitType, area: l.area,
+      price: l.price, monthly: dealType==='월세' ? (l.rent ?? null) : null, direction: l.direction || null,
+      checkedDate: brfFmtDate(l.checkedDate), source: l._src || 'partner' }
+  };
+  BRF.picks[lk] = 'sending'; renderMain();
+  try{
+    const r = await brfFetch('/picks', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    if(!r.ok) throw new Error('picks '+r.status);
+    const j = await r.json();
+    BRF.picks[lk] = j.updated ? 'updated' : 'ok';
+  }catch(e){ BRF.picks[lk] = e.code===401 ? undefined : 'err'; }
+  if(state.feature==='briefing') renderMain();
+}
+
+/* 시작: 주소에 토큰이 있으면 상담 모드로, [연장] 시 hashchange로 토큰 교체 */
+(function(){
+  const t = brfReadHash();
+  if(t) brfStart(t);
+  window.addEventListener('hashchange', ()=>{ const nt = brfReadHash(); if(nt) brfStart(nt); });
+})();
+
+/* </BRIEFING_JS> */
 </script>
 </body>
 </html>
