@@ -645,6 +645,9 @@
   .brf-src{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle;}
   .brf-src.o{background:#E0A800;}
   .brf-src.p{background:#9FB7B1;}
+  .brf-occ{display:inline-block;margin-top:3px;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;font-family:inherit;}
+  .brf-occ.gap{background:#FFF1D6;color:#8A5A00;}
+  .brf-occ.vac{background:#DDF3E8;color:#12614A;}
   .brf-zoom{position:fixed;inset:0;z-index:200;background:rgba(10,20,18,.88);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;}
   .brf-zoom img{max-width:100%;max-height:100%;border-radius:8px;background:#fff;}
   .brf-zoom .x{position:absolute;top:14px;right:18px;color:#fff;font-weight:700;font-size:15px;}
@@ -4083,7 +4086,7 @@ function brfDetailHtml(){
       : st==='updated' ? `<button class="brf-pick done" disabled>✓ 다시 담음</button>`
       : `<button class="brf-pick" onclick="brfPick(${i})">♡ 관심 매물 담기</button>${st==='err'?'<div class="brf-err">실패 · 다시 눌러 주세요</div>':''}`;
     return `<tr><td><span class="brf-src ${l._src==='own'?'o':'p'}"></span>${brfEsc(l.building)}동<div class="brf-small brf-muted">${brfEsc(l.floor)}층 · ${brfEsc(l.direction||'')}</div></td>
-      <td class="num">${priceTxt}<div class="brf-small brf-muted">확인 ${brfFmtDate(l.checkedDate).slice(5)}</div></td><td>${btn}</td></tr>`;
+      <td class="num">${priceTxt}<div class="brf-small brf-muted">확인 ${brfFmtDate(l.checkedDate).slice(5)}</div>${brfOccBadge(l)}</td><td>${btn}</td></tr>`;
   };
   const dealTabs = ['매매','전세','월세'].map(d=>`<button class="brf-deal ${BRF.deal===d?'on':''}" onclick="brfDeal('${d}')">${d} ${counts[d]}</button>`).join('');
   const listBody = rows.length ? rows.map(lrow).join('') : `<tr><td colspan="3" class="brf-muted">지금 소개해 드릴 ${BRF.deal} 매물이 없어요</td></tr>`;
@@ -4149,6 +4152,10 @@ function brfType(t){ BRF.type=t; render(); }
 function brfDeal(d){ BRF.deal=d; render(); }
 function brfZoom(on){ BRF.zoom=!!on; render(); }
 
+function brfOccBadge(l){
+  const o = brfOccupancy(l);
+  return o==='gap' ? '<span class="brf-occ gap">갭투자</span>' : o==='vacant' ? '<span class="brf-occ vac">입주 가능</span>' : '';
+}
 /* 2026-10-10: 갭/입주가능 — 확신 없으면 "" (CRM 확정본 5장) */
 function brfOccupancy(l){
   if((l.dealType||'매매')!=='매매') return '';
