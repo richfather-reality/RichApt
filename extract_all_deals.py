@@ -53,6 +53,17 @@ def detect_gap(items):
             return True
     return False
 
+# 2026-10-10: 바로 입주 가능 판단 키워드 (CRM 담기 occupancy용). 갭 키워드가 하나라도 있으면 갭이 우선.
+VACANT_KEYWORDS = ['즉시입주', '즉입', '바로입주', '입주가능', '공실', '빈집', '입주협의가능']
+def detect_vacant(items):
+    if detect_gap(items):
+        return False
+    for i in items:
+        compact = (i.get('feature') or '').replace(' ', '')
+        if any(kw in compact for kw in VACANT_KEYWORDS):
+            return True
+    return False
+
 def parse_gu_dong(addr):
     parts = (addr or '').split()
     gu = parts[2] if len(parts) > 2 else '기흥구'
@@ -136,7 +147,7 @@ def process_file(path):
                 'gu': None, 'type': None, 'dong': None, 'complex': complex_name,
                 'building': rep['building'], 'floor': str(rep['floor']), 'unitType': str(rep['unitType']),
                 'area': area_f, 'price': round(float(price_f), 2), 'direction': rep['direction'],
-                'checkedDate': str(rep['checked']), 'gap': detect_gap(items),
+                'checkedDate': str(rep['checked']), 'gap': detect_gap(items), 'vacant': detect_vacant(items),
                 'agencies': agencies, 'listingIds': listing_ids,
             })
         elif dt in ('전세', '월세'):
