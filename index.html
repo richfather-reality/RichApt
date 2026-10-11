@@ -4173,6 +4173,15 @@ function brfInternal(l){
   const name = String(pick).replace(/\(.*?\)/g,'').trim();
   const o = {agencyName: name};
   if(m) o.agencyPhone = m[1];
+  // 같은 매물을 가진 우리·협력 부동산 전체 (우리 먼저, 상호 중복 제거, 최대 15곳)
+  const seen = new Set(), list = [];
+  for(const a of [...ags.filter(isOwnAgency), ...ags.filter(x => !isOwnAgency(x) && isPartnerAgency(x))]){
+    const raw = String(a).trim(); if(!raw || seen.has(raw)) continue; seen.add(raw);
+    const pm = raw.match(/\(([0-9\-]{8,})\)/);
+    const it = {name: raw}; if(pm) it.phone = pm[1];
+    list.push(it); if(list.length >= 15) break;
+  }
+  if(list.length) o.agencies = list;
   return o;
 }
 
