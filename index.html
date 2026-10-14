@@ -361,6 +361,12 @@
     padding:12px;font-weight:800;font-size:14px;cursor:pointer;margin-top:4px;
   }
   .form-submit-btn:disabled{opacity:0.6;cursor:not-allowed;}
+  .inq-consent{margin:10px 0 6px;font-size:12.5px;}
+  .inq-consent-row{display:flex;align-items:center;gap:8px;cursor:pointer;}
+  .inq-consent-row input{width:17px;height:17px;accent-color:var(--teal);flex-shrink:0;}
+  .inq-consent-more{background:none;border:none;color:var(--text-muted);font-size:11.5px;text-decoration:underline;cursor:pointer;padding:2px 0 0 25px;font-family:inherit;}
+  .inq-consent-terms{margin-top:6px;padding:9px 11px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-size:11.5px;line-height:1.6;color:var(--text-muted);}
+  .inq-consent-terms b{color:var(--text);margin-right:4px;}
   .inquiry-privacy-note{font-size:10.5px;color:var(--text-muted);margin-top:8px;line-height:1.4;}
   .inquiry-done-card{text-align:center;padding:30px 16px;}
   .inquiry-done-icon{font-size:28px;margin-bottom:8px;}
@@ -951,7 +957,7 @@ let state = { gu:"기흥구", dong:"전체", feature:"overview", housingType:"�
   areaTrend: { complexes: [], open:false },
   rentAnalysis: { sortBy: 'count' },
   inquiry: { open:false, kind:"buy", submitting:false, done:false, error:"",
-    phone:"", name:"", category:"아파트", complex:"", dong:"", ho:"", price:"", rent:"", message:"" } };
+    phone:"", name:"", category:"아파트", complex:"", dong:"", ho:"", price:"", rent:"", message:"", agree:false, showTerms:false } };
 
 const CRM_LEADS_URL = 'https://richfathercrm-production.up.railway.app/api/leads';
 /* 매물/실거래 데이터를 마지막으로 갱신한 날짜. 새 데이터를 올려서 처리할 때마다 이 값을 갱신한다.
@@ -1566,6 +1572,13 @@ function realTxTable(rows, isNew){
             const dongType = (r.dong && r.dong!=='-') ? `${dongLabel}동 · ${fmtArea(r.sizeFloor ?? r.size)}㎡` : `${fmtArea(r.sizeFloor ?? r.size)}㎡`;
             // 신고가 배지는 "오늘 새로 올라온 실거래"에서만 사용. 과거 전체 이력에서는 최고가 배지만 사용.
             let badge = '';
+            // 지연신고: 계약일로부터 30일 넘게 지나서 국토부에 공개된 매매 거래 (2026-10-14 추가)
+            let lateBadge = '';
+            if(isNew && r.date && typeof DATA_LAST_UPDATED==='string'){
+              const cd = new Date(r.date.replace(/\./g,'-')+'T00:00:00'), ud = new Date(DATA_LAST_UPDATED+'T00:00:00');
+              const days = Math.round((ud-cd)/86400000);
+              if(days>30) lateBadge = ` <span class="tag-gap" title="계약 후 ${days}일 지나 공개된 거래" style="background:rgba(120,120,120,0.15);color:var(--text-muted);">지연신고</span>`;
+            }
             if(isNew && r.isRecordHigh){
               badge = '<span class="tag-gap" style="background:rgba(203,163,92,0.2);color:var(--gold);">신고가</span>';
             } else if(!isNew && r.isTopPrice){
@@ -1575,7 +1588,7 @@ function realTxTable(rows, isNew){
             <td style="font-family:'Pretendard'">${dongType}</td>
             <td>${r.floor}층</td>
             <td>${r.date}</td>
-            <td>${r.amount}억 ${badge}${isNew ? deltaHtml : ''}</td>
+            <td>${r.amount}억 ${badge}${isNew ? deltaHtml : ''}${lateBadge}</td>
           </tr>`;}).join('')}
         </tbody>
       </table>
@@ -1850,7 +1863,7 @@ function renderMain(){
         <h2>🆕 오늘 새로 올라온 실거래 (${newRows.length}건)</h2>
         <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">
           📅 최근 갱신일: <b style="color:var(--gold);">${DATA_LAST_UPDATED}</b><br>
-          ⚠️ 계약일이 오늘이라는 뜻이 아니라, 국토부 시스템에 이 날짜에 새로 공개된 거래입니다 (신고 기한이 최대 30일이라 계약은 몇 달 전일 수 있어요). 신고가 여부와 (±억)은 <b>국토부 정확한 전용면적(예: 84.53㎡) 기준</b> 기존 최고가 대비 변동폭입니다 — 신고가면 (+) 얼마나 넘었는지, 아니면 (−) 최고가보다 얼마나 낮은지.
+          ⚠️ 계약일이 오늘이라는 뜻이 아니라, 국토부 시스템에 이 날짜에 새로 공개된 거래입니다 (신고 기한이 최대 30일이라 계약은 몇 달 전일 수 있어요). 계약일로부터 30일이 넘어 공개된 거래에는 <b>지연신고</b> 표시가 붙습니다. 신고가 여부와 (±억)은 <b>국토부 정확한 전용면적(예: 84.53㎡) 기준</b> 기존 최고가 대비 변동폭입니다 — 신고가면 (+) 얼마나 넘었는지, 아니면 (−) 최고가보다 얼마나 낮은지.
         </p>
         ${newRows.length ? realTxTable(newRows, true) : emptyState('이번 갱신에는 새로 올라온 실거래가 없습니다', `${DATA_LAST_UPDATED} 기준, 매물 추적 단지 중 새로 공개된 거래가 없었어요`)}
       </div>`;
@@ -3061,8 +3074,20 @@ function renderInquiryForm(complexNames){
       <textarea class="form-input" id="inqMessage" rows="2" placeholder="${isSell ? '매물 상태, 입주 가능일 등을 남겨주세요' : '궁금하신 점을 남겨주세요'}">${esc(s.message)}</textarea></div>
     <input type="text" id="inqWebsite" value="" class="hp-field" tabindex="-1" autocomplete="off">
     ${s.error ? `<div class="inquiry-error">${esc(s.error)}</div>` : ''}
+    <div class="inq-consent">
+      <label class="inq-consent-row"><input type="checkbox" id="inqAgree" ${s.agree?'checked':''} onchange="state.inquiry.agree=this.checked">
+        <span><b>[필수]</b> 개인정보 수집·이용에 동의합니다</span></label>
+      <button type="button" class="inq-consent-more" onclick="syncInquiryFromDOM();state.inquiry.showTerms=!state.inquiry.showTerms;render()">${s.showTerms?'접기':'내용 보기'}</button>
+      ${s.showTerms ? `<div class="inq-consent-terms">
+        <div><b>수집 목적</b> 매물 ${isSell?'등록':'소개'} 상담 및 연락</div>
+        <div><b>수집 항목</b> 연락처(필수), 성함·단지·동/호·희망가격·메모(입력한 경우)</div>
+        <div><b>보유 기간</b> 동의 철회(삭제 요청) 시까지 보관 · 전화나 문자로 요청하시면 바로 삭제합니다</div>
+        <div><b>처리자</b> 리치부동산 공인중개사사무소 (031-285-8240)</div>
+        <div>동의를 거부할 수 있으나, 거부 시 온라인 문의 접수가 어렵습니다. 전화 문의는 언제든 가능합니다.</div>
+      </div>` : ''}
+    </div>
     <button class="form-submit-btn" id="inqSubmitBtn" ${s.submitting?'disabled':''} onclick="submitInquiry()">${s.submitting?'보내는 중...':L.submitLabel}</button>
-    <div class="inquiry-privacy-note">남겨주신 연락처는 문의 상담 목적으로만 사용되며, 담당 공인중개사에게 직접 전달됩니다.</div>
+    <div class="inquiry-privacy-note">남겨주신 연락처는 문의 상담 목적으로만 사용되며, 리치부동산 공인중개사에게 직접 전달됩니다.</div>
   </div>`;
 }
 
@@ -3094,8 +3119,10 @@ function submitInquiry(){
   const dealType = state.dealType;
   const L = inquiryLabels(dealType, isSell);
   syncInquiryFromDOM();
+  const agreeEl = document.getElementById('inqAgree'); if(agreeEl) s.agree = agreeEl.checked;
   if(!/^[0-9\-+ ]{9,20}$/.test((s.phone||'').trim())){ s.error = '연락처를 정확히 입력해주세요 (예: 010-1234-5678).'; render(); return; }
   if(isSell && !s.complex){ s.error = '단지를 선택해주세요.'; render(); return; }
+  if(!s.agree){ s.error = '개인정보 수집·이용에 동의해 주세요.'; render(); return; }
   if(!s.price || isNaN(parseFloat(s.price)) || parseFloat(s.price)<=0){ s.error = `${L.priceLabel.replace(' *','').replace(/\(.*?\)/,'').trim()}을(를) 입력해주세요.`; render(); return; }
   if(L.needsRent && (!s.rent || isNaN(parseFloat(s.rent)) || parseFloat(s.rent)<=0)){ s.error = `${L.rentLabel.replace(' *','').replace(/\(.*?\)/,'').trim()}을(를) 입력해주세요.`; render(); return; }
   s.error = '';
@@ -3128,6 +3155,8 @@ function submitInquiry(){
       depositEok: parseFloat(s.price),
       monthlyRentManwon: L.needsRent ? parseFloat(s.rent) : null,
       source: '리치아파트 대시보드',
+      privacyConsent: true,
+      consentAt: new Date().toISOString(),
       website: websiteEl ? websiteEl.value : ''
     })
   }).then(res=>{
