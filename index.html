@@ -1835,7 +1835,7 @@ function renderMain(){
     const ls = getListingSummary();
     if(!ls || !ls.count) return emptyState('표시할 오피스텔 매물이 없습니다','해당 범위에 매물 데이터가 없습니다');
     return `<div class="summary-grid">
-        <div class="stat-card"><div class="label">${scopeLabel} 오피스텔 매물 수</div><div class="value">${ls.count}건</div><div class="delta up">리치부동산연구소 대표매물 기준</div></div>
+        <div class="stat-card"><div class="label">${scopeLabel} 오피스텔 매물 수</div><div class="value">${ls.count}건</div><div class="delta up">네이버 부동산 등록 매물(대표매물) 기준</div></div>
         <div class="stat-card"><div class="label">평균 호가</div><div class="value">${ls.avgPrice}억</div><div class="delta up">확인일 2026-08-24</div></div>
         <div class="stat-card"><div class="label">갭투자 매물 비중</div><div class="value">${ls.gapPct}%</div><div class="delta down">특징 키워드 기준</div></div>
       </div>
@@ -2506,7 +2506,7 @@ function renderSnapshotDiffPanel(){
 
   return `<div class="panel trend-panel">
     <h2>매물 변동추이 · 소멸매물 추적</h2>
-    <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">${SNAPSHOT_DIFF.oldDate} → ${SNAPSHOT_DIFF.newDate} 스냅샷 비교 · 동·층·타입 매칭 기준 (매물 데이터가 있는 전체 추적 단지)</p>
+    <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">${SNAPSHOT_DIFF.oldDate} → ${SNAPSHOT_DIFF.newDate} 스냅샷 비교 · 네이버 부동산 등록 매물 기준 · 동·층·타입 매칭 (매물 데이터가 있는 전체 추적 단지)</p>
     <div class="summary-grid" style="margin-bottom:18px;">
       <div class="stat-card"><div class="label">🆕 신규 매물</div><div class="value" style="color:var(--teal-light);">${fresh.length}건</div></div>
       <div class="stat-card"><div class="label">💨 소멸 매물</div><div class="value" style="color:var(--danger);">${gone.length}건</div></div>
@@ -2535,7 +2535,7 @@ function renderSnapshotDiffPanel(){
   </div>
   <div class="panel trend-panel">
     <h2>📈 평형별 매물·호가 변화</h2>
-    <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">단지·평형별로 매물 수와 평균 호가가 어떻게 움직였는지 한눈에 보여줍니다.</p>
+    <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">단지·평형별로 네이버 부동산 등록 매물 수와 평균 호가가 어떻게 움직였는지 한눈에 보여줍니다.</p>
     ${collapsiblePanel('📈 평형별 변화 보기', '단지별로 펼쳐서 보기', renderAreaTrendPanel(), state.areaTrend.open)}
   </div>`;
 }
@@ -2924,17 +2924,17 @@ function renderFinderPanel(scopeLabel){
   </select>`;
 
   return `<div class="summary-grid">
-      <div class="stat-card"><div class="label">${scopeLabel} 매물 수${hasFilter?' (필터 적용)':''}</div><div class="value">${count}건</div><div class="delta up">${hasFilter ? `전체 ${totalInScope}건 중` : `필터 없음 · 전체 기준`}</div></div>
+      <div class="stat-card"><div class="label">${scopeLabel} 매물 수${hasFilter?' (필터 적용)':''}</div><div class="value">${count}건</div><div class="delta up">${hasFilter ? `전체 ${totalInScope}건 중` : `네이버 부동산 등록 매물 · 전체 기준`}</div></div>
       <div class="stat-card"><div class="label">평균 호가(84㎡)</div><div class="value">${avgPrice84!==null?avgPrice84+'억':'-'}</div><div class="delta up">${avgPrice84!==null?`${rows84.length}건 기준`:'84㎡ 매물 없음'}</div></div>
       ${state.dealType==='매매'
         ? `<div class="stat-card"><div class="label">갭투자 매물 비중</div><div class="value">${count?gapPct+'%':'-'}</div><div class="delta down">특징 키워드 기준</div></div>`
         : `<div class="stat-card"><div class="label">데이터 건수</div><div class="value">${count}건</div><div class="delta down">${state.dealType} 기준</div></div>`}
-      <div class="stat-card"><div class="label">데이터 소스</div><div class="value">리치부동산연구소</div><div class="delta up">대표매물 · ${state.dealType}</div></div>
+      <div class="stat-card"><div class="label">데이터 소스</div><div class="value">네이버 부동산</div><div class="delta up">등록 매물 · 리치부동산연구소 집계 · ${state.dealType}</div></div>
     </div>
     <p style="color:var(--text-muted);font-size:11.5px;margin:-8px 0 16px;">👆 위 숫자는 구/동/아파트·오피스텔·거래유형 선택과 아래 필터에 따라 실시간으로 바뀝니다. 필터를 하나도 안 고르면 "${scopeLabel} · ${state.housingType} · ${state.dealType}" 전체 매물 기준이에요.</p>
     <div class="panel">
       <h2>${scopeLabel} 단지별 매물 현황 (${state.housingType})</h2>
-      <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;">단지별 매물 수 · 평균호가 · 갭투자 건수입니다. 단지를 탭하면 아래 필터에 반영됩니다 (결과를 보려면 '매물 찾기' 버튼을 눌러주세요).</p>
+      <p style="color:var(--text-muted);font-size:13px;margin-top:-6px;margin-bottom:14px;"><b>네이버 부동산에 등록된 매물</b>을 매일 모아 집계한 단지별 매물 수 · 평균호가 · 갭투자 건수입니다. 단지를 탭하면 아래 필터에 반영됩니다 (결과를 보려면 '매물 찾기' 버튼을 눌러주세요).</p>
       ${complexTable(complexBreakdown())}
     </div>
     <div class="panel">
@@ -3477,7 +3477,7 @@ function renderPredictPanel(scopeLabel){
   if(stat && trendAvg!==null){
     base = statAvgUsed*0.2 + trendAvg*0.8;
     basisText = `국토부 실거래(최근 4개월) ${stat.count}건(${statAreaLabel}㎡${statBuildingNote}${exactNote} 평균 ${statAvgUsed}억${trimmedNote}) 20% + 리치부동산연구소 매물 ${listingMatches.length}건(오늘 기준 평균 ${Math.round(listingAvg*100)/100}억${gapExcludedNote}, 추세반영값 ${Math.round(trendAvg*100)/100}억${trendNote}${typeNote}${buildingNote}${directionNote}${floorNote}) 80% 가중평균`;
-    simpleBasis = `국토부 실거래가 + 리치부동산연구소 매물 호가(최근 흐름 반영)를 함께 반영한 추정가입니다.`;
+    simpleBasis = `국토부 실거래가 + 네이버 부동산 매물 호가(최근 흐름 반영)를 함께 반영한 추정가입니다.`;
   } else if(stat){
     base = statAvgUsed;
     basisText = `국토부 실거래(최근 4개월) ${stat.count}건(${statAreaLabel}㎡${statBuildingNote}${exactNote} 평균 ${statAvgUsed}억${trimmedNote}) 평균가 기준 (해당 조건 매물 데이터 없음)`;
@@ -3485,7 +3485,7 @@ function renderPredictPanel(scopeLabel){
   } else if(trendAvg!==null){
     base = trendAvg;
     basisText = `리치부동산연구소 매물 ${listingMatches.length}건(${areaKey}㎡${gapExcludedNote}) 호가 추세 기준${trendNote}${typeNote}${buildingNote}${directionNote}${floorNote} (최근 4개월 실거래 데이터 없음)`;
-    simpleBasis = `최근 호가 흐름을 기준으로 산정했습니다.`;
+    simpleBasis = `네이버 부동산 매물의 최근 호가 흐름을 기준으로 산정했습니다.`;
   }
 
   // 실제 그 층대 매물로 계산됐으면 이미 층 프리미엄이 반영된 것이므로 추가 보정을 생략(이중 반영 방지).
